@@ -1,5 +1,8 @@
 package ch.epfl.tchu.game;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class Ticket implements Comparable<Ticket>{
     private final String text;
     private final int points;
@@ -21,6 +24,8 @@ public final class Ticket implements Comparable<Ticket>{
         return from + " - " + to + " (" + points + ") ";
     }
 
+    List<String> Stations = new ArrayList<String>( 56);
+
     /**
      * Getter for the # of points of the ticket connectivity
      * @param connectivity
@@ -30,8 +35,13 @@ public final class Ticket implements Comparable<Ticket>{
         return points(connectivity);
     }
 
+    /**
+     * Compare the current Ticket with another ticket??????
+     * @param that The current ticket
+     * @return Result if they are the same ticket or not
+     */
     public int compareTo(Ticket that) {
-        return 0;
+    return this.compareTo(that);
     }
 
 

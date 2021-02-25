@@ -8,7 +8,9 @@ public final class Station {
     public Station(int id, String name){
         this.id = id;
         this.name = name;
-/**        boolean BooleanID;
+
+/**
+ * boolean BooleanID;
  * if (id<0){
  *BooleanID = false;
  Preconditions.checkArgument(BooleanID);
@@ -26,7 +28,7 @@ public final class Station {
 
     /**
      * Getter for the Station Name
-     * @return
+     * @return Name of Station
      */
     final String name(){
         return name;
