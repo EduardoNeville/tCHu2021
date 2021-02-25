@@ -26,7 +26,8 @@ public final class Ticket implements Comparable<Ticket>{
      * @return Departing Station - to - Arriving Station (# of points)
      */
      final String text(Station from, Station to, int points){
-        return from + " - " + to + " (" + points + ") ";
+         //to be fixed
+       // return from + " - " + to + " (" + points + ") ";
      }
 
 
@@ -48,14 +49,6 @@ public final class Ticket implements Comparable<Ticket>{
      * @return Result if they are the same ticket or not
      */
     public int compareTo(Ticket that) {
-        int compared = this.compareTo(that);
-        if (compared > 0)
-            return 1;
-
-        else if (compared == 0)
-            return 0;
-
-        else if (compared < 0)
-            return -1;
+         return this.compareTo(that);
     }
 }
