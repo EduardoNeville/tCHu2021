@@ -57,17 +57,6 @@ public final class Trip {
     }
 
     /**
-     *
-     * @param list
-     * @return
-     */
-    final ArrayList all(ArrayList list){
-        for(int i = 0; true ; i++){
-            return list;
-        }
-    }
-
-    /**
     private final int computeText(){
 
     }

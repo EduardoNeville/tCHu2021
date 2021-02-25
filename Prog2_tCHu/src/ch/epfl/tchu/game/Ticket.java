@@ -27,7 +27,9 @@ public final class Ticket implements Comparable<Ticket>{
      */
      final String text(Station from, Station to, int points){
         return from + " - " + to + " (" + points + ") ";
-    }
+     }
+
+
 
    // List<String> Stations = new ArrayList<String>( 56);
 
