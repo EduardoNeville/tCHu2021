@@ -2,6 +2,8 @@ package ch.epfl.tchu;
 //https://cs108.epfl.ch
 
 /**
+ * Preconditions Class
+ *
  * Class to check for conditions and throw exceptions
  * @author Eduardo Neville (314667)
  */

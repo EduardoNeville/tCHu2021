@@ -1,27 +1,23 @@
 package ch.epfl.tchu.game;
 import java.util.List;
 
-public class Card {
-    private enum Cards {
-        BLACK (1),
-        VIOLET(2),
-        BLUE(3),
-        GREEN(4),
-        YELLOW(5),
-        ORANGE(6),
-        RED(7),
-        WHITE(8);
+/**
+ * Card Class
+ *
+ * @author Eduardo Neville
+ */
+public enum Card {
+        BLACK,
+        VIOLET,
+        BLUE,
+        GREEN,
+        YELLOW,
+        ORANGE,
+        RED,
+        WHITE;
 
-        private final int values;
+    public static final List<Card> ALL = List.of(values());
 
-        Cards(final int COUNT) {
-            this.values = COUNT;
-        }
-    }
-    /**
-    public final String[] CardArray = new String[]{
-            "printemps", "été", "automne", "hiver"
-    };
-    List<String> seasons = List.of(CardArray);
-     */
+    public static final int COUNT = ALL.size();
+
 }

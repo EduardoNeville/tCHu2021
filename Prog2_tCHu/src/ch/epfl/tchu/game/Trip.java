@@ -1,5 +1,11 @@
 package ch.epfl.tchu.game;
+import java.util.*;
 
+/**
+ * Trip Class
+ *
+ * @author Eduardo Neville
+ */
 public final class Trip {
     private final Station from;
     private final Station to;
@@ -12,8 +18,8 @@ public final class Trip {
      * @param points Points of the trip
      */
     public Trip(Station from, Station to, int points){
-        this.from = from;
-        this.to = to;
+        this.from = Objects.requireNonNull(from);
+        this.to = Objects.requireNonNull(to);
         this.points = points;
     }
 
@@ -21,7 +27,7 @@ public final class Trip {
      * Getter for the Departing station
      * @return Departing station
      */
-    final Station from(){
+    final Station GetFrom(){
         return from;
     }
 
@@ -29,7 +35,7 @@ public final class Trip {
      * Getter for the arriving station
      * @return Arriving station
      */
-    final Station to(){
+    final Station GetTo(){
         return to;
     }
 
@@ -37,7 +43,7 @@ public final class Trip {
      * Getter for the # of points the trip has
      * @return Points of the trip
      */
-    final int points(){
+    final int GetPoints(){
         return points;
     }
 
@@ -49,4 +55,22 @@ public final class Trip {
     final int points(StationConnectivity connectivity){
         return points(connectivity);
     }
+
+    /**
+     *
+     * @param list
+     * @return
+     */
+    final ArrayList all(ArrayList list){
+        for(int i = 0; true ; i++){
+            return list;
+        }
+    }
+
+    /**
+    private final int computeText(){
+
+    }
+     */
+
 }

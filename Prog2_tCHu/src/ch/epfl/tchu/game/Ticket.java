@@ -3,6 +3,11 @@ package ch.epfl.tchu.game;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Ticket Class
+ *
+ * @author Eduardo Neville
+ */
 public final class Ticket implements Comparable<Ticket>{
     private final String text;
     private final int points;
@@ -24,7 +29,7 @@ public final class Ticket implements Comparable<Ticket>{
         return from + " - " + to + " (" + points + ") ";
     }
 
-    List<String> Stations = new ArrayList<String>( 56);
+   // List<String> Stations = new ArrayList<String>( 56);
 
     /**
      * Getter for the # of points of the ticket connectivity
@@ -41,8 +46,14 @@ public final class Ticket implements Comparable<Ticket>{
      * @return Result if they are the same ticket or not
      */
     public int compareTo(Ticket that) {
-    return this.compareTo(that);
+        int compared = this.compareTo(that);
+        if (compared > 0)
+            return 1;
+
+        else if (compared == 0)
+            return 0;
+
+        else if (compared < 0)
+            return -1;
     }
-
-
 }

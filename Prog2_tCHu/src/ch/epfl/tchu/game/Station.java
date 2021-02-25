@@ -1,5 +1,11 @@
 package ch.epfl.tchu.game;
+import java.util.*;
 
+/**
+ * Station Class
+ *
+ * @author Eduardo Neville
+ */
 public final class Station {
 
     private final int id;
@@ -9,20 +15,13 @@ public final class Station {
         this.id = id;
         this.name = name;
 
-/**
- * boolean BooleanID;
- * if (id<0){
- *BooleanID = false;
- Preconditions.checkArgument(BooleanID);
- }
- */
     }
 
     /**
      * Getter for the Station ID
      * @return ID
      */
-    final int id(){
+    final int GetId(){
         return id;
     }
 
@@ -30,7 +29,7 @@ public final class Station {
      * Getter for the Station Name
      * @return Name of Station
      */
-    final String name(){
+    final String GetName(){
         return name;
     }
 
