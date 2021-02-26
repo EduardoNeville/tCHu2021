@@ -34,12 +34,6 @@ public final class Station {
         return name;
     }
 
-    /** To fix
-        final String toString(String name, int id){
-        return String.format(name + id);
-    }
-     */
-
 
 
 }
