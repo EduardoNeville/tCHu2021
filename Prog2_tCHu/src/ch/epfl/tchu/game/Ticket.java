@@ -26,13 +26,13 @@ public final class Ticket implements Comparable<Ticket>{
      * @return Departing Station - to - Arriving Station (# of points)
      */
      final String text(Station from, Station to, int points){
-         //to be fixed
-       // return from + " - " + to + " (" + points + ") ";
+        return from + " - " + to + " (" + points + ") ";
      }
-
-
-
-   // List<String> Stations = new ArrayList<String>( 56);
+/**
+    public final int computeText(){
+         return 0;
+    }
+ */
 
     /**
      * Getter for the # of points of the ticket connectivity
@@ -49,6 +49,6 @@ public final class Ticket implements Comparable<Ticket>{
      * @return Result if they are the same ticket or not
      */
     public int compareTo(Ticket that) {
-         return this.compareTo(that);
+     return this.compareTo(that);
     }
 }

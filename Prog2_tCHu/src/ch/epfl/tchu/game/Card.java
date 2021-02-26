@@ -3,7 +3,7 @@ import java.util.List;
 
 /**
  * Card Class
- *
+ * The different colors of the cards have
  * @author Eduardo Neville
  */
 public enum Card {
@@ -14,7 +14,8 @@ public enum Card {
         YELLOW,
         ORANGE,
         RED,
-        WHITE;
+        WHITE,
+        LOCOMOTIVE;
 
     public static final List<Card> ALL = List.of(values());
 

@@ -1,5 +1,4 @@
 package ch.epfl.tchu.game;
-import java.util.*;
 
 /**
  * Station Class
@@ -11,10 +10,12 @@ public final class Station {
     private final int id;
     private final String name;
 
+
     public Station(int id, String name){
         this.id = id;
         this.name = name;
         // throw IllegalArgumentException
+
     }
 
     /**

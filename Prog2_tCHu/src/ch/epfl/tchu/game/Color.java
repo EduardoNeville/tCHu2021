@@ -2,11 +2,9 @@ package ch.epfl.tchu.game;
 
 import java.util.List;
 
-//The enumerated type Color represents the eight colors used in the game to color railcar cards and roads.
-
 /**
  * Color Class
- *
+ * The enumerated type Color represents the eight colors used in the game to color railcar cards and roads.
  * @author eduardoneville
  */
 public enum Color {

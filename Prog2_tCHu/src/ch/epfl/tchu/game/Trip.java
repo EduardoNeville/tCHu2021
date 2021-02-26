@@ -56,10 +56,7 @@ public final class Trip {
         return points(connectivity);
     }
 
-    /**
-    private final int computeText(){
+    public static void main(String[] args) {
 
     }
-     */
-
 }
