@@ -1,20 +1,19 @@
 package ch.epfl.tchu.game;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Ticket Class
  *
  * @author Eduardo Neville
  */
 public final class Ticket implements Comparable<Ticket>{
-    private final String text;
+    private final Station Departing;
+    private final Station Arriving;
     private final int points;
 
 
-    public Ticket(String text, int points){
-        this.text = text;
+    public Ticket(Station departing, Station arriving, int points){
+        this.Departing = departing;
+        this.Arriving = arriving;
         this.points = points;
     }
 

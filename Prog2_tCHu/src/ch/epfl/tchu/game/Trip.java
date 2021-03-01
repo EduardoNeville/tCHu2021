@@ -55,8 +55,4 @@ public final class Trip {
     final int points(StationConnectivity connectivity){
         return points(connectivity);
     }
-
-    public static void main(String[] args) {
-
-    }
 }
