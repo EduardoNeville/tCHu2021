@@ -1,9 +1,12 @@
 package ch.epfl.tchu.game;
 
+import java.util.Objects;
+
+import ch.epfl.tchu.Preconditions;
+
 /**
  * Station Class
  *
- * @author Eduardo Neville
  */
 public final class Station {
 
@@ -22,7 +25,7 @@ public final class Station {
      * Getter for the Station ID
      * @return ID
      */
-    final int id(){
+    public int id(){
         return id;
     }
 
@@ -30,7 +33,7 @@ public final class Station {
      * Getter for the Station Name
      * @return Name of Station
      */
-    final String name(){
+    public String name(){
         return name;
     }
 
