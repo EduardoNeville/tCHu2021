@@ -3,6 +3,8 @@ import java.util.*;
 
 /**
  * Trip Class
+ *LIST<TRIP> METHOD IS MISSING
+ *Trio.POINTS Is messed up i think
  *
  * @author Eduardo Neville
  */
@@ -27,7 +29,7 @@ public final class Trip {
      * Getter for the Departing station
      * @return Departing station
      */
-    final Station GetFrom(){
+    final Station from(){
         return from;
     }
 
@@ -35,7 +37,7 @@ public final class Trip {
      * Getter for the arriving station
      * @return Arriving station
      */
-    final Station GetTo(){
+    final Station to(){
         return to;
     }
 
@@ -43,8 +45,8 @@ public final class Trip {
      * Getter for the # of points the trip has
      * @return Points of the trip
      */
-    final int GetPoints(){
-        return points;
+    final int points(){ 
+        return points; //ARE YOU SURE?
     }
 
     /**
