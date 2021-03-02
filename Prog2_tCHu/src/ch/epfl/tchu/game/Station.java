@@ -12,9 +12,9 @@ public final class Station {
 
 
     public Station(int id, String name){
+        Preconditions.checkArgument(id >=0);
         this.id = id;
         this.name = name;
-        // throw IllegalArgumentException
 
     }
 
@@ -22,7 +22,7 @@ public final class Station {
      * Getter for the Station ID
      * @return ID
      */
-    final int GetId(){
+    final int id(){
         return id;
     }
 
@@ -30,7 +30,7 @@ public final class Station {
      * Getter for the Station Name
      * @return Name of Station
      */
-    final String GetName(){
+    final String name(){
         return name;
     }
 
