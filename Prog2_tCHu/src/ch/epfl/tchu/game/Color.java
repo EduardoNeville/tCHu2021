@@ -7,15 +7,12 @@ import java.util.List;
  * The enumerated type Color represents the eight colors used in the game to color railcar cards and roads.
  * @author eduardoneville
  */
+
+import java.util.List;
+
 public enum Color {
-    BLACK,
-    VIOLET,
-    BLUE,
-    GREEN,
-    YELLOW,
-    ORANGE,
-    RED,
-    WHITE;
+
+    BLACK, VIOLET, BLUE, GREEN, YELLOW, ORANGE, RED, WHITE;
 
     public static final List<Color> ALL = List.of(values());
 
