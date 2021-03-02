@@ -13,18 +13,18 @@ public final class Route {
     UNDERGROUND
     }
 
-    private final String IDRoute;
-    private final Station Station1;
-    private final Station Station2;
+    private final String id;
+    private final Station station1;
+    private final Station station2;
     private final int length;
     private final Color color;
     private final Level level;
 
 
-    public Route(String IDRoute, Station station1, Station station2, int length, Level level,  Color color) {
-        this.IDRoute = IDRoute;
-        Station1 = station1;
-        Station2 = station2;
+    public Route(String id, Station station1, Station station2, int length, Level level,  Color color) {
+        this.id = id;
+        this.station1 = station1;
+        this.station2 = station2;
         this.level = level;
         this.length = length;
         this.color = color;
@@ -34,48 +34,45 @@ public final class Route {
      * Getter for ID of the route
      * @return ID of route
      */
-    public String getId() {
-        return IDRoute;
-    }
+    public String id() {
+        return id;
+    } //name change
 
     /**
-     * Getter for the 1st Station of the route
-     * @return 1st Station of the route
+     * Getter for the departing Station of the route
+     * @return departing Station of the route
      */
-    public Station getStation1() {
-        return Station1;
-    }
+    public Station station1() {
+        return station1;
+    } //name change
 
     /**
-     * Getter for the Last Station of the route
-     * @return Last Station of the route
+     * Getter for the arriving Station of the route
+     * @return arriving Station of the route
      */
-    public Station getStation2() {
-        return Station2;
-    }
+    public Station station2() {
+        return station2;
+    } //name change
 
     /**
      * Getter for the length of a route
      * @return The length of the route
      */
-    public int getLength() {
+    public int length() {
         return length;
-    }
+    } //name change
 
     /**
      * Getter for the level of a route
      * @return The level of the route
      */
-    public Level getLevel() {
-        return level;
-    }
+    public Level level() {return level;} //name change
 
     /**
      * Getter for the color of a route
      * @return Color of the route
      */
-    public Color getColor() {
+    public Color color() { //name change
         // return null if color neutral?
-        return color;
-    }
+        return color;}
 }
