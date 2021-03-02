@@ -29,7 +29,7 @@ public final class Trip {
      * Getter for the Departing station
      * @return Departing station
      */
-    final Station from(){
+    public Station from(){
         return from;
     }
 
@@ -37,7 +37,7 @@ public final class Trip {
      * Getter for the arriving station
      * @return Arriving station
      */
-    final Station to(){
+    public Station to(){
         return to;
     }
 
@@ -45,7 +45,7 @@ public final class Trip {
      * Getter for the # of points the trip has
      * @return Points of the trip
      */
-    final int points(){ 
+    public int points(){ 
         return points; //ARE YOU SURE?
     }
 
@@ -54,7 +54,11 @@ public final class Trip {
      * @param connectivity
      * @return Points of the trips connectivity
      */
-    final int points(StationConnectivity connectivity){
-        return points(connectivity);
+    public int points(StationConnectivity connectivity){
+        return points(connectivity);        // AND NEGATIVE POINTS?
+                                            // int points(StationConnectivity connectivity), qui retourne le nombre de points du trajet pour la connectivité donnée.
+                                            //La seconde variante de la méthode points retourne le nombre de points du trajet si la méthode connected de la connectivité 
+                                            //qu'on lui passe retourne vrai lorsqu'on l'applique aux deux gares du trajet — ce qui signifie qu'elles sont bien connectées —, 
+                                            //et la négation de ce nombre de points sinon.
     }
 }
