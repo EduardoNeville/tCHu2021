@@ -8,15 +8,14 @@ import java.util.TreeSet;
 /**
  * Ticket Class
  *
- * @author Eduardo Neville
  */
 public final class Ticket implements Comparable<Ticket>{
        private final List<Trip> trips;
     
     
-        public Ticket(List<Trip> trips){
+       public Ticket(List<Trip> trips){
         Preconditions.checkArgument(!trips.isEmpty());
-        this.trips = trips;
+        this.trips = List.copyOf(trips); //We must put a Defensive copying for Trip
 
     }
 
@@ -38,11 +37,6 @@ public final class Ticket implements Comparable<Ticket>{
         return computeText(trips);
     }
     
-        /**
-     * Compare the current Ticket with the given one
-     * @param that The current ticket
-     * @return Result if they are the same ticket or not
-     */
 
     public final int points(StationConnectivity connectivity){
         int max= Integer.MIN_VALUE;
@@ -53,22 +47,29 @@ public final class Ticket implements Comparable<Ticket>{
         }
         return max;
     }
-    
+        /**
+     * Compare the current Ticket with the given one
+     * @param that The current ticket
+     * @return Result if they are the same ticket or not
+     */
+       
         public int compareTo(Ticket that) {
         return this.text().compareTo(that.text());
     }
 
+       //Calculation of the textual representation of the ticket according to the given specificatio
+       
     private static String computeText(List<Trip> trips){
 
         TreeSet<String> arrivals = new TreeSet<>();
         for (Trip trip : trips){
-            arrivals.add(String.format("%s (%s)", trip.to().toString(), trip.points()));
+            arrivals.add(String.format("%s (%s)", trip.to().name(), trip.points()));
         }
         //we add a delimiter so that we add la virgule
         String text = String.join(", ", arrivals);
         if (arrivals.size()>1){
             String finalText = "{ " + text + "}";
-            return finalText;
+            return from + " - " + finalText; //MOD FROM SHOULD GIVE THE DEPARTURE STATION
         }
         return text;
     }
