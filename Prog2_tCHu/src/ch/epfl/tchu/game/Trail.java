@@ -34,7 +34,7 @@ public final class Trail {
      */
     public Station station1() {
         if (length<=0){return null;}
-        return Station1;
+        return station1;
     }
 
     /**
@@ -43,7 +43,7 @@ public final class Trail {
      */
     public Station station2() {
         if (length<=0){return null;}
-        return Station2;
+        return station2;
     }
 
     /**
