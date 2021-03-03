@@ -22,24 +22,28 @@ public final class Trail {
     //TODO Create Trail longest(List<Route> routes) method its supposed to be statique
 
     public static Trail longest(List<Route> routes){
-
-        return ;
+        Trail longestRoute = null;
+        //posible for loop here;
+        return longestRoute;
+    }
     }
 
     /**
-     * Getter for the departing Station of the route
-     * @return departing Station of the route
+     * Getter for the 1st Station of the route
+     * @return 1st Station of the route
      */
-    public Station station1() { //name changed
-        return station1;
+    public Station station1() {
+        if (length<=0){return null;}
+        return Station1;
     }
 
     /**
-     * Getter for the arriving Station of the route
-     * @return arriving Station of the route
+     * Getter for the Last Station of the route
+     * @return Last Station of the route
      */
-    public Station station2() { //name changed
-        return station2;
+    public Station station2() {
+        if (length<=0){return null;}
+        return Station2;
     }
 
     /**
