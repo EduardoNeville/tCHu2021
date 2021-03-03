@@ -4,26 +4,24 @@ import ch.epfl.tchu.Preconditions;
 import java.util.List;
 import java.util.TreeSet;
 
+// Ticket Class
 
-/**
- * Ticket Class
- *
- */
 public final class Ticket implements Comparable<Ticket>{
-       private final List<Trip> trips;
-    
-    
-       public Ticket(List<Trip> trips){
+    private final List<Trip> trips;
+
+
+    public Ticket(List<Trip> trips){
         Preconditions.checkArgument(!trips.isEmpty());
-        this.trips = List.copyOf(trips); //We must put a Defensive copying for Trip
+        this.trips = List.copyOf(trips); // Defensive copying
 
     }
 
-     public Ticket(Station from, Station to, int points) {
+    public Ticket(Station from, Station to, int points) {
 
         this(List.of(new Trip(from,to,points)));
 
     }
+
 
     /**
      * Getter that gives us the Text of a ticket to later display
@@ -32,12 +30,20 @@ public final class Ticket implements Comparable<Ticket>{
      * @param points Points of the trip
      * @return Departing Station - to - Arriving Station (# of points)
      */
-    
-        public String text() {
+
+    public String text() {
         return computeText(trips);
     }
-    
 
+//    final String text(Station from, Station to, int points){
+//        return from + " - " + to + " (" + points + ") ";
+//    }
+
+    /**
+     * Getter for the # of points of the ticket connectivity
+     * @param connectivity
+     * @return Points of the trips connectivity
+     */
     public final int points(StationConnectivity connectivity){
         int max= Integer.MIN_VALUE;
         for (Trip trips : trips){
@@ -47,18 +53,17 @@ public final class Ticket implements Comparable<Ticket>{
         }
         return max;
     }
-        /**
+
+    /**
      * Compare the current Ticket with the given one
      * @param that The current ticket
      * @return Result if they are the same ticket or not
      */
-       
-        public int compareTo(Ticket that) {
+    public int compareTo(Ticket that) {
+
         return this.text().compareTo(that.text());
     }
 
-       //Calculation of the textual representation of the ticket according to the given specificatio
-       
     private static String computeText(List<Trip> trips){
 
         TreeSet<String> arrivals = new TreeSet<>();
@@ -68,13 +73,9 @@ public final class Ticket implements Comparable<Ticket>{
         //we add a delimiter so that we add la virgule
         String text = String.join(", ", arrivals);
         if (arrivals.size()>1){
-            String finalText = "{ " + text + "}";
-            return from + " - " + finalText; //MOD FROM SHOULD GIVE THE DEPARTURE STATION
+            text = "{" + text + "}";
         }
-        return text;
-    }
-    
-}
+        return trips.get(0).from().toString() + " - " + text;
 
+    }
 }
-//Problem in the method points
