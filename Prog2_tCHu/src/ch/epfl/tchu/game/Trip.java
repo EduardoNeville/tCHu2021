@@ -1,10 +1,11 @@
 package ch.epfl.tchu.game;
+import ch.epfl.tchu.Preconditions;
+
 import java.util.*;
 
 /**
  * Trip Class
  *LIST<TRIP> METHOD IS MISSING
- *Trio.POINTS Is messed up i think
  *
  * @author Eduardo Neville
  */
@@ -23,6 +24,29 @@ public final class Trip {
         this.from = Objects.requireNonNull(from);
         this.to = Objects.requireNonNull(to);
         this.points = points;
+    }
+
+    //created this method
+    /**
+     * Gives all possible trips that can be take from a given station (from)
+     * @param from List of all possible starting station
+     * @param to List of all possible finishing station
+     * @param points The points that you can obtain from said trip
+     * @return List of all possible train trips you can take.
+     */
+    public static List<Trip> all(List<Station> from, List<Station> to, int points){
+
+        List<Trip> PossibleTrips = new ArrayList<>();
+        //loop through all possible routes and if connectivity cool
+        for (Station station: from) {
+            for (Station station1 : to) {
+                if () { //connectivity is cool then add to list
+                    PossibleTrips.add(new Trip(station, station1,)); //points could be received with a method
+                }
+            }
+        }
+        Preconditions.checkArgument(!PossibleTrips.isEmpty());
+        return PossibleTrips;
     }
 
     /**
@@ -45,20 +69,23 @@ public final class Trip {
      * Getter for the # of points the trip has
      * @return Points of the trip
      */
-    public int points(){ 
-        return points; //ARE YOU SURE?
+    public int points(){
+        return points; //ARE YOU SURE? This is just a getter
     }
 
+    //re did this method
+    //is this a fix?
     /**
-     * Getter for the # of points of the trips connectivity
+     * The # of points of the trips connectivity
      * @param connectivity
      * @return Points of the trips connectivity
      */
-    public int points(StationConnectivity connectivity){
-        return points(connectivity);        // AND NEGATIVE POINTS?
-                                            // int points(StationConnectivity connectivity), qui retourne le nombre de points du trajet pour la connectivité donnée.
-                                            //La seconde variante de la méthode points retourne le nombre de points du trajet si la méthode connected de la connectivité 
-                                            //qu'on lui passe retourne vrai lorsqu'on l'applique aux deux gares du trajet — ce qui signifie qu'elles sont bien connectées —, 
-                                            //et la négation de ce nombre de points sinon.
+    public int points(StationConnectivity connectivity) {
+        if (connectivity.connected(from, to)) {
+            return points;
+        }
+        else {
+            return 0;
+        }
     }
 }
