@@ -19,14 +19,31 @@ public final class Trail {
         this.length = length;
     }
 
-    //TODO Create Trail longest(List<Route> routes) method its supposed to be statique
-
+   /**
+     * Method used to find the longest possible route from Station1 to Station2 given
+     * the routes possible to take.
+     * @param routes
+     * @return Longest route possible
+     */
     public static Trail longest(List<Route> routes){
         Trail longestRoute = null;
-        //posible for loop here;
+
+        List<Trail> PossibleRoutes = new ArrayList<Trail>(List.of()); //elts that the route can take
+        List<Trail> PossibleRoutes1 = new ArrayList<>();
+
+        for (Route route: ){ //loop trails that are in PossibleRoutes
+            // List<Route> that bellong to player,don't bellong to PossibleRoutes, (and can prolong routes in Possible Routes)?
+            //
+            for (){ //For all routes in List<Route> of prev line
+                //add the prolonged version of PossibleRoutes by Routes in List<Route> to PossibleRoutes1
+            }
+        }
+        //check PossibleRoutes not empty
+        Preconditions.checkArgument(!PossibleRoutes1.isEmpty());
+
+        //The route with max points is equal to longestRoute
         return longestRoute;
-    
-    }
+}
 
     /**
      * Getter for the 1st Station of the route
