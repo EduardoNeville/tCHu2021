@@ -13,7 +13,7 @@ public final class Trail {
     private final Station station2;
     private final int length;
 
-    private Trail(Station station1, Station station2, int length) {
+    public Trail(Station station1, Station station2, int length) {
         this.station1 = station1; //maybe change as well
         this.station2 = station2;
         this.length = length;
