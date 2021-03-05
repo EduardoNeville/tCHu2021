@@ -46,7 +46,7 @@ public final class Trip {
                 }
             }
         }
-        Preconditions.checkArgument(!PossibleTrips.isEmpty() || !(points > 0));
+        Preconditions.checkArgument(!PossibleTrips.isEmpty());
         return PossibleTrips;
     }
 
