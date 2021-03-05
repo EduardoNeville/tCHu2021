@@ -1,7 +1,11 @@
 package ch.epfl.tchu.game;
 
 
-//Route Class
+/**
+ * Route Class: Class that allows us to represent a road connecting two neighboring towns
+ *
+ * @author Hamza Karime
+ */
 
 import ch.epfl.tchu.Preconditions;
 import ch.epfl.tchu.SortedBag;
@@ -13,7 +17,15 @@ import java.util.Objects;
 
 import static ch.epfl.tchu.game.Constants.ADDITIONAL_TUNNEL_CARDS;
 
+/**
+ * An enumerated type representing the two levels at which a road can be found. Its values are, in order
+ */
 public final class Route {
+
+    /**
+     * An enumerated type representing the two levels at which a road can be found. Its values are, in order
+     */
+
     public enum Level{
         OVERGROUND, //Route en surface
         UNDERGROUND // Route en tunnel
@@ -34,9 +46,14 @@ public final class Route {
      * @param length
      * @param level
      * @param color
+     * who builds a road with the given identity, stations, length, level and color;
+     * throws IllegalArgumentException if both stations are equal or if the length is not within acceptable limits;
+     * or NullPointerException if the identity, one of the two stations or the level are null. Note that the color can however be zero,
+     * which means the road is neutral in color.
      */
    public Route(String id, Station station1, Station station2, int length, Level level, Color color){
-        Preconditions.checkArgument(station1.equals(station2) || (Constants.MIN_ROUTE_LENGTH <= length && length <= Constants.MAX_ROUTE_LENGTH));
+       Preconditions.checkArgument(!station1.equals(station2));
+       Preconditions.checkArgument((Constants.MIN_ROUTE_LENGTH <= length && length <= Constants.MAX_ROUTE_LENGTH));
         this.id = Objects.requireNonNull(id);
         this.station1 = Objects.requireNonNull(station1);
         this.station2 = Objects.requireNonNull(station2);
@@ -89,24 +106,25 @@ public final class Route {
      */
 
     public Color color() {
-        if(this.color == null){
-            return null;
-        }
         return color;
     }
 
-
     /**
-     * @return List of the stations
+     * @return the list of the two stations of the route, in the order
+     * in which they were passed to the constructor
      */
     public List<Station> stations(){
-        List<Station> stations = new ArrayList<>();
-        stations.add(station1);
-        stations.add(station2);
-            return stations;
+        return List.of(station1, station2);
     }
 
     //dns trail creer tu le mets en deuxieme arg addedtrail route.StationOpposite
+
+
+    /**
+     * @param station
+     * @return the station of the route which is not the given one, or throws IllegalArgumentException
+     * if the given station is neither the first nor the second station of the route
+     */
     public Station stationOpposite(Station station){
         Preconditions.checkArgument(station.equals(station1) || station.equals(station2) );
         if (station.equals(station1)) {
@@ -118,49 +136,51 @@ public final class Route {
 
     }
 
-    public List<SortedBag<Card>> possibleClaimCards(){
-        SortedBag<Card> possibleCards;
-        List<SortedBag<Card>> listOfPossibleCards = List.of();
+    /**
+     * @return which returns the list of all the sets of cards that could be played to (attempt to)
+     * seize the road, sorted in ascending order of number of locomotive cards, then by color
+     */
+    public List<SortedBag<Card>> possibleClaimCards() {
+        List<SortedBag<Card>> possibleCards = new ArrayList<>();
 
-        if(level == Level.OVERGROUND){
-            if(color == null){
-                for(Color color : Color.ALL) {
-                    possibleCards = SortedBag.of(length, Card.of(color));
-                    listOfPossibleCards.add(possibleCards);
+        if (level == Level.OVERGROUND) {
+            if (color == null) {
+                for (Card card : Card.CARS) {
+                    possibleCards.add(SortedBag.of(length, card));
                 }
-
+            } else {
+                possibleCards = List.of(SortedBag.of(length, Card.of(color)));
             }
-            else{
-                possibleCards = SortedBag.of(length, Card.of(color));
-                listOfPossibleCards.add(possibleCards);
-
-            }
-        }
-        else {
-            if(color == null){
-                for(Color color : Color.ALL) {
-                    for (int i = 0; i < length; i++) {
-                        possibleCards = SortedBag.of((length - i), Card.of(color), i, Card.of(null));
-                        listOfPossibleCards.add(possibleCards);
+        } else {
+            if (color == null) {
+                for (int i = 0; i < length; ++i) {
+                    for (Card card : Card.CARS) {
+                        possibleCards.add(SortedBag.of(length - i, card, i, Card.LOCOMOTIVE));
                     }
                 }
-                possibleCards = SortedBag.of(length, Card.of(null));
-                listOfPossibleCards.add(possibleCards);
-                }
-            else{
-                int i;
-                for(i=0; i<length; i++){
-                    possibleCards = SortedBag.of((length-i), Card.of(color), i, Card.of(null));
-                    listOfPossibleCards.add(possibleCards);
+                possibleCards.add(SortedBag.of(length, Card.LOCOMOTIVE));
+            } else {
+                possibleCards.add(SortedBag.of(length, Card.of(color)));
+                for (int i = 1; i <= length; ++i) {
+                    possibleCards.add(SortedBag.of(length - i, Card.of(color), i, Card.LOCOMOTIVE));
                 }
             }
         }
-        return listOfPossibleCards;
+        return possibleCards;
     }
 
+    /**
+     * @param claimCards
+     * @param drawnCards
+     * @return which returns the number of additional cards to be played to seize the road (in tunnel),
+     * knowing that the player has initially put down the claimCards and that the three cards drawn from the top of the pile are drawnCards;
+     * throws the IllegalArgumentException if the route to which it is applied is not a tunnel,
+     * or if drawnCards does not contain exactly 3 cards2,
+     */
     public int additionalClaimCardsCount(SortedBag<Card> claimCards, SortedBag<Card> drawnCards) {
 
-        Preconditions.checkArgument(level==Level.OVERGROUND && drawnCards.size() == ADDITIONAL_TUNNEL_CARDS);
+
+        Preconditions.checkArgument(!(level==Level.OVERGROUND && drawnCards.size() == ADDITIONAL_TUNNEL_CARDS));
         int counter = 0;
         for (Card card : drawnCards) {
             if (claimCards.contains(card) || card == Card.LOCOMOTIVE) {
@@ -170,6 +190,9 @@ public final class Route {
         return counter;
     }
 
+    /**
+     * @return the number of construction points a player gets when they grab the road.
+     */
     public int claimPoints(){
             return Constants.ROUTE_CLAIM_POINTS.get(length);
         }
