@@ -46,21 +46,21 @@ public final class Trail {
 }
 
     /**
-     * Getter for the 1st Station of the route
-     * @return 1st Station of the route
+     * Getter for the 1st Station of the trail
+     * @return 1st Station of the trail
      */
     public Station station1() {
-        if (length<=0){return null;}
-        return station1;
+        if (length==0){return null;}
+        else {return station1;}
     }
 
     /**
-     * Getter for the Last Station of the route
-     * @return Last Station of the route
+     * Getter for the Last Station of the trail
+     * @return Last Station of the trail
      */
     public Station station2() {
-        if (length<=0){return null;}
-        return station2;
+        if (length==0){return null;}
+        else {return station2;}
     }
 
     /**
