@@ -9,6 +9,10 @@ import java.util.List;
 /**
  * Trail Class
  *
+ * Constructor: Trail
+ * Getters: toString, station1, station2, length
+ * Methods: longest
+ *
  * @author Eduardo Neville
  */
 public final class Trail {
@@ -60,7 +64,7 @@ public final class Trail {
             PossibleRoutes = PossibleTrails;
             //The route with max length is equal to longestTrail
             for (Trail loopingTrails : PossibleRoutes) {
-                if (loopingTrails.length > longestTrail.length) {
+                if (loopingTrails.length >= longestTrail.length) {
                     longestTrail = loopingTrails;
                 }
             }
