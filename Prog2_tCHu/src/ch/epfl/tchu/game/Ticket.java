@@ -4,7 +4,16 @@ import ch.epfl.tchu.Preconditions;
 import java.util.List;
 import java.util.TreeSet;
 
-// Ticket Class
+/**
+ * Ticket Class (implements Comparable<Ticket>)
+ *
+ * Constructors: Ticket
+ * Getters: points
+ * Methods: text, compareTo, and compareText
+ *
+ * @author Eduardo Neville
+ * @author Hamza Karime
+ */
 
 public final class Ticket implements Comparable<Ticket>{
     private final List<Trip> trips;
@@ -16,28 +25,25 @@ public final class Ticket implements Comparable<Ticket>{
 
     }
 
+    /**
+     * Ticket Constructor
+     * @param from Departing Station
+     * @param to Arriving Station
+     * @param points Points of the Ticket
+     */
     public Ticket(Station from, Station to, int points) {
 
         this(List.of(new Trip(from,to,points)));
 
     }
 
-
     /**
-     * Getter that gives us the Text of a ticket to later display
-     * @param from Departing Station
-     * @param to Arriving Station
-     * @param points Points of the trip
-     * @return Departing Station - to - Arriving Station (# of points)
+     * Text method that returns the display Ticket
+     * @return the text of the Ticket in a display fassion
      */
-
     public String text() {
         return computeText(trips);
     }
-
-//    final String text(Station from, Station to, int points){
-//        return from + " - " + to + " (" + points + ") ";
-//    }
 
     /**
      * Getter for the # of points of the ticket connectivity
@@ -64,6 +70,11 @@ public final class Ticket implements Comparable<Ticket>{
         return this.text().compareTo(that.text());
     }
 
+    /**
+     * Forms the text ticket for a trip
+     * @param trips The trips we are using
+     * @return text of the ticket of a trip
+     */
     private static String computeText(List<Trip> trips){
 
         TreeSet<String> arrivals = new TreeSet<>();
