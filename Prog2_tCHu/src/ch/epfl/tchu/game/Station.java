@@ -4,6 +4,15 @@ import ch.epfl.tchu.Preconditions;
 
 import java.util.Objects;
 
+/**
+ *  Station Class
+ *
+ *  Constructors: Station
+ *  Getters: id, name, toString
+ *
+ *  @author Eduardo Neville
+ *  @author Hamza Karime
+ */
 public final class Station {
 
     private final int id;
