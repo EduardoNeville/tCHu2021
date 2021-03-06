@@ -2,7 +2,13 @@ package ch.epfl.tchu.game;
 
 
 /**
- * Route Class: Class that allows us to represent a road connecting two neighboring towns
+ * Route Class
+ * Class that allows us to represent a road connecting two neighboring towns
+ *
+ * Enum: Level
+ * Constructor: Route
+ * Getter: ID, Station1, Station2, Length, Level, Color
+ * Methods: stationOpposite, possibleClaimCards, additionalClaimCardsCount, claimPoints
  *
  * @author Hamza Karime
  */
@@ -40,20 +46,21 @@ public final class Route {
 
 
     /**
-     * @param id
-     * @param station1
-     * @param station2
-     * @param length
-     * @param level
-     * @param color
+     * Route Constructor
+     * @param id Id of the route
+     * @param station1 Departing Station
+     * @param station2 Arriving Station
+     * @param length Length of route
+     * @param level Level of Route (OVERGROUND,UNDERGROUND)
+     * @param color Color of Card
      * who builds a road with the given identity, stations, length, level and color;
      * throws IllegalArgumentException if both stations are equal or if the length is not within acceptable limits;
      * or NullPointerException if the identity, one of the two stations or the level are null. Note that the color can however be zero,
      * which means the road is neutral in color.
      */
-   public Route(String id, Station station1, Station station2, int length, Level level, Color color){
-       Preconditions.checkArgument(!station1.equals(station2));
-       Preconditions.checkArgument((Constants.MIN_ROUTE_LENGTH <= length && length <= Constants.MAX_ROUTE_LENGTH));
+    public Route(String id, Station station1, Station station2, int length, Level level, Color color){
+        Preconditions.checkArgument(!station1.equals(station2));
+        Preconditions.checkArgument((Constants.MIN_ROUTE_LENGTH <= length && length <= Constants.MAX_ROUTE_LENGTH));
         this.id = Objects.requireNonNull(id);
         this.station1 = Objects.requireNonNull(station1);
         this.station2 = Objects.requireNonNull(station2);
@@ -194,7 +201,7 @@ public final class Route {
      * @return the number of construction points a player gets when they grab the road.
      */
     public int claimPoints(){
-            return Constants.ROUTE_CLAIM_POINTS.get(length);
-        }
+        return Constants.ROUTE_CLAIM_POINTS.get(length);
+    }
 
 }
