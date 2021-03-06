@@ -3,7 +3,13 @@ import ch.epfl.tchu.Preconditions;
 
 import java.util.*;
 
-//Trip CLass
+/**
+ * Trip Class
+ *
+ * Constructor: Trip
+ * Getters: from, to, points
+ * Methods: all, points
+ */
 
 public final class Trip {
 
@@ -38,15 +44,16 @@ public final class Trip {
 
         //THROW UNE ILLEGAL EXCEPTION SI UN ELEMENT DE FROM = UN ELEMENT DE TO AVANT D'AJOUTER AU TABLEAU DES TRAJETS
         List<Trip> PossibleTrips = new ArrayList<>();
-        //loop through all possible routes and if connectivity cool
+
+        //loop through all possible routes if the connectivity is okay add to the list
         for (Station station : from) {
             for (Station station1 : to) {
-                if (from != to) { //connectivity is cool then add to list
+                if (from != to) {
                     PossibleTrips.add(new Trip(station, station1, points)); //points could be received with a method
                 }
             }
         }
-        Preconditions.checkArgument(!PossibleTrips.isEmpty());
+        Preconditions.checkArgument(!PossibleTrips.isEmpty() || !(points > 0));
         return PossibleTrips;
     }
 
@@ -58,7 +65,7 @@ public final class Trip {
 
     public Station from() {
         return from;
-    } //ADDED METHOD
+    }
 
     /**
      * Getter for the arriving station
@@ -80,7 +87,7 @@ public final class Trip {
     /**
      * Getter for the # of points of the trips connectivity
      *
-     * @param connectivity
+     * @param connectivity check if trip is possible
      * @return Points of the trips connectivity
      */
 
