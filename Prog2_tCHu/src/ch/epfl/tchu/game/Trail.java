@@ -4,6 +4,7 @@ import ch.epfl.tchu.Preconditions;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -17,14 +18,15 @@ import java.util.List;
  */
 public final class Trail {
 
+    private static Trail EMPTYTRAIL;
     private final Station station1;
     private final Station station2;
     private final int length;
     private final List<Route> routes;
 
     private Trail(Station station1, Station station2, List<Route> routes, int length) {
-        this.station1 = station1; //maybe change as well
-        this.station2 = station2; //this(List.of(... doesn't work as we would have to add an id
+        this.station1 = station1;
+        this.station2 = station2;
         this.length = length;
         this.routes = routes;
     }
@@ -36,45 +38,58 @@ public final class Trail {
      * @return Longest trail possible
      */
     public static Trail longest(List<Route> routes) {
+
+        List<Trail> trailList = new ArrayList<>();
+        for (Route route : routes){
+            trailList.add(new Trail(route.station1(), route.station2(), List.of(route), route.length()));
+            trailList.add(new Trail(route.station2(), route.station1(), List.of(route), route.length()));
+        }
+
         Trail longestTrail = new Trail(null, null, new ArrayList<>(), 0);
 
-        List<Trail> PossibleRoutes = new ArrayList<>();
-
-            for (Route route : routes){
-                    PossibleRoutes.add(new Trail(route.station1(), route.station2(), List.of(route), route.length()));
-                    PossibleRoutes.add(new Trail(route.station2(), route.station1(), List.of(route), route.length()));
-            }
-
-        while(!PossibleRoutes.isEmpty()){
+        while(!trailList.isEmpty()){
             List<Trail> PossibleTrails = new ArrayList<>(); //Possible trails that we will eventually have routes added to them till max length of each trail
-            for (Trail trail : PossibleRoutes){ //loop trails that are in PossibleRoutes
-                List<Route> PlayerRoutes = new ArrayList<>(routes); //that belong to player,don't belong to PossibleRoutes,
-                PlayerRoutes.removeAll(trail.routes);
-                for (Route route1 : PlayerRoutes){ //For all routes in List<Route> of prev line
-                    for (Station station1:route1.stations()) {
-                        if (station1.equals(trail.station2)) {
-                            List<Route> extended = new ArrayList<>(routes);
-                            extended.add(route1);
-                            PossibleTrails.add(new Trail(trail.station1, route1.stationOpposite(station1),extended, extended.size()));
+
+            for (Trail forTrail : trailList){ //loop trails that are in trailList
+                List<Route> PlayerRoutes = new ArrayList<>(routes); //that belong to player,don't belong to trailList,
+                PlayerRoutes.removeAll(forTrail.routes);
+
+                for (Route forRoute : PlayerRoutes){ //For all routes in List<Route> of prev line
+                    for (Station station1:forRoute.stations()) {
+
+                        if (station1.equals(forTrail.station2)) {
+                            List<Route> extended = new ArrayList<>(forTrail.routes);
+                            extended.add(forRoute);
+
+                            Trail newTrail = new Trail(forTrail.station1(),  forRoute.stationOpposite(forTrail.station2()),extended, forTrail.length() + forRoute.length());
+                            PossibleTrails.add(newTrail);
+
+
                         }
                     }
                 }
-            }
 
-            PossibleRoutes = PossibleTrails;
-            //The route with max length is equal to longestTrail
-            for (Trail loopingTrails : PossibleRoutes) {
-                if (loopingTrails.length >= longestTrail.length) {
-                    longestTrail = loopingTrails;
+                if (forTrail.length() > longestTrail.length()){
+                    longestTrail = forTrail;
                 }
+
             }
+            trailList = new ArrayList<>(PossibleTrails);
         }
         return longestTrail;
     }
 
-    //To be perfected
-    public String toString() {
-        return station1 + " - " + station2 + " (" + length + ") ";
+    /**
+     * Getter for the Display name of a trail
+     * @param trail Trail we want to get a name
+     * @return Display name for the trail
+     */
+    public String toString(Trail trail) {
+        StringBuilder TrailText = null;
+        for (Route route: routes) {
+            TrailText.append(" - ").append(route.toString());
+        }
+       return TrailText + " (" + length +") ";
     }
 
     /**
@@ -84,6 +99,13 @@ public final class Trail {
     public Station station1() {
         if (length==0){return null;}
         else {return station1;}
+    }
+
+    public List<Route> route(){
+        if (routes.size() == 0){
+            return null;
+        }
+        return routes;
     }
 
     /**
@@ -99,7 +121,7 @@ public final class Trail {
      * Getter for the length of a trail
      * @return The length of the trail
      */
-    public int length() { //name changed
+    public int length() {
         return length;
     }
 }
