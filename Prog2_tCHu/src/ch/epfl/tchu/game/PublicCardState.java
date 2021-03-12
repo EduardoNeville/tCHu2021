@@ -13,9 +13,9 @@ import static ch.epfl.tchu.game.Constants.FACE_UP_CARDS_COUNT;
  */
 public class PublicCardState {
 
-    public final int deckSize;
-    public final int discardsSize;
-    public final List<Card> faceUpCards;
+    private final int deckSize;
+    private final int discardsSize;
+    private final List<Card> faceUpCards;
 
 
     public PublicCardState(List<Card> faceUpCards, int deckSize, int discardsSize){
