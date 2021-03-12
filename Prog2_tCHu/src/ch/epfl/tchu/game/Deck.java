@@ -13,7 +13,6 @@ import java.util.*;
  * @author Eduardo Neville
  */
 public final class Deck <C extends Comparable<C>> {
-
     private final List<C> deckofCards;
 
     /**
@@ -34,7 +33,7 @@ public final class Deck <C extends Comparable<C>> {
     public static <C extends Comparable<C>> Deck<C> of(SortedBag<C> cards, Random rng){
         var PostShuffle = new ArrayList<>(cards.toList());
         Collections.shuffle(PostShuffle,rng);
-        return new Deck<>(PostShuffle) ;
+        return new Deck<>(PostShuffle);
     }
 
     /**
@@ -58,7 +57,7 @@ public final class Deck <C extends Comparable<C>> {
      * @return topCard of the deck
      */
     public C topCard(){
-        Preconditions.checkArgument(!isEmpty());
+        Preconditions.checkArgument(!(deckofCards.isEmpty()));
         return deckofCards.get(0);
     }
 
@@ -87,7 +86,7 @@ public final class Deck <C extends Comparable<C>> {
      * @return DeckofCards without the first (count) top cards
      */
     public Deck<C> withoutTopCards(int count){
-        Preconditions.checkArgument(!(0 <= count && count <= deckofCards.size()));
+        Preconditions.checkArgument(0 <= count && count <= deckofCards.size());
         return new Deck<>(deckofCards.subList(count, deckofCards.size()));
     }
 }
