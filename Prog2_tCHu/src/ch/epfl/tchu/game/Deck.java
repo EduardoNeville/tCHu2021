@@ -59,7 +59,7 @@ public final class Deck <C extends Comparable<C>> {
      */
     public C topCard(){
         Preconditions.checkArgument(!isEmpty());
-        return deckofCards.get(0); //to be fixed
+        return deckofCards.get(0);
     }
 
     /**
@@ -67,7 +67,7 @@ public final class Deck <C extends Comparable<C>> {
      * @return DeckofCards without the top card
      */
     public Deck<C> withoutTopCard(){
-        Preconditions.checkArgument(deckofCards.isEmpty());
+        Preconditions.checkArgument(!(deckofCards.isEmpty()));
         return new Deck<>(deckofCards.subList(1, deckofCards.size()));
     }
 
