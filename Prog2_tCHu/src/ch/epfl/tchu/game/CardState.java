@@ -35,7 +35,7 @@ public class CardState extends PublicCardState{
         Preconditions.checkArgument(deck.size()>4);
         //CardState cardState = new CardState();
         List<Card> faceUp = null;
-        for (int i =0 ;i<5;++i){ //change 5 to constant value
+        for (int i =0 ;i<=Constants.INITIAL_CARDS_COUNT;++i){ //change 5 to constant value
             faceUp.add(deck.topCard());
             deck = deck.withoutTopCard();
         }
@@ -51,10 +51,10 @@ public class CardState extends PublicCardState{
      */
     public CardState withDrawnFaceUpCard(int slot){
         Preconditions.checkArgument(!deckofCards.isEmpty());
-        Objects.checkIndex(slot, 5); //To be corrected
+        Objects.checkIndex(slot,5); //To be corrected
         faceUpCards.remove(slot);
         faceUpCards.add(slot,deckofCards.topCard());
-        return new CardState(deckofCards,faceUpCards,discardedCards);
+        return new CardState(deckofCards.withoutTopCard(),faceUpCards,discardedCards);
     }
 
     /**
@@ -63,7 +63,7 @@ public class CardState extends PublicCardState{
      */
     public Card topDeckCard(){
         Preconditions.checkArgument(!deckofCards.isEmpty());
-        return deckofCards.topCard(); //is this correct?
+        return deckofCards.topCard();
     }
 
     /**
@@ -73,7 +73,6 @@ public class CardState extends PublicCardState{
     public CardState withoutTopDeckCard(){
         Preconditions.checkArgument(!deckofCards.isEmpty());
         return new CardState(this.deckofCards.withoutTopCard(),faceUpCards,discardedCards);
-        //is this correct?
     }
 
     /**
@@ -83,21 +82,21 @@ public class CardState extends PublicCardState{
      */
     public CardState withDeckRecreatedFromDiscards(Random rng){
         Preconditions.checkArgument(deckofCards.isEmpty());
-        List<Card> tobeShuffled = discardedCards;
-        Collections.shuffle(tobeShuffled,rng);
-        Deck<Card> shuffledDeck= new Deck<Card>(tobeShuffled);
+        var shuffledCards = Deck.of(discardedCards, rng);
 
-        return new CardState(shuffledDeck,faceUpCards,discardedCards);
+        return new CardState(shuffledCards,faceUpCards,discardedCards);
     }
 
     /**
      *
      * @param additionalDiscards
      * @return
-     */
+     *//*
     public CardState withMoreDiscardedCards(SortedBag<Card> additionalDiscards){
-        var Discarded = SortedBag.of(discardedCards);
-        Discarded.add(additionalDiscards);
-        return new CardState(deckofCards,faceUpCards,)
+        var discardedCards = SortedBag.of(discardedCards);
+
+        return new CardState(deckofCards,faceUpCards,discardedCards);
     }
+    */
+
 }
