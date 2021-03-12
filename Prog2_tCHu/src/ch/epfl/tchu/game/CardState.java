@@ -8,7 +8,8 @@ import java.util.*;
 /**
  * CardState Class
  * Methods: withDrawnFaceUpCard, topDeckCard, withoutTopDeckCard, withDeckRecreatedFromDiscards, withMoreDiscardedCards
- * Constructor:
+ * Constructor: CardState
+ *
  * @author Eduardo Neville
  */
 public class CardState extends PublicCardState {
@@ -32,21 +33,23 @@ public class CardState extends PublicCardState {
     public static CardState of(Deck<Card> deck) {
         Preconditions.checkArgument(deck.size() > 4);
         List<Card> faceUp = new ArrayList<>();
-        for (int i = 0; i < Constants.FACE_UP_CARDS_COUNT; ++i) { //change 5 to constant value
+        
+        for (int i = 0; i < Constants.FACE_UP_CARDS_COUNT; ++i) { 
             faceUp.add(deck.topCard());
             deck = deck.withoutTopCard();
         }
         return new CardState(deck, faceUp, SortedBag.of());
     }
-    //Listof(first 5 cards) use method faceUpCard
-
+    
     /**
-     * @param slot
-     * @return
+     * Returns a new card into the faceUp cards from the deck
+     * @param slot the slot take by this new card
+     * @return the new set of cards in the table
      */
     public CardState withDrawnFaceUpCard(int slot) {
         Objects.checkIndex(slot, 5);
         Preconditions.checkArgument(!deckofCards.isEmpty());
+        
         List<Card> faceUpCards = new ArrayList<>(faceUpCards());
         faceUpCards.remove(slot);
         faceUpCards.add(slot, deckofCards.topCard());
@@ -64,7 +67,8 @@ public class CardState extends PublicCardState {
     }
 
     /**
-     * @return
+     * CardState without the top deck card
+     * @return new cardstate without top card
      */
     public CardState withoutTopDeckCard() {
         Preconditions.checkArgument(!deckofCards.isEmpty());
@@ -72,19 +76,19 @@ public class CardState extends PublicCardState {
     }
 
     /**
-     * @param rng
-     * @return
+     * Reshuffling the discarded cards to make a new deck
+     * @param rng random paramenter
+     * @return new deck of shuffled cards made up of the previously discarded cards 
      */
     public CardState withDeckRecreatedFromDiscards(Random rng) {
         Preconditions.checkArgument(deckofCards.isEmpty());
-        var shuffledCards = Deck.of(discardedCards, rng);
-
-        return new CardState(shuffledCards, faceUpCards(), discardedCards);
+        return new CardState(Deck.of(discardedCards, rng), faceUpCards(), discardedCards);
     }
 
     /**
-     * @param additionalDiscards
-     * @return
+     * Adding discarded cards to the discaerded pile
+     * @param additionalDiscards more discarded cards to be added
+     * @return group of discarded cards
      */
     public CardState withMoreDiscardedCards(SortedBag<Card> additionalDiscards) {
         return new CardState(deckofCards, faceUpCards(), discardedCards.union(additionalDiscards));
