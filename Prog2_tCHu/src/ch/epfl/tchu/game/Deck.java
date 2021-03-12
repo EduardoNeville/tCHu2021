@@ -21,7 +21,7 @@ public final class Deck <C extends Comparable<C>> {
      * @param sortedBag
      */
     private Deck(List<C> sortedBag){
-        this.deckofCards = sortedBag;
+        this.deckofCards = List.copyOf(sortedBag);
     }
 
     /**
@@ -48,17 +48,17 @@ public final class Deck <C extends Comparable<C>> {
     /**
      * Check if the deck is empty
      * @return true if deck is empty
-    */
+     */
     public boolean isEmpty(){
-        return deckofCards.isEmpty(); //is it returning true here?
+        return size()==0;
     }
 
     /**
      * Method topCard finds the top card in the deck
      * @return topCard of the deck
-    */
+     */
     public C topCard(){
-        Preconditions.checkArgument(deckofCards.isEmpty());
+        Preconditions.checkArgument(!isEmpty());
         return deckofCards.get(0); //to be fixed
     }
 
@@ -77,9 +77,8 @@ public final class Deck <C extends Comparable<C>> {
      * @return The first (count) top cards
      */
     public SortedBag<C> topCards(int count){
-        Preconditions.checkArgument(deckofCards.isEmpty());
-        SortedBag<C> topCards = new SortedBag<>(deckofCards.subList(0, count));
-        return topCards;// to be fixed
+        Preconditions.checkArgument(0 <= count && count <= size());
+        return SortedBag.of(deckofCards.subList(0, count));
     }
 
     /**
@@ -89,6 +88,6 @@ public final class Deck <C extends Comparable<C>> {
      */
     public Deck<C> withoutTopCards(int count){
         Preconditions.checkArgument(!(0 <= count && count <= deckofCards.size()));
-        return new Deck<>(deckofCards.subList(count, deckofCards.size()-count));
+        return new Deck<>(deckofCards.subList(count, deckofCards.size()));
     }
 }
