@@ -11,7 +11,7 @@ import static ch.epfl.tchu.game.Constants.FACE_UP_CARDS_COUNT;
  *This class represents (part of) the state of the wagon
  * / locomotive cards that are not in the players' hand
  */
-public final class PublicCardState {
+public class PublicCardState {
 
     public final int deckSize;
     public final int discardsSize;
