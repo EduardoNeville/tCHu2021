@@ -1,7 +1,7 @@
 package ch.epfl.tchu.game;
 
 import ch.epfl.tchu.SortedBag;
-import ch.epfl.tchu.gui.StringsFr;
+import static ch.epfl.tchu.gui.StringsFr.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,15 +29,15 @@ public final class Info {
     private static String colorName(Card card){
         //String colorName;
         switch(card){
-            case BLACK: return StringsFr.BLACK_CARD;
-            case VIOLET:return StringsFr.VIOLET_CARD;
-            case BLUE: return StringsFr.BLUE_CARD;
-            case GREEN: return StringsFr.GREEN_CARD;
-            case YELLOW: return StringsFr.YELLOW_CARD;
-            case ORANGE: return StringsFr.ORANGE_CARD;
-            case RED: return StringsFr.RED_CARD;
-            case WHITE: return StringsFr.WHITE_CARD;
-            default: return StringsFr.LOCOMOTIVE_CARD;
+            case BLACK: return BLACK_CARD;
+            case VIOLET:return VIOLET_CARD;
+            case BLUE: return BLUE_CARD;
+            case GREEN: return GREEN_CARD;
+            case YELLOW: return YELLOW_CARD;
+            case ORANGE: return ORANGE_CARD;
+            case RED: return RED_CARD;
+            case WHITE: return WHITE_CARD;
+            default: return LOCOMOTIVE_CARD;
         }
     }
 
@@ -45,8 +45,8 @@ public final class Info {
      * @param route
      * @return the two cities of the route separated with a en dash
      */
-    private static String fullRouteString(Route route){
-        return route.station1().toString()+StringsFr.EN_DASH_SEPARATOR+route.station2().toString();
+    private static String routeName(Route route){
+        return route.station1().toString()+EN_DASH_SEPARATOR+route.station2().toString();
     }
 
     /**
@@ -64,11 +64,11 @@ public final class Info {
         switch(carteToSet.size()){
             case 1: carteToSetString = carteToSet.get(0);
             break;
-            case 2: carteToSetString = String.join(StringsFr.AND_SEPARATOR, carteToSet);
+            case 2: carteToSetString = String.join(AND_SEPARATOR, carteToSet);
             break;
             default: String lastString = carteToSet.get(carteToSet.size() -1);
             carteToSet.remove(carteToSet.size()-1);
-            carteToSetString = String.join(", ", carteToSet) + StringsFr.AND_SEPARATOR + lastString;
+            carteToSetString = String.join(", ", carteToSet) + AND_SEPARATOR + lastString;
         }
         return carteToSetString;
     }
@@ -79,7 +79,7 @@ public final class Info {
      * @return the name of the given card
      */
     public static String cardName(Card card, int count){
-        return String.format("%s", colorName(card)) + StringsFr.plural(count);
+        return String.format("%s", colorName(card)) + plural(count);
     }
 
     /**
@@ -88,14 +88,14 @@ public final class Info {
      * @return the message stating that the players
      */
     public static String draw(List<String> playerNames, int points){
-        return String.format(StringsFr.DRAW, String.join(StringsFr.AND_SEPARATOR, playerNames), points);
+        return String.format(DRAW, String.join(AND_SEPARATOR, playerNames), points);
     }
 
     /**
      * @return the message stating that the player will play first
      */
     public String willPlayFirst(){
-        return String.format(StringsFr.WILL_PLAY_FIRST, playerName);
+        return String.format(WILL_PLAY_FIRST, playerName);
     }
 
     /**
@@ -103,14 +103,14 @@ public final class Info {
      * @return the message declaring that the player has kept the given number of tickets
      */
     public String keptTickets(int count){
-        return String.format(StringsFr.KEPT_N_TICKETS, playerName, count, StringsFr.plural(count));
+        return String.format(KEPT_N_TICKETS, playerName, count, plural(count));
     }
 
     /**
      * @return the message declaring that the player can play
      */
     public String canPlay(){
-        return String.format(StringsFr.CAN_PLAY, playerName);
+        return String.format(CAN_PLAY, playerName);
     }
 
     /**
@@ -118,14 +118,14 @@ public final class Info {
      * @return the message stating that the player has drawn the given number of tickets
      */
     public String drewTickets(int count){
-        return String.format(StringsFr.DREW_TICKETS, playerName, count, StringsFr.plural(count));
+        return String.format(DREW_TICKETS, playerName, count, plural(count));
     }
 
     /**
      * @return the message declaring that the player has drawn a card "blind", ie from the top of the draw pile
      */
     public String drewBlindCard(){
-        return String.format(StringsFr.DREW_BLIND_CARD, playerName);
+        return String.format(DREW_BLIND_CARD, playerName);
     }
 
     /**
@@ -133,7 +133,7 @@ public final class Info {
      * @return
      */
     public String drewVisibleCard(Card card){
-        return String.format(StringsFr.DREW_VISIBLE_CARD, playerName, cardName(card, 1));
+        return String.format(DREW_VISIBLE_CARD, playerName, cardName(card, 1));
     }
 
     /**
@@ -142,7 +142,7 @@ public final class Info {
      * @return the message stating that the player has seized the given route using the given cards
      */
     public String claimedRoute(Route route, SortedBag<Card> cards){
-        return String.format(StringsFr.CLAIMED_ROUTE, playerName, fullRouteString(route), cardToString(cards)); //A VERIFIER cards
+        return String.format(CLAIMED_ROUTE, playerName, routeName(route), cardToString(cards)); //A VERIFIER cards
     }
 
     /**
@@ -151,7 +151,7 @@ public final class Info {
      * @return the message stating that the player wishes to seize the given tunnel route using initially the given cards
      */
     public String attemptsTunnelClaim(Route route, SortedBag<Card> initialCards){
-        return String.format(StringsFr.ATTEMPTS_TUNNEL_CLAIM, playerName, fullRouteString(route), cardToString(initialCards)); // A VERIFIER inCARds
+        return String.format(ATTEMPTS_TUNNEL_CLAIM, playerName, routeName(route), cardToString(initialCards)); // A VERIFIER inCARds
     }
 
     /**
@@ -161,9 +161,9 @@ public final class Info {
      */
     public String drewAdditionalCards(SortedBag<Card> drawnCards, int additionalCost) {
         if (additionalCost == 0) {
-            return String.format(StringsFr.ADDITIONAL_CARDS_ARE, cardToString(drawnCards)) + String.format(StringsFr.NO_ADDITIONAL_COST, StringsFr.plural(additionalCost));
+            return String.format(ADDITIONAL_CARDS_ARE, cardToString(drawnCards)) + String.format(NO_ADDITIONAL_COST, plural(additionalCost));
         } else
-            return String.format(StringsFr.ADDITIONAL_CARDS_ARE, cardToString(drawnCards)) + String.format(StringsFr.SOME_ADDITIONAL_COST, additionalCost, StringsFr.plural(additionalCost));
+            return String.format(ADDITIONAL_CARDS_ARE, cardToString(drawnCards)) + String.format(SOME_ADDITIONAL_COST, additionalCost, plural(additionalCost));
     }
 
     /**
@@ -171,7 +171,7 @@ public final class Info {
      * @return the message stating that the player could not (or wanted) to seize the given tunnel
      */
     public String didNotClaimRoute(Route route){
-        return String.format(StringsFr.DID_NOT_CLAIM_ROUTE, playerName, fullRouteString(route));
+        return String.format(DID_NOT_CLAIM_ROUTE, playerName, routeName(route));
     }
 
     /**
@@ -179,7 +179,7 @@ public final class Info {
      * @return the message declaring that the player has only the given number (and less than or equal to 2) of wagons, and that the last turn therefore begins
      */
     public String lastTurnBegins(int carCount){
-        return  String.format(StringsFr.LAST_TURN_BEGINS, playerName, carCount, StringsFr.plural(carCount));
+        return  String.format(LAST_TURN_BEGINS, playerName, carCount, plural(carCount));
     }
 
     /**
@@ -187,8 +187,8 @@ public final class Info {
      * @return the message declaring that the player obtains the end-of-game bonus thanks to the given path, which is the longest, or one of the longest
      */
     public String getsLongestTrailBonus(Trail longestTrail){
-        String endashTrail = longestTrail.station1().toString()+StringsFr.EN_DASH_SEPARATOR+longestTrail.station2().toString();
-        return String.format(StringsFr.GETS_BONUS, playerName, endashTrail); // A VERIFIER
+        String trail = longestTrail.station1()+EN_DASH_SEPARATOR+longestTrail.station2();
+        return String.format(GETS_BONUS, playerName, trail); // A VERIFIER
     }
 
     /**
@@ -197,7 +197,7 @@ public final class Info {
      * @return which returns the message declaring that the player wins the game with the number of points given, his opponent having only obtained loserPoints
      */
     public String won(int points, int loserPoints){
-        return String.format(StringsFr.WINS, playerName, points, StringsFr.plural(points), loserPoints, StringsFr.plural(loserPoints));
+        return String.format(WINS, playerName, points, plural(points), loserPoints, plural(loserPoints));
     }
 
 }
