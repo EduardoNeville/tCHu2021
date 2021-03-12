@@ -13,6 +13,7 @@ import java.util.*;
  * @author Eduardo Neville
  */
 public final class Deck <C extends Comparable<C>> {
+
     private final List<C> deckofCards;
 
     /**
@@ -57,7 +58,7 @@ public final class Deck <C extends Comparable<C>> {
      * @return topCard of the deck
      */
     public C topCard(){
-        Preconditions.checkArgument(!(deckofCards.isEmpty()));
+        Preconditions.checkArgument(!isEmpty());
         return deckofCards.get(0);
     }
 
@@ -66,7 +67,7 @@ public final class Deck <C extends Comparable<C>> {
      * @return DeckofCards without the top card
      */
     public Deck<C> withoutTopCard(){
-        Preconditions.checkArgument(!(deckofCards.isEmpty()));
+        Preconditions.checkArgument(!deckofCards.isEmpty());
         return new Deck<>(deckofCards.subList(1, deckofCards.size()));
     }
 
@@ -89,4 +90,5 @@ public final class Deck <C extends Comparable<C>> {
         Preconditions.checkArgument(0 <= count && count <= deckofCards.size());
         return new Deck<>(deckofCards.subList(count, deckofCards.size()));
     }
+    
 }
