@@ -28,13 +28,16 @@ public class PublicPlayerState {
         return routes;
     }
 
+    //TODO waggon count
+    /*
     public int carCount(){
         return
     }
-    public int getWagonCount = carCount();
-
+    //public int getWagonCount = carCount();
+    */
+    
     public int claimPoints(){
-        routes.size();
+        return Constants.ROUTE_CLAIM_POINTS.get(routes.size());
     }
 
 }
