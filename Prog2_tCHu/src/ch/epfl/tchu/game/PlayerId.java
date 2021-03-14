@@ -11,8 +11,7 @@ public enum PlayerId {
     public static final int COUNT = ALL.size();
 
     public PlayerId next(){
-        return PlayerId.PLAYER_1;
-        //return PlayerId.PLAYER_2;
+    
     }
 
 
