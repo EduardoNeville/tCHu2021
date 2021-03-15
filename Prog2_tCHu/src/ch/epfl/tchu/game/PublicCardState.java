@@ -2,67 +2,91 @@ package ch.epfl.tchu.game;
 
 import ch.epfl.tchu.Preconditions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import static ch.epfl.tchu.game.Constants.FACE_UP_CARDS_COUNT;
 
 /**
- *This class represents (part of) the state of the wagon
- * / locomotive cards that are not in the players' hand
+ * Public card state. Information about the cards that are accessible to all players.
+ *
+ * @author Martin Sanchez Lopez (313238)
  */
 public class PublicCardState {
 
+    private final List<Card> faceUpCards;
+    private final int faceUpCardsSize;
     private final int deckSize;
     private final int discardsSize;
-    private final List<Card> faceUpCards;
-
-
-    public PublicCardState(List<Card> faceUpCards, int deckSize, int discardsSize){
-        Preconditions.checkArgument(faceUpCards.size()== FACE_UP_CARDS_COUNT);
-        Preconditions.checkArgument(deckSize>=0);
-        Preconditions.checkArgument(discardsSize>=0);
-
-        this.deckSize = deckSize;
-        this.discardsSize = discardsSize;
-        this.faceUpCards = List.copyOf(faceUpCards);    }
 
     /**
-     *
-     * @return the total number of cards that are not in the players' hand, namely the 5 with the face up, those from the draw pile and those from the discard pile
+     * Constructs a PublicCardState with the given list of faceUpCards, deck size and discards pile size
+     * @param faceUpCards
+     *          face up cards
+     * @param deckSize
+     *          size of the deck of cards
+     * @param discardsSize
+     *          size of the discard pile
      */
-    public int totalSize(){
-        return (FACE_UP_CARDS_COUNT + deckSize + discardsSize);
+    public PublicCardState(List<Card> faceUpCards, int deckSize, int discardsSize){
+        Preconditions.checkArgument(faceUpCards.size() == Constants.FACE_UP_CARDS_COUNT);
+        Preconditions.checkArgument(deckSize >= 0 && discardsSize >= 0);
+        this.faceUpCards = List.copyOf(faceUpCards);
+        faceUpCardsSize = faceUpCards.size();
+        this.deckSize = deckSize;
+        this.discardsSize=discardsSize;
     }
 
     /**
-     * @return the 5 cards face up, in the form of a list containing exactly 5 elements
+     * Returns the total number of cards, the ones face up, the one in the deck and those in the discard.
+     * @return the total number of cards, the ones face up, the one in the deck and those in the discard
+     */
+    public int totalSize(){
+        return (faceUpCardsSize + deckSize + discardsSize);
+    }
+
+    /**
+     * Return a list of the face up cards.
+     * @return a list of the face up cards
      */
     public List<Card> faceUpCards(){
         return faceUpCards;
     }
 
     /**
-     * @return the card face up at the given index
+     * Return the face up card at the given slot.
+     * @param slot
+     *          slot of the card to get
+     *
+     * @throws IndexOutOfBoundsException
+     *          if the slot number is not between 0 (included) and the number of
+     *          face up cards (excluded)
+     * @return the face up card at the given slot
      */
     public Card faceUpCard(int slot){
-        Objects.checkIndex(slot, FACE_UP_CARDS_COUNT);
+        Objects.checkIndex(slot, faceUpCardsSize);
         return faceUpCards.get(slot);
     }
 
     /**
-     * @return the deckSize
+     * Returns true if the deck is empty.
+     * @return true if the deck is empty
      */
-    public int deckSize(){
-        return deckSize;
-    }
-
     public boolean isDeckEmpty(){
-        return deckSize==0;
+        return deckSize == 0;
     }
 
-    public int discardsSize(){
+    /**
+     * Returns the number of cards discarded.
+     * @return the number of cards discarded
+     */
+    public int discardsSize() {
         return discardsSize;
     }
 
+    /**
+     * Returns the number of cards in the deck.
+     * @return the number of cards in the deck
+     */
+    public int deckSize() {
+        return deckSize;
+    }
 }
