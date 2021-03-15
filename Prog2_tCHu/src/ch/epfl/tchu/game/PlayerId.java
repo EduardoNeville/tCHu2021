@@ -11,7 +11,10 @@ public enum PlayerId {
     public static final int COUNT = ALL.size();
 
     public PlayerId next(){
-    //TODO
+        if (this.equals(PLAYER_1)){
+            return PLAYER_2;
+        }
+        return PLAYER_1;
     }
 
 
