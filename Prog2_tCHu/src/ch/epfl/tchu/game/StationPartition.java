@@ -58,7 +58,7 @@ public final class StationPartition implements StationConnectivity {
     /**
      * A StationPartition builder.
      */
-    public class Builder{
+    public static class Builder{
 
         private int[] partitionArray;
 
