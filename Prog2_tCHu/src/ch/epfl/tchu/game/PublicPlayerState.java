@@ -7,28 +7,25 @@ import java.util.List;
 /**
  * Class PublicPlayerState
  * Methods: ticketCount, CardCount, routes, carCount, claimPoints.
- * 
+ *
  * @author Eduardo Neville (314667)
  */
 public class PublicPlayerState {
     private final int ticketCount;
     private final int cardCount;
     private final List<Route> routes;
-    private final int wagonCount;
 
     /**
      * Constructor for PublicPlayerState
      * @param ticketCount # of tickets a player has
      * @param cardCount # of cards a player has
      * @param routes # of routes a player has
-     * @param wagonCount # of wagons a player has
      */
-    public PublicPlayerState(int ticketCount, int cardCount, List<Route> routes, int wagonCount){
+    public PublicPlayerState(int ticketCount, int cardCount, List<Route> routes){
         Preconditions.checkArgument(!(ticketCount<0));
         this.ticketCount = ticketCount;
         this.cardCount = cardCount;
         this.routes = List.copyOf(routes);
-        this.wagonCount = wagonCount;
     }
 
     /**
@@ -59,9 +56,13 @@ public class PublicPlayerState {
      * Wagon getter
      * @return # of wagons
      */
-    public int carCount(){
-        return wagonCount;
-    }
+        public int carCount(){
+            int total =0;
+            for (Route route: routes) {
+                total = total + route.length();
+            }
+            return Constants.INITIAL_CAR_COUNT - total;
+        }
 
     /**
      * Points earned
