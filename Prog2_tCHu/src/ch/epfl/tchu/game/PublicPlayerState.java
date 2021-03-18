@@ -22,10 +22,11 @@ public class PublicPlayerState {
      * @param routes # of routes a player has
      */
     public PublicPlayerState(int ticketCount, int cardCount, List<Route> routes){
-        Preconditions.checkArgument(!(ticketCount<0));
+        Preconditions.checkArgument(!(ticketCount<0) && cardCount>=0);
         this.ticketCount = ticketCount;
         this.cardCount = cardCount;
         this.routes = List.copyOf(routes);
+        var networkStation = new StationPartition.Builder(43);
     }
 
     /**
@@ -40,7 +41,7 @@ public class PublicPlayerState {
      * Card getter
      * @return # of cards
      */
-    public int CardCount() {
+    public int cardCount() {
         return cardCount;
     }
 
@@ -69,7 +70,15 @@ public class PublicPlayerState {
      * @return # of points earned
      */
     public int claimPoints(){
-        return Constants.ROUTE_CLAIM_POINTS.get(routes.size());
+        int points = 0;
+
+        for (Route r :
+                routes()) {
+            points += Constants.ROUTE_CLAIM_POINTS.get(r.length());
+        }
+
+        return points;
+        //return Constants.ROUTE_CLAIM_POINTS.get(routes.size());
     }
 
 }
