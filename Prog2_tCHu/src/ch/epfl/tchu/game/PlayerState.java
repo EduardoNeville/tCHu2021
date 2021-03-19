@@ -128,29 +128,32 @@ public class PlayerState extends PublicPlayerState{
      public List<SortedBag<Card>> possibleAdditionalCards(int additionalCardsCount,
                                                          SortedBag<Card> initialCards,
                                                          SortedBag<Card> drawnCards){
-         Preconditions.checkArgument(additionalCardsCount >= 1 && additionalCardsCount <=3);
-         Preconditions.checkArgument(!initialCards.isEmpty() && initialCards.toSet().size() <=2);
-         Preconditions.checkArgument(drawnCards.size() == Constants.ADDITIONAL_TUNNEL_CARDS);
-         //1 Calculate usable cards
+        Preconditions.checkArgument(Constants.ADDITIONAL_TUNNEL_CARDS>=additionalCardsCount && additionalCardsCount>= 1);
+        Preconditions.checkArgument(!(initialCards.isEmpty()));
+        Preconditions.checkArgument(drawnCards.size()== Constants.ADDITIONAL_TUNNEL_CARDS);
+        Preconditions.checkArgument(initialCards.toSet().size() <= 2);
+
+        //1 Calculate usable cards
         var options1 = new SortedBag.Builder<Card>();
 
         for (Card card: SortedBag.of(cards.difference(initialCards))) {
             for (Card card1 : drawnCards) {
-                if (card.color().equals(card1.color()) || card.color().equals(Card.LOCOMOTIVE)) {
+                if (card.color().equals(card1.color()) || card.equals(Card.LOCOMOTIVE)) {
                     options1.add(card);
                 }
             }
         }
 
-        //2 create all subsets of
-        //we need to use subsetsOfSize
-        SortedBag<Card> options2 = options1.build();    //verify that options2 is at least size additionalCards
+        SortedBag<Card> options2 = options1.build();
+        //verify that options2 is at least size additionalCards
+        if (options2.size()>=additionalCardsCount){
             List<SortedBag<Card>> options = new ArrayList<>(options2.subsetsOfSize(additionalCardsCount));
 
             //3 sort them with amount of LOCOMOTIVE cards
             options.sort(Comparator.comparingInt(cs -> cs.countOf(Card.LOCOMOTIVE)));
             return options;
-        
+        }
+        else return List.of();
     }
 
     /**
