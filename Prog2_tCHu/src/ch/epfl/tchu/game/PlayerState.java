@@ -160,7 +160,6 @@ public class PlayerState extends PublicPlayerState{
      * @return new PlayerState with claimed route and without cards used to claim
      */
     public PlayerState withClaimedRoute(Route route, SortedBag<Card> claimCards){
-        Preconditions.checkArgument(!(cards.size()<route.length()));
         List<Route> totalRoutes = new ArrayList<>(routes);
         totalRoutes.add(route);
         return new PlayerState(tickets,cards.difference(claimCards),totalRoutes);
