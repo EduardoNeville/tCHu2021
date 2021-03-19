@@ -94,8 +94,14 @@ public class PlayerState extends PublicPlayerState{
      * @param route route in question to see if possible to claim
      * @return If  it is possible to return card
      */
-    public boolean canClaimRoute(Route route){
-        return !(route.possibleClaimCards().isEmpty());
+     public boolean canClaimRoute(Route route){
+        List<Card> possibleCards = new ArrayList<>();
+        for (Card card:cards) {
+            if (card.color().equals(route.color()) || card.equals(Card.LOCOMOTIVE)){
+                possibleCards.add(card);
+            }
+        }
+        return possibleCards.size()>= route.length();
     }
 
     /**
