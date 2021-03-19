@@ -3,10 +3,20 @@ package ch.epfl.tchu.game;
 import ch.epfl.tchu.Preconditions;
 import ch.epfl.tchu.SortedBag;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
+/**
+ * Class PlayerState
+ *
+ * Methods: tickets, withAddedTickets, cards, withAddedCard, withAddedCards, canClaimRoute,
+ * possibleClaimCards, possibleAdditionalCards, withClaimedRoute, ticketPoints, finalPoints
+ *
+ * @author Eduardo Neville (314667)
+ */
 public class PlayerState extends PublicPlayerState{
 
     private final SortedBag<Ticket> tickets;
@@ -25,6 +35,7 @@ public class PlayerState extends PublicPlayerState{
         Preconditions.checkArgument(!(initialCards.size() == Constants.INITIAL_CARDS_COUNT));
         return new PlayerState(SortedBag.of(), initialCards,List.of());
     }
+
 
     public SortedBag<Ticket> tickets(){
         return tickets;
@@ -60,16 +71,21 @@ public class PlayerState extends PublicPlayerState{
                                                          SortedBag<Card> initialCards,
                                                          SortedBag<Card> drawnCards){
         //1 Calculate usable cards
-        for (Card card: initialCards) {
-            if (){
+        SortedBag<Card> options1 = null;
 
+        for (Card card: SortedBag.of(cards.difference(initialCards))) {
+            for (Card card1 : drawnCards) {
+                if (card.color().equals(card1.color())||card.color().equals(Card.LOCOMOTIVE)) {
+                    options1.add(SortedBag.of(card));
+                }
             }
         }
-        //2
-        List<SortedBag<Card>> options = ;
+        //2 create all subsets of
+        //we need to use subsetsOfSize
+        List<SortedBag<Card>> options = new ArrayList<>();
+        //use subsetOfSize from SortedBag
 
-
-        //3
+        //3 sort them with amount of LOCOMOTIVE cards
         options.sort(Comparator.comparingInt(cs -> cs.countOf(Card.LOCOMOTIVE)));
         return options;
     }
