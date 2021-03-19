@@ -43,7 +43,7 @@ class PlayerStateTest {
     @Test
     void cards() {
         PlayerState ps = PlayerState.initial(SortedBag.of( 4, Card.ORANGE));
-        assertEquals(0, ps.cards().size());
+        assertEquals(4, ps.cards().size());
     }
 
     @Test
@@ -51,7 +51,7 @@ class PlayerStateTest {
         PlayerState ps = PlayerState.initial(SortedBag.of( 4, Card.ORANGE));
         assertEquals(4, ps.cards().size());
         ps = ps.withAddedCard(Card.LOCOMOTIVE);
-        assertEquals(5, ps.cards());
+        assertEquals(5, ps.cards().size());
     }
 
     @Test
@@ -59,7 +59,7 @@ class PlayerStateTest {
         PlayerState ps = PlayerState.initial(SortedBag.of( 4, Card.ORANGE));
         assertEquals(4, ps.cards().size());
         ps = ps.withAddedCards(SortedBag.of(2, Card.BLUE, 4, Card.LOCOMOTIVE));
-        assertEquals(11, ps.cards());
+        assertEquals(10, ps.cards().size());
     }
 
     @Test
@@ -71,6 +71,24 @@ class PlayerStateTest {
 
     @Test
     void possibleClaimCards() {
+        List<Route>  routes = ChMap.routes();
+        PlayerState ps = PlayerState.initial(SortedBag.of( 3, Card.YELLOW, 1 , Card.LOCOMOTIVE));
+        assertEquals(List.of(
+                SortedBag.of(2, Card.YELLOW), SortedBag.of(1, Card.YELLOW, 1, Card.LOCOMOTIVE)        ),
+                ps.possibleClaimCards(routes.get(6)));
+
+        ps = ps.withAddedCards(SortedBag.of(3, Card.LOCOMOTIVE, 1, Card.YELLOW));
+        ps = ps.withAddedCards(SortedBag.of(1, Card.LOCOMOTIVE, 1, Card.RED));
+
+
+        assertEquals(List.of(
+                SortedBag.of(4, Card.YELLOW),
+                SortedBag.of(3, Card.YELLOW, 1, Card.LOCOMOTIVE),
+                SortedBag.of(2, Card.YELLOW, 2, Card.LOCOMOTIVE),
+                SortedBag.of(1, Card.RED, 3, Card.LOCOMOTIVE),
+                SortedBag.of(1, Card.YELLOW, 3, Card.LOCOMOTIVE),
+                SortedBag.of(4, Card.LOCOMOTIVE)),
+                ps.possibleClaimCards(routes.get(1)));
     }
 
     @Test
@@ -86,6 +104,16 @@ class PlayerStateTest {
 
     @Test
     void ticketPoints() {
+        List<Route>  routes = ChMap.routes();
+        PlayerState ps = PlayerState.initial(SortedBag.of( 4, Card.ORANGE));
+        assertEquals(0, ps.ticketPoints());
+        ps = ps.withAddedTickets(SortedBag.of(ChMap.tickets().get(1)));
+        assertEquals(-10, ps.ticketPoints());
+        ps = ps.withAddedTickets(SortedBag.of(ChMap.tickets().get(0)));
+        ps = ps.withClaimedRoute(routes.get(7), SortedBag.of()).withClaimedRoute(routes.get(67), SortedBag.of())
+                .withClaimedRoute(routes.get(19), SortedBag.of());
+        assertEquals(-5, ps.ticketPoints());
+
     }
 
     @Test
