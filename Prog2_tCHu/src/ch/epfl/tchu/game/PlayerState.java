@@ -99,10 +99,30 @@ public class PlayerState extends PublicPlayerState{
     }
 
     /**
-     * Possible Card claims
-     * @param route
-     * @return
+     * Used to check if a route can be claimed
+     * @param route route in question to see if possible to claim
+     * @return If it is possible to claim route
      */
+    public boolean canClaimRoute(Route route){
+        return !(possibleClaimCards(route).isEmpty());
+    }
+
+    /**
+     * Possible Card claims
+     * @param route route we want to claim
+     * @return list of possible ways to claim it
+     */
+    public List<SortedBag<Card>> possibleClaimCards(Route route){
+        Preconditions.checkArgument(route.length()> cards.size());
+        
+        List<SortedBag<Card>> possibleCards = new ArrayList<>();
+        for (Card card:cards) {
+            if (card.color().equals(route.color()) || card.equals(Card.LOCOMOTIVE)){
+                possibleCards.add(SortedBag.of(card));
+            }
+        }
+        return possibleCards;
+    }
     public List<SortedBag<Card>> possibleClaimCards(Route route){
         Preconditions.checkArgument(route.length()> cards.size());
         
