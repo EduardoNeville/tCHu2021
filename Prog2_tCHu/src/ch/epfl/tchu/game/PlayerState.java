@@ -105,17 +105,19 @@ public class PlayerState extends PublicPlayerState{
      * @param route route we want to claim
      * @return list of possible ways to claim it
      */
-    public List<SortedBag<Card>> possibleClaimCards(Route route){
+     public List<SortedBag<Card>> possibleClaimCards(Route route){
         Preconditions.checkArgument(carCount() > route.length());
-        
+        var routePossible = route.possibleClaimCards();
         List<SortedBag<Card>> possibleCards = new ArrayList<>();
-        for (Card card:cards) {
-            if (card.equals(Card.LOCOMOTIVE) || card.color().equals(route.color())){
-                possibleCards.add(SortedBag.of(card));
+
+        for (var possibleroutes: routePossible ){
+            if (cards.contains(possibleroutes)){
+                possibleCards.add(possibleroutes);
             }
         }
         return possibleCards;
     }
+
 
 
     /**
