@@ -92,7 +92,29 @@ class PlayerStateTest {
     }
 
     @Test
-    void possibleAdditionalCards() {
+    void possibleAdditionalCardsThrowsErrors() {
+        Route r = ChMap.routes().get(1);
+        PlayerState ps = PlayerState.initial(SortedBag.of( 4, Card.BLUE));
+        SortedBag.Builder<Card> sB =new SortedBag.Builder<>();
+        sB.add(SortedBag.of(2, Card.VIOLET, 1, Card.YELLOW)).add(Card.RED);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            ps.possibleAdditionalCards(0, SortedBag.of(2, Card.VIOLET, 1, Card.YELLOW), SortedBag.of(2, Card.VIOLET, 1, Card.YELLOW));
+        });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            ps.possibleAdditionalCards(4, SortedBag.of(2, Card.VIOLET, 1, Card.YELLOW), SortedBag.of(2, Card.VIOLET, 1, Card.YELLOW));
+        });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            ps.possibleAdditionalCards(2, sB.build(), SortedBag.of(2, Card.VIOLET, 1, Card.YELLOW));
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            ps.possibleAdditionalCards(2, SortedBag.of(2, Card.VIOLET, 1, Card.YELLOW), SortedBag.of(2, Card.VIOLET, 3, Card.YELLOW));
+        });
+
+        ps.possibleAdditionalCards(2, SortedBag.of(1, Card.VIOLET, 1, Card.YELLOW), SortedBag.of(2, Card.VIOLET, 1, Card.YELLOW));
+
     }
 
     @Test

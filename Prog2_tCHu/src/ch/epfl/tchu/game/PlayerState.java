@@ -128,7 +128,10 @@ public class PlayerState extends PublicPlayerState{
      public List<SortedBag<Card>> possibleAdditionalCards(int additionalCardsCount,
                                                          SortedBag<Card> initialCards,
                                                          SortedBag<Card> drawnCards){
-        //1 Calculate usable cards
+         Preconditions.checkArgument(additionalCardsCount >= 1 && additionalCardsCount <=3);
+         Preconditions.checkArgument(!initialCards.isEmpty() && initialCards.toSet().size() <=2);
+         Preconditions.checkArgument(drawnCards.size() == Constants.ADDITIONAL_TUNNEL_CARDS);
+         //1 Calculate usable cards
         var options1 = new SortedBag.Builder<Card>();
 
         for (Card card: SortedBag.of(cards.difference(initialCards))) {
