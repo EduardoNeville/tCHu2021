@@ -1,16 +1,16 @@
 package ch.epfl.tchu.game;
+
 import ch.epfl.tchu.Preconditions;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
- * Trip Class
+ * A Trip.
  *
- * Constructor: Trip
- * Getters: from, to, points
- * Methods: all, points
+ * @author Martin Sanchez Lopez (313238)
  */
-
 public final class Trip {
 
     private final Station from;
@@ -18,14 +18,18 @@ public final class Trip {
     private final int points;
 
     /**
-     * Trip method brings all the info of a given trip
+     * Construct a Trip with a 'from' Station, a 'to' Station and an atributed number of points.
      *
-     * @param from   Departing station must be non null
-     * @param to     Arriving station must be non null
-     * @param points Points of the trip must be >0
+     * @param from
+     *          from Station
+     * @param to
+     *          to Station
+     * @param points
+     *          points worth of completing the Trip
+     * @throws IllegalArgumentException
+     *          if the number of points is lower or equal to 0
      */
-
-    public Trip(Station from, Station to, int points) {
+    public Trip(Station from, Station to, int points){
         Preconditions.checkArgument(points > 0);
         this.from = Objects.requireNonNull(from);
         this.to = Objects.requireNonNull(to);
@@ -33,68 +37,63 @@ public final class Trip {
     }
 
     /**
-     * Gives all possible trips that can be take from a given station (from)
+     * Return list of trip, for each 'from' station to every 'to' station, as long as they are not the same.
      *
-     * @param from   List of all possible starting station
-     * @param to     List of all possible finishing station
-     * @param points The points that you can obtain from said trip
-     * @return List of all possible train trips you can take.
+     * @param from From Station for the trip
+     * @param to To Station for the trip
+     * @param points Points that the trip rewards
+     * @return ArrayList of all Trips
      */
-    public static List<Trip> all(List<Station> from, List<Station> to, int points) {
+    public static List<Trip> all(List<Station> from, List<Station> to, int points){
+        ArrayList<Trip> allTrips = new ArrayList<>();
 
-        //THROW UNE ILLEGAL EXCEPTION SI UN ELEMENT DE FROM = UN ELEMENT DE TO AVANT D'AJOUTER AU TABLEAU DES TRAJETS
-        List<Trip> PossibleTrips = new ArrayList<>();
-
-        //loop through all possible routes if the connectivity is okay add to the list
-        for (Station station : from) {
-            for (Station station1 : to) {
-                if (from != to) {
-                    PossibleTrips.add(new Trip(station, station1, points)); //points could be received with a method
+        for (Station f: from) {
+            for (Station t : to) {
+                //no trip from a station to that same station
+                if ( !f.name().equals(t.name()) ) {
+                    allTrips.add(new Trip(f, t, points));
                 }
             }
         }
-        Preconditions.checkArgument(!PossibleTrips.isEmpty() || !(points > 0));
-        return PossibleTrips;
+        return allTrips;
     }
 
     /**
-     * Getter for the Departing station
-     *
-     * @return Departing station
+     * Returns the 'from' Station of this Trip.
+     * @return the 'from' Station of this Trip
      */
-
-    public Station from() {
+    public Station from(){
         return from;
     }
 
     /**
-     * Getter for the arriving station
-     *
-     * @return Arriving station
+     * Returns the 'to' Station of this Trip.
+     * @return the 'to' Station of this Trip
      */
-    public Station to() {
+    public Station to(){
         return to;
     }
 
     /**
-     * Getter for the # of points the trip has
-     *
-     * @return Points of the trip
+     * Returns the points this Trip rewards.
+     * @return the points this Trip rewards
      */
-
-    public int points() { return points; }
+    public int points(){
+        return points;
+    }
 
     /**
-     * Getter for the # of points of the trips connectivity
+     * Returns the points of this Trip for a given connectivity.
      *
-     * @param connectivity check if trip is possible
-     * @return Points of the trips connectivity
+     * @param connectivity
+     *              connectivity
+     * @return the points of this Trip for a given connectivity
      */
-
-    public int points(StationConnectivity connectivity) {
-        if (connectivity.connected(from, to)) {
+    public int points(StationConnectivity connectivity){
+        if(connectivity.connected(from, to)){
             return points;
-        } else {
+        }
+        else{
             return -points;
         }
     }
