@@ -142,27 +142,29 @@ public class PlayerState extends PublicPlayerState{
      * @param drawnCards  cards need to claim
      * @return List of all possible combinations of cards that can be used to claim route
      */
-    public List<SortedBag<Card>> possibleAdditionalCards(int additionalCardsCount,
+     public List<SortedBag<Card>> possibleAdditionalCards(int additionalCardsCount,
                                                          SortedBag<Card> initialCards,
                                                          SortedBag<Card> drawnCards){
         //1 Calculate usable cards
-        List<SortedBag<Card>> options1 = new ArrayList<>();
+        var options1 = new SortedBag.Builder<Card>();
 
         for (Card card: SortedBag.of(cards.difference(initialCards))) {
             for (Card card1 : drawnCards) {
-                if (card.color().equals(card1.color())||card.color().equals(Card.LOCOMOTIVE)) {
-                    options1.add(SortedBag.of(card));
+                if (card.color().equals(card1.color()) || card.color().equals(Card.LOCOMOTIVE)) {
+                    options1.add(card);
                 }
             }
         }
+
         //2 create all subsets of
         //we need to use subsetsOfSize
-        List<SortedBag<Card>> options = new ArrayList<>();
-        //use subsetOfSize from SortedBag
+        SortedBag<Card> options2 = options1.build();    //verify that options2 is at least size additionalCards
+            List<SortedBag<Card>> options = new ArrayList<>(options2.subsetsOfSize(additionalCardsCount));
 
-        //3 sort them with amount of LOCOMOTIVE cards
-        options.sort(Comparator.comparingInt(cs -> cs.countOf(Card.LOCOMOTIVE)));
-        return options;
+            //3 sort them with amount of LOCOMOTIVE cards
+            options.sort(Comparator.comparingInt(cs -> cs.countOf(Card.LOCOMOTIVE)));
+            return options;
+        
     }
 
     /**
