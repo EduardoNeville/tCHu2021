@@ -32,7 +32,7 @@ public class PlayerState extends PublicPlayerState{
 
     //TODO create the initial conditions for the players
     public static PlayerState initial(SortedBag<Card> initialCards){
-        Preconditions.checkArgument(!(initialCards.size() == Constants.INITIAL_CARDS_COUNT));
+        Preconditions.checkArgument((initialCards.size() == Constants.INITIAL_CARDS_COUNT));
         return new PlayerState(SortedBag.of(), initialCards,List.of());
     }
 
