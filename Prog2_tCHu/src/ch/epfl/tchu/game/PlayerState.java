@@ -56,7 +56,7 @@ public class PlayerState extends PublicPlayerState{
 
     /**
      * PlayerState with Tickets added
-     * @param newTickets new tickets  
+     * @param newTickets new tickets
      * @return PlayerState with new tickets added
      */
     public PlayerState withAddedTickets(SortedBag<Ticket> newTickets){
@@ -70,10 +70,10 @@ public class PlayerState extends PublicPlayerState{
     public SortedBag<Card> cards(){
         return cards;
     }
-    
+
     /**
     * PlayerState with card added
-    * @param card new card  
+    * @param card new card
     * @return PlayerState with new card added
     */
     public PlayerState withAddedCard(Card card){
@@ -95,6 +95,10 @@ public class PlayerState extends PublicPlayerState{
      * @return If  it is possible to return card
      */
      public boolean canClaimRoute(Route route){
+         if(route.length()> carCount()){
+             return false;
+         }
+
         List<Card> possibleCards = new ArrayList<>();
         for (Card card:cards) {
             if (card.color().equals(route.color()) || card.equals(Card.LOCOMOTIVE)){
@@ -105,19 +109,19 @@ public class PlayerState extends PublicPlayerState{
     }
 
     /**
-     * Possible Card claims 
-     * @param route 
+     * Possible Card claims
+     * @param route
      * @return
      */
     public List<SortedBag<Card>> possibleClaimCards(Route route){
-        Preconditions.checkArgument(route.length()> cards.size());
+        Preconditions.checkArgument(route.length()> carCount());
         return route.possibleClaimCards(); //is this correct? Used method from Route
     }
 
     /**
      * Used to see which options we have when trying to claim a route
      * @param additionalCardsCount # of cards needed to claim the route
-     * @param initialCards cards used from the players hand 
+     * @param initialCards cards used from the players hand
      * @param drawnCards  cards need to claim
      * @return List of all possible combinations of cards that can be used to claim route
      */
