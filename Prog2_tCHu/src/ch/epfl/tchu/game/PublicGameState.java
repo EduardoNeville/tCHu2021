@@ -2,6 +2,7 @@ package ch.epfl.tchu.game;
 
 import ch.epfl.tchu.Preconditions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +34,7 @@ public class PublicGameState {
     }
 
     public PublicCardState cardState(){
-        return new PublicCardState(cardStatE.faceUpCards(), cardStatE.deckSize(), cardStatE.discardsSize())
+        return new PublicCardState(cardStatE.faceUpCards(), cardStatE.deckSize(), cardStatE.discardsSize());
     }
 
     public boolean canDrawCards(){
@@ -46,21 +47,24 @@ public class PublicGameState {
     }
 
     public PublicPlayerState playerState(PlayerId playerId){
-        //TODO
+        return new PublicPlayerState(ticketCounT, cardStatE.totalSize(),playerState(playerId).routes());
     }
 
     public PublicPlayerState currentPlayerState(){
-        //Use playerStatE?
-        return new PublicPlayerState(playerStatE);
+        return playerState(currentPlayerID);
     }
 
-    //TODO
     public List<Route> claimedRoutes(){
+        List<PublicPlayerState> allPublicPlayerState = new ArrayList<PublicPlayerState>(playerStatE.values());
+        List<Route> allRoutes = new ArrayList<>();
 
+        for (PublicPlayerState player: allPublicPlayerState) {
+            allRoutes.addAll(player.routes());
+        }
+        return allRoutes;
     }
 
-    //TODO Correct
     public PlayerId lastPlayer(){
-        return currentPlayerID.next();
+        return lastPlayeR;
     }
 }
