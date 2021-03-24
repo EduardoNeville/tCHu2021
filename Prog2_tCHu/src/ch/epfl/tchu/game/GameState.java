@@ -5,41 +5,49 @@ import ch.epfl.tchu.SortedBag;
 
 import java.util.*;
 
+/**
+ * GameState class
+ * Methods: playerState, currentPlayerState, topTickets, withoutTopTickets, topCard,
+ * withoutTopCard, withMoreDiscardedCards, withCardsDeckRecreatedIfNeeded, withInitiallyChosenTickets,
+ * withChosenAdditionalTickets, withDrawnFaceUpCard, withBlindlyDrawnCard, withClaimedRoute, lastTurnBegins, 
+ * forNextTurn
+ * 
+ * 
+ * @author Eduardo Neville
+ */
 public final class GameState extends PublicGameState{
+
     private final Deck<Ticket> tickets;
-    private final Map playerState;
-    private final PlayerId lastPlayer,currentPlayer;
-    private final PublicCardState publicCardState;
-    private final Deck<Card> deckofCards;
+    private final Map<PlayerId,PlayerState> playerState;
     private final CardState privateCardState;
 
-
-    private GameState(int ticketCounts, PublicCardState publicCardState,
-                     PlayerId currentPLayer, Map playerState, PlayerId lastPlayer,
-                     Deck<Ticket> tickets, Deck<Card> deckofCards, CardState privateCardState){
-        super(ticketCounts,publicCardState,currentPLayer,
+    private GameState(Map<PlayerId,PlayerState> playerState, PlayerId lastPlayer,
+                     Deck<Ticket> ticketsDeck, CardState privateCardState, PlayerId currentPlayerId){
+        super(ticketsDeck.size(),privateCardState,currentPlayerId,
                 makePublic(playerState),lastPlayer);
 
-        this.tickets = tickets;
+        this.tickets = ticketsDeck;
         this.playerState = playerState;
-        this.lastPlayer = lastPlayer; // Make immutable
-        this.currentPlayer = currentPLayer; // Make immutable
-        this.publicCardState = publicCardState; // Make immutable
-        this.deckofCards = deckofCards;
         this.privateCardState = privateCardState;
     }
 
+    /**
+     * Initial static constructor that initializes the game
+     * @param tickets tickets in the deck
+     * @param rng used to shuffle the tickets
+     * @return
+     */
     public static GameState initial(SortedBag<Ticket> tickets, Random rng){
 
         SortedBag<Card> withoutInitialCards = SortedBag.of(Constants.ALL_CARDS);
         List<Card> shuffleDeck = withoutInitialCards.toList();
         Collections.shuffle(shuffleDeck);
-        Deck theDeck = Deck.of(withoutInitialCards,rng);
+        Deck<Card> theDeck = Deck.of(withoutInitialCards,rng);
 
         Map<PlayerId,PlayerState> initialMap = new HashMap<>();
-        initialMap.put(PlayerId.PLAYER_1, PlayerState.initial(theDeck.topCards(4))); //TODO
+        initialMap.put(PlayerId.PLAYER_1, PlayerState.initial(theDeck.topCards(4)));
         theDeck = theDeck.withoutTopCards(4);
-        initialMap.put(PlayerId.PLAYER_2, PlayerState.initial(theDeck.topCards(4))); //TODO
+        initialMap.put(PlayerId.PLAYER_2, PlayerState.initial(theDeck.topCards(4)));
         theDeck = theDeck.withoutTopCards(4);
 
         List<PlayerId> listOfPlayers = new ArrayList<>();
@@ -48,39 +56,20 @@ public final class GameState extends PublicGameState{
         Random random = new Random();
         PlayerId randStartingPlayer = listOfPlayers.get(random.nextInt());
 
-        int ticketCount = tickets.size();
-        PublicCardState initialCardState = new PublicCardState(new ArrayList<>(),theDeck.size(),0);
+        CardState privateCardState = CardState.of(theDeck);
 
-        //TODO
-        GameState initialGameState = new GameState(ticketCount, initialCardState,
-                randStartingPlayer,initialMap,null,tickets,
-                theDeck,);
-
-
-        return initialGameState;
+        return new GameState(initialMap, null,Deck.of(tickets,rng), privateCardState,randStartingPlayer);
     }
 
-
     private static Map<PlayerId, PublicPlayerState> makePublic(Map<PlayerId,PlayerState> playerStateMap){
-        int cardCount1, cardCount2;
-        int ticketCount1, ticketCount2;
-        List<Route> routes1,routes2;
 
         Map<PlayerId, PlayerState> playerStateTreeMap = new TreeMap<PlayerId, PlayerState>(playerStateMap);
 
         PlayerState playerState1 = playerStateTreeMap.get(PlayerId.PLAYER_1);
         PlayerState playerState2 = playerStateTreeMap.get(PlayerId.PLAYER_2);
 
-        cardCount1 = playerState1.cards().size();
-        ticketCount1 = playerState1.tickets().size();
-        routes1 = playerState1.routes();
-
-        cardCount2 = playerState2.cards().size();
-        ticketCount2 = playerState2.tickets().size();
-        routes2 = playerState2.routes();
-
-        PublicPlayerState publicPlayerState1 = new PublicPlayerState(ticketCount1,cardCount1,routes1);
-        PublicPlayerState publicPlayerState2 = new PublicPlayerState(ticketCount2,cardCount2,routes2);
+        PublicPlayerState publicPlayerState1 = new PublicPlayerState(playerState1.tickets().size(),playerState1.cards().size(),playerState1.routes());
+        PublicPlayerState publicPlayerState2 = new PublicPlayerState(playerState2.tickets().size(),playerState2.cards().size(),playerState2.routes());
 
         Map<PlayerId, PublicPlayerState> publicPlayerStateMap = new TreeMap<PlayerId, PublicPlayerState>();
         publicPlayerStateMap.put(PlayerId.PLAYER_1,publicPlayerState1);
@@ -89,86 +78,178 @@ public final class GameState extends PublicGameState{
         return publicPlayerStateMap;
     }
 
+    /**
+     * Returns the full playerState
+     * @param playerId Player in question
+     * @return full playerState of playerId
+     */
     public PlayerState playerState(PlayerId playerId){
-        //override method from parent class
+        return playerState.get(playerId);
     }
 
+    /**
+     * Returns the full playerState of the currentPlayerId
+     * @return full playerState of currentplayerId
+     */
     public PlayerState currentPlayerState(){
-        //override method from parent class
+        return playerState(currentPlayerId());
     }
-
 
     //Bloc 1 of methods
 
-
+    /**
+     * Returns the toptickets of the deck
+     * @param count # of tickets returned
+     * @return # of tickets at the top that are being returned
+     */
     public SortedBag<Ticket> topTickets(int count){
         Preconditions.checkArgument(count>0 || tickets.size()>count);
         return tickets.topCards(count);
     }
 
-    //TODO
+    /**
+     * Returns the deck without the toptickets of the deck
+     * @param count # of tickets that we remove
+     * @return deck without the toptickets
+     */
     public GameState withoutTopTickets(int count){
         Preconditions.checkArgument(count>0 || tickets.size()>count);
-        return new GameState(); //take out toptickets from gamestate deck using constructor
+        return new GameState(playerState,lastPlayer(),
+                tickets.withoutTopCards(count),privateCardState,currentPlayerId()); //take out toptickets from gamestate deck using constructor
     }
 
+    /**
+     * Returns the top card of the deck
+     * @return top card of the deck
+     */
     public Card topCard(){
-        Preconditions.checkArgument(!deckofCards.isEmpty());
-        return deckofCards.topCard();
+        Preconditions.checkArgument(!privateCardState.isDeckEmpty());
+        return privateCardState.topDeckCard();
     }
 
+    //do i have to create a new map here?
+
+    /**
+     * Returns the deck without the top card
+     * @return Returns the deck without the top card
+     */
     public GameState withoutTopCard(){
-        Preconditions.checkArgument(!deckofCards.isEmpty());
-        //take out top cards from gamestate deck using constructor
+        Preconditions.checkArgument(!privateCardState.isDeckEmpty());
+        return new GameState(playerState,
+                lastPlayer(),tickets,privateCardState.withoutTopDeckCard(),currentPlayerId());
     }
 
+    /**
+     * Returns the Gamestate with more discardedCards added to the deck
+     * @param discardedCards discardedCards in question
+     * @return
+     */
     public GameState withMoreDiscardedCards(SortedBag<Card> discardedCards){
-        //add cards to the Gamestate discard pile
+        return new GameState(playerState,
+                lastPlayer(),
+                tickets,privateCardState.withMoreDiscardedCards(discardedCards),currentPlayerId());
     }
 
+    /**
+     * Returns a deck of cards from discarded if deck of cards is empty
+     * @param rng random var needed to shuffle the cards
+     * @return new deck of cards from shuffled discarded cards or the same gamestate
+     */
     public GameState withCardsDeckRecreatedIfNeeded(Random rng){
-        if (deckofCards.isEmpty()){
-            //CardState thenewCardState = new CardState(Deck.of(discardedCards, rng),, discardedCards);
+        if (privateCardState.isDeckEmpty()){
+            return new GameState(playerState, lastPlayer(), tickets,
+                    privateCardState.withDeckRecreatedFromDiscards(rng),currentPlayerId());
         }
+        return this;
     }
 
-    //TODO to fix constructor first
+    /**
+     * Added tickets to a player
+     * @param playerId player in question
+     * @param chosenTickets tickets added
+     * @return new GameState with added tickets to a player
+     */
     public GameState withInitiallyChosenTickets(PlayerId playerId, SortedBag<Ticket> chosenTickets){
         Preconditions.checkArgument(playerState(playerId).tickets().size()<1);
-        return new GameState();
+        Map<PlayerId,PlayerState> addedTickets = new TreeMap<>(playerState);
+        addedTickets.put(playerId,playerState(playerId).withAddedTickets(chosenTickets));
+        return new GameState(addedTickets,lastPlayer(),tickets, privateCardState, currentPlayerId());
     }
 
     //Block 2 of methods
 
+
+    /**
+     * Removed drawnTickets and added the chosenTickets to the player
+     * @param drawnTickets removed tickets
+     * @param chosenTickets added tickets
+     * @return gameState with removed drawnTickets and added the chosenTickets
+     */
     public GameState withChosenAdditionalTickets(SortedBag<Ticket> drawnTickets, SortedBag<Ticket> chosenTickets){
         Preconditions.checkArgument(!drawnTickets.contains(chosenTickets));
-
+        //creating new map
+        //remove drawn tickets and add chosenTickets to currentplayerstate
+        Map<PlayerId,PlayerState> additionalTickets = new TreeMap<>(playerState);
+        additionalTickets.put(currentPlayerId(),playerState(currentPlayerId()).withAddedTickets(chosenTickets));
+        return new GameState(additionalTickets,lastPlayer(),tickets.withoutTopCards(drawnTickets.size()),privateCardState,currentPlayerId());
     }
 
+    //TODO
+    /**
+     *
+     * @param slot
+     * @return
+     */
     public GameState withDrawnFaceUpCard(int slot){
         Preconditions.checkArgument(!canDrawCards());
-
-
+        return new GameState(playerState,lastPlayer(),tickets,
+                privateCardState.withDrawnFaceUpCard(slot),currentPlayerId());
     }
 
+    /**
+     * Picked Card from deck to player
+     * @return player has a new card
+     */
     public GameState withBlindlyDrawnCard(){
         Preconditions.checkArgument(!canDrawCards());
-
+        //remove topcard
+        //add it to currentplayerid playerstate
+        //creating a new map with previous map info
+        Map<PlayerId,PlayerState> drawnCards = new TreeMap<>(playerState);
+        drawnCards.put(currentPlayerId(),currentPlayerState().withAddedCard(topCard()));
+        return new GameState(drawnCards,lastPlayer(),tickets,privateCardState.withoutTopDeckCard(),currentPlayerId());
     }
 
+    /**
+     * Claimed route
+     * @param route route in question
+     * @param cards cards used to claim the route
+     * @return player has new route and defausse has new cards
+     */
     public GameState withClaimedRoute(Route route, SortedBag<Card> cards){
-
+        Map<PlayerId,PlayerState> withClaimedRoute = new TreeMap<>(playerState);
+        withClaimedRoute.put(currentPlayerId(), playerState(currentPlayerId()).withClaimedRoute(route,cards));
+        return new GameState(withClaimedRoute,lastPlayer(),tickets,privateCardState.withMoreDiscardedCards(cards),currentPlayerId());
     }
 
     //Block 3 of methods
 
+    /**
+     * Asks were the last turn will begin
+     * @return will the last turn begin
+     */
     public boolean lastTurnBegins(){
-
+        return lastPlayer() == null && currentPlayerState().carCount() <= 2;
     }
 
+    /**
+     * Makes last player begin
+     * @return returns player that begins?
+     */
     public GameState forNextTurn(){
-
+        PlayerId lastPlayer1 = lastTurnBegins()
+                ? currentPlayerId()
+                : lastPlayer();
+        return new GameState(playerState, lastPlayer1, tickets, privateCardState,currentPlayerId().next());
     }
-
-
 }
