@@ -11,7 +11,13 @@ import static ch.epfl.tchu.game.Constants.MIN_ROUTE_LENGTH;
 
 
 /**
- * A Route (Road)
+ * Route Class
+ * Class that allows us to represent a road connecting two neighboring towns
+ *
+ * Enum: Level
+ * Constructor: Route
+ * Getter: ID, Station1, Station2, Length, Level, Color
+ * Methods: stationOpposite, possibleClaimCards, additionalClaimCardsCount, claimPoints
  *
  * @author Martin Sanchez Lopez (313238)
  */
