@@ -10,7 +10,7 @@ import java.util.*;
  * Methods: withDrawnFaceUpCard, topDeckCard, withoutTopDeckCard, withDeckRecreatedFromDiscards, withMoreDiscardedCards
  * Constructor: CardState
  *
- * @author Eduardo Neville
+ * @author Eduardo Neville (314667)
  */
 public class CardState extends PublicCardState {
 
