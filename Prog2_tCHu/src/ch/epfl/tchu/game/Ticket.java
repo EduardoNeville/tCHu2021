@@ -11,8 +11,8 @@ import java.util.TreeSet;
  * Getters: points
  * Methods: text, compareTo, and compareText
  *
- * @author Eduardo Neville
- * @author Hamza Karime
+ * @author Eduardo Neville (314667)
+ * @author Martin Sanchez Lopez (313238) 
  */
 
 public final class Ticket implements Comparable<Ticket>{
