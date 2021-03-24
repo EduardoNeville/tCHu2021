@@ -13,7 +13,7 @@ import java.util.*;
  * forNextTurn
  * 
  * 
- * @author Eduardo Neville
+ * @author Eduardo Neville (314667)
  */
 public final class GameState extends PublicGameState{
 
