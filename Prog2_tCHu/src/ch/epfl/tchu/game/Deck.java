@@ -10,7 +10,7 @@ import java.util.*;
  * Methods: of, size, isEmpty, topCard, withoutTopCard, topCards, withoutTopCards
  * Constructor: Deck Constructor (private)
  *
- * @author Eduardo Neville
+ * @author Eduardo Neville (314667)
  */
 public final class Deck <C extends Comparable<C>> {
 
