@@ -10,8 +10,8 @@ import java.util.Objects;
  *  Constructors: Station
  *  Getters: id, name, toString
  *
- *  @author Eduardo Neville
- *  @author Hamza Karime
+ *  @author Eduardo Neville (314667)
+ *  @author Martin Sanchez Lopez (313238)
  */
 public final class Station {
 
