@@ -20,10 +20,4 @@ public final class Preconditions {
             throw new IllegalArgumentException();
         }
     }
-
-    public static void checkIfEmpty(boolean shouldBeTrue){
-        if (!shouldBeTrue){
-            throw new NullPointerException();
-        }
-    }
 }
