@@ -5,8 +5,8 @@ import java.util.List;
 /**
  * Color Enumerated Class
  *
- * @author Eduardo Neville
- * @author Hamza Karime
+ * @author Eduardo Neville (314667)
+ * @author Martin Sanchez Lopez (313238)
  */
 public enum Color {
 
