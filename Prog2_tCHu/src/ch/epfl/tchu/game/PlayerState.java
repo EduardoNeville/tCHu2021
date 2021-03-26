@@ -140,7 +140,7 @@ public class PlayerState extends PublicPlayerState{
 
         for (Card card: SortedBag.of(cards.difference(initialCards))) {
             for (Card card1 : drawnCards) {
-                if (card.color().equals(card1.color()) || card.equals(Card.LOCOMOTIVE)) {
+                if ( card.equals(Card.LOCOMOTIVE)  || (card.color().equals(card1.color()) && initialCards.contains(card1)  && cards().contains(card1))  )  {
                     options1.add(card);
                 }
             }
@@ -151,9 +151,22 @@ public class PlayerState extends PublicPlayerState{
         if (options2.size()>=additionalCardsCount){
             List<SortedBag<Card>> options = new ArrayList<>(options2.subsetsOfSize(additionalCardsCount));
 
+
+
             //3 sort them with amount of LOCOMOTIVE cards
             options.sort(Comparator.comparingInt(cs -> cs.countOf(Card.LOCOMOTIVE)));
-            return options;
+
+
+            //4 delete bags with more cards than the player has
+            List<SortedBag<Card>> optionsFinal = new ArrayList<>(options);
+            for (SortedBag<Card> bag : options) {
+                for (Card c : bag) {
+                    if (bag.countOf(c) > cards().difference(initialCards).countOf(c))
+                        optionsFinal.remove(bag);
+                }
+            }
+
+            return optionsFinal;
         }
         else return List.of();
     }
