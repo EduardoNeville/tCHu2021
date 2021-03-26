@@ -76,11 +76,11 @@ public class PublicGameState {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean canDrawCards(){
-        return (cardStatE.deckSize() + cardStatE.discardsSize() >= Constants.INITIAL_TICKETS_COUNT);
+        return (cardStatE.deckSize()+cardStatE.discardsSize()>=Constants.INITIAL_TICKETS_COUNT);
     }
 
     /**
