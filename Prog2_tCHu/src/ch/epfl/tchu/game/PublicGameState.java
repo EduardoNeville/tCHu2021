@@ -80,7 +80,7 @@ public class PublicGameState {
      * @return
      */
     public boolean canDrawCards(){
-        return (cardStatE.deckSize()+cardStatE.discardsSize()>Constants.INITIAL_TICKETS_COUNT);
+        return (cardStatE.deckSize() + cardStatE.discardsSize() >= Constants.INITIAL_TICKETS_COUNT);
     }
 
     /**
@@ -92,7 +92,7 @@ public class PublicGameState {
     }
 
     public PublicPlayerState playerState(PlayerId playerId){
-        return new PublicPlayerState(ticketCounT, cardStatE.totalSize(),playerState(playerId).routes());
+        return new PublicPlayerState(ticketCounT, cardStatE.totalSize(), playerStatE.get(playerId).routes());
     }
 
     /**
@@ -100,7 +100,7 @@ public class PublicGameState {
      * @return the playerState of the currentplayer
      */
     public PublicPlayerState currentPlayerState(){
-        return playerState(currentPlayerID);
+        return playerState(currentPlayerId());
     }
 
     /**
