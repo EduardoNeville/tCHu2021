@@ -9,10 +9,10 @@ import java.util.*;
  * GameState class
  * Methods: playerState, currentPlayerState, topTickets, withoutTopTickets, topCard,
  * withoutTopCard, withMoreDiscardedCards, withCardsDeckRecreatedIfNeeded, withInitiallyChosenTickets,
- * withChosenAdditionalTickets, withDrawnFaceUpCard, withBlindlyDrawnCard, withClaimedRoute, lastTurnBegins, 
+ * withChosenAdditionalTickets, withDrawnFaceUpCard, withBlindlyDrawnCard, withClaimedRoute, lastTurnBegins,
  * forNextTurn
- * 
- * 
+ *
+ *
  * @author Eduardo Neville (314667)
  */
 public final class GameState extends PublicGameState{
@@ -35,7 +35,7 @@ public final class GameState extends PublicGameState{
      * Initial static constructor that initializes the game
      * @param tickets tickets in the deck
      * @param rng used to shuffle the tickets
-     * @return
+     * @return The initial GameState at the beginning of the match
      */
     public static GameState initial(SortedBag<Ticket> tickets, Random rng){
 
@@ -54,11 +54,13 @@ public final class GameState extends PublicGameState{
         listOfPlayers.add(PlayerId.PLAYER_1);
         listOfPlayers.add(PlayerId.PLAYER_2);
         Random random = new Random();
-        PlayerId randStartingPlayer = listOfPlayers.get(random.nextInt());
+
+        PlayerId randStartingPlayer = listOfPlayers.get(random.nextInt(listOfPlayers.size()));
 
         CardState privateCardState = CardState.of(theDeck);
 
-        return new GameState(initialMap, null,Deck.of(tickets,rng), privateCardState,randStartingPlayer);
+        return new GameState(initialMap, null,Deck.of(tickets,rng),
+                privateCardState,randStartingPlayer);
     }
 
     private static Map<PlayerId, PublicPlayerState> makePublic(Map<PlayerId,PlayerState> playerStateMap){
@@ -68,8 +70,10 @@ public final class GameState extends PublicGameState{
         PlayerState playerState1 = playerStateTreeMap.get(PlayerId.PLAYER_1);
         PlayerState playerState2 = playerStateTreeMap.get(PlayerId.PLAYER_2);
 
-        PublicPlayerState publicPlayerState1 = new PublicPlayerState(playerState1.tickets().size(),playerState1.cards().size(),playerState1.routes());
-        PublicPlayerState publicPlayerState2 = new PublicPlayerState(playerState2.tickets().size(),playerState2.cards().size(),playerState2.routes());
+        PublicPlayerState publicPlayerState1 = new PublicPlayerState(playerState1.tickets().size(),
+                playerState1.cards().size(),playerState1.routes());
+        PublicPlayerState publicPlayerState2 = new PublicPlayerState(playerState2.tickets().size(),
+                playerState2.cards().size(),playerState2.routes());
 
         Map<PlayerId, PublicPlayerState> publicPlayerStateMap = new TreeMap<PlayerId, PublicPlayerState>();
         publicPlayerStateMap.put(PlayerId.PLAYER_1,publicPlayerState1);
@@ -104,6 +108,7 @@ public final class GameState extends PublicGameState{
      */
     public SortedBag<Ticket> topTickets(int count){
         Preconditions.checkArgument(count>0 || tickets.size()>count);
+
         return tickets.topCards(count);
     }
 
@@ -115,7 +120,8 @@ public final class GameState extends PublicGameState{
     public GameState withoutTopTickets(int count){
         Preconditions.checkArgument(count>0 || tickets.size()>count);
         return new GameState(playerState,lastPlayer(),
-                tickets.withoutTopCards(count),privateCardState,currentPlayerId()); //take out toptickets from gamestate deck using constructor
+                tickets.withoutTopCards(count),
+                privateCardState,currentPlayerId());
     }
 
     /**
@@ -127,8 +133,6 @@ public final class GameState extends PublicGameState{
         return privateCardState.topDeckCard();
     }
 
-    //do i have to create a new map here?
-
     /**
      * Returns the deck without the top card
      * @return Returns the deck without the top card
@@ -136,7 +140,9 @@ public final class GameState extends PublicGameState{
     public GameState withoutTopCard(){
         Preconditions.checkArgument(!privateCardState.isDeckEmpty());
         return new GameState(playerState,
-                lastPlayer(),tickets,privateCardState.withoutTopDeckCard(),currentPlayerId());
+                lastPlayer(),tickets,
+                privateCardState.withoutTopDeckCard(),
+                currentPlayerId());
     }
 
     /**
@@ -147,7 +153,9 @@ public final class GameState extends PublicGameState{
     public GameState withMoreDiscardedCards(SortedBag<Card> discardedCards){
         return new GameState(playerState,
                 lastPlayer(),
-                tickets,privateCardState.withMoreDiscardedCards(discardedCards),currentPlayerId());
+                tickets,
+                privateCardState.withMoreDiscardedCards(discardedCards),
+                currentPlayerId());
     }
 
     /**
@@ -157,8 +165,9 @@ public final class GameState extends PublicGameState{
      */
     public GameState withCardsDeckRecreatedIfNeeded(Random rng){
         if (privateCardState.isDeckEmpty()){
-            return new GameState(playerState, lastPlayer(), tickets,
-                    privateCardState.withDeckRecreatedFromDiscards(rng),currentPlayerId());
+            return new GameState(playerState, lastPlayer(),
+                    tickets,privateCardState.withDeckRecreatedFromDiscards(rng),
+                    currentPlayerId());
         }
         return this;
     }
@@ -173,11 +182,12 @@ public final class GameState extends PublicGameState{
         Preconditions.checkArgument(playerState(playerId).tickets().size()<1);
         Map<PlayerId,PlayerState> addedTickets = new TreeMap<>(playerState);
         addedTickets.put(playerId,playerState(playerId).withAddedTickets(chosenTickets));
-        return new GameState(addedTickets,lastPlayer(),tickets, privateCardState, currentPlayerId());
+        return new GameState(addedTickets,lastPlayer(),
+                tickets, privateCardState,
+                currentPlayerId());
     }
 
     //Block 2 of methods
-
 
     /**
      * Removed drawnTickets and added the chosenTickets to the player
@@ -186,24 +196,28 @@ public final class GameState extends PublicGameState{
      * @return gameState with removed drawnTickets and added the chosenTickets
      */
     public GameState withChosenAdditionalTickets(SortedBag<Ticket> drawnTickets, SortedBag<Ticket> chosenTickets){
-        Preconditions.checkArgument(!drawnTickets.contains(chosenTickets));
-        //creating new map
-        //remove drawn tickets and add chosenTickets to currentplayerstate
+        Preconditions.checkArgument(drawnTickets.contains(chosenTickets));
+
         Map<PlayerId,PlayerState> additionalTickets = new TreeMap<>(playerState);
         additionalTickets.put(currentPlayerId(),playerState(currentPlayerId()).withAddedTickets(chosenTickets));
-        return new GameState(additionalTickets,lastPlayer(),tickets.withoutTopCards(drawnTickets.size()),privateCardState,currentPlayerId());
+        return new GameState(additionalTickets,lastPlayer(),
+                tickets.withoutTopCards(drawnTickets.size()),privateCardState,
+                currentPlayerId());
     }
 
-    //TODO
     /**
      *
      * @param slot
      * @return
      */
     public GameState withDrawnFaceUpCard(int slot){
-        Preconditions.checkArgument(!canDrawCards());
-        return new GameState(playerState,lastPlayer(),tickets,
-                privateCardState.withDrawnFaceUpCard(slot),currentPlayerId());
+        Preconditions.checkArgument(canDrawCards());
+        var playerstate2 = new HashMap<PlayerId,PlayerState>(playerState);
+        playerstate2.put(currentPlayerId(), playerState(currentPlayerId()).withAddedCard(privateCardState.faceUpCard(slot)));
+
+        return new GameState(playerstate2,lastPlayer(),tickets,
+                privateCardState.withDrawnFaceUpCard(slot),
+                currentPlayerId());
     }
 
     /**
@@ -211,12 +225,11 @@ public final class GameState extends PublicGameState{
      * @return player has a new card
      */
     public GameState withBlindlyDrawnCard(){
-        Preconditions.checkArgument(!canDrawCards());
-        //remove topcard
-        //add it to currentplayerid playerstate
-        //creating a new map with previous map info
+        Preconditions.checkArgument(canDrawCards());
+
         Map<PlayerId,PlayerState> drawnCards = new TreeMap<>(playerState);
         drawnCards.put(currentPlayerId(),currentPlayerState().withAddedCard(topCard()));
+
         return new GameState(drawnCards,lastPlayer(),tickets,privateCardState.withoutTopDeckCard(),currentPlayerId());
     }
 
@@ -229,7 +242,9 @@ public final class GameState extends PublicGameState{
     public GameState withClaimedRoute(Route route, SortedBag<Card> cards){
         Map<PlayerId,PlayerState> withClaimedRoute = new TreeMap<>(playerState);
         withClaimedRoute.put(currentPlayerId(), playerState(currentPlayerId()).withClaimedRoute(route,cards));
-        return new GameState(withClaimedRoute,lastPlayer(),tickets,privateCardState.withMoreDiscardedCards(cards),currentPlayerId());
+
+        return new GameState(withClaimedRoute,lastPlayer(),tickets,
+                privateCardState.withMoreDiscardedCards(cards),currentPlayerId());
     }
 
     //Block 3 of methods
@@ -250,6 +265,8 @@ public final class GameState extends PublicGameState{
         PlayerId lastPlayer1 = lastTurnBegins()
                 ? currentPlayerId()
                 : lastPlayer();
-        return new GameState(playerState, lastPlayer1, tickets, privateCardState,currentPlayerId().next());
+
+        return new GameState(playerState, lastPlayer1, tickets,
+                privateCardState,currentPlayerId().next());
     }
 }
