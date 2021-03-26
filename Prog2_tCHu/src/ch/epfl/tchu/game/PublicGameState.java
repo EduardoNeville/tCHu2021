@@ -1,7 +1,6 @@
 package ch.epfl.tchu.game;
 
 import ch.epfl.tchu.Preconditions;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Copy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +86,7 @@ public class PublicGameState {
     }
 
     public PublicPlayerState playerState(PlayerId playerId){
-        return new PublicPlayerState(ticketCounT, cardStatE.totalSize(),playerState(playerId).routes());
+        return new PublicPlayerState(ticketCounT, cardStatE.totalSize(),playerStatE.get(playerId).routes());
     }
 
     /**
@@ -95,7 +94,7 @@ public class PublicGameState {
      * @return the playerState of the currentplayer
      */
     public PublicPlayerState currentPlayerState(){
-        return playerState(currentPlayerId());
+        return playerState(currentPlayerID);
     }
 
     /**
