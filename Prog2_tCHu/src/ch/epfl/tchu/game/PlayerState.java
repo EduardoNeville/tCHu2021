@@ -21,7 +21,6 @@ public class PlayerState extends PublicPlayerState{
 
     private final SortedBag<Ticket> tickets;
     private final SortedBag<Card> cards;
-    private final List<Route> routes;
 
     /**
      * Constructor for Player State
@@ -33,7 +32,6 @@ public class PlayerState extends PublicPlayerState{
         super(tickets.size(),cards.size(),routes);
         this.tickets = tickets;
         this.cards = cards;
-        this.routes = List.copyOf(routes);
     }
 
     /**
@@ -60,7 +58,7 @@ public class PlayerState extends PublicPlayerState{
      * @return PlayerState with new tickets added
      */
     public PlayerState withAddedTickets(SortedBag<Ticket> newTickets){
-        return new PlayerState(tickets.union(newTickets),cards,routes);
+        return new PlayerState(tickets.union(newTickets),cards,routes());
     }
 
     /**
@@ -77,7 +75,7 @@ public class PlayerState extends PublicPlayerState{
     * @return PlayerState with new card added
     */
     public PlayerState withAddedCard(Card card){
-        return new PlayerState(tickets,cards.union(SortedBag.of(card)),routes);
+        return new PlayerState(tickets,cards.union(SortedBag.of(card)),routes());
     }
 
     /**
@@ -86,7 +84,7 @@ public class PlayerState extends PublicPlayerState{
      * @return PlayerState with new cards added
      */
     public PlayerState withAddedCards(SortedBag<Card> additionalCards){
-        return new PlayerState(tickets, cards.union(additionalCards),routes);
+        return new PlayerState(tickets, cards.union(additionalCards),routes());
     }
 
     /**
@@ -97,6 +95,7 @@ public class PlayerState extends PublicPlayerState{
     public boolean canClaimRoute(Route route){
         if(carCount() < route.length())
             return false;
+
         return !(possibleClaimCards(route).isEmpty());
     }
 
@@ -106,7 +105,8 @@ public class PlayerState extends PublicPlayerState{
      * @return list of possible ways to claim it
      */
      public List<SortedBag<Card>> possibleClaimCards(Route route){
-        Preconditions.checkArgument(carCount() > route.length());
+         //TODO: SAME CARD ORDER AS FOR THE ROUTE METHOD
+        Preconditions.checkArgument(carCount() >= route.length());
         var routePossible = route.possibleClaimCards();
         List<SortedBag<Card>> possibleCards = new ArrayList<>();
 
@@ -132,8 +132,8 @@ public class PlayerState extends PublicPlayerState{
                                                          SortedBag<Card> drawnCards){
         Preconditions.checkArgument(Constants.ADDITIONAL_TUNNEL_CARDS>=additionalCardsCount && additionalCardsCount>= 1);
         Preconditions.checkArgument(!(initialCards.isEmpty()));
-        Preconditions.checkArgument(drawnCards.size()== Constants.ADDITIONAL_TUNNEL_CARDS);
-        Preconditions.checkArgument(initialCards.toSet().size() <= 2);
+         Preconditions.checkArgument(initialCards.toSet().size() <= 2);
+         Preconditions.checkArgument(drawnCards.size()== Constants.ADDITIONAL_TUNNEL_CARDS);
 
         //1 Calculate usable cards
         var options1 = new SortedBag.Builder<Card>();
@@ -165,7 +165,7 @@ public class PlayerState extends PublicPlayerState{
      * @return new PlayerState with claimed route and without cards used to claim
      */
     public PlayerState withClaimedRoute(Route route, SortedBag<Card> claimCards){
-        List<Route> totalRoutes = new ArrayList<>(routes);
+        List<Route> totalRoutes = new ArrayList<>(routes());
         totalRoutes.add(route);
         return new PlayerState(tickets,cards.difference(claimCards),totalRoutes);
     }
@@ -177,7 +177,7 @@ public class PlayerState extends PublicPlayerState{
     public int ticketPoints(){
         //create stationPartion give it to ticket points
         int maxID = 0;
-        for (Route route: routes) {
+        for (Route route: routes()) {
             if (route.station1().id() > maxID){
                 maxID = route.station1().id();
             }
@@ -188,7 +188,7 @@ public class PlayerState extends PublicPlayerState{
 
         //use max+1 to build stationPartition
         var networkStation = new StationPartition.Builder(maxID+1);
-        for (Route route: routes) {
+        for (Route route: routes()) {
             networkStation.connect(route.station1(),route.station2());
         }
         //for loop ticket for points
