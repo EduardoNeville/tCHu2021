@@ -30,6 +30,9 @@ public interface Player {
      */
     void initPlayers(PlayerId ownId, Map<PlayerId, String> playerNames);
 
+    //TODO: comnment
+    void setInitialTicketChoice(SortedBag<Ticket> tickets);
+
     /**
      * Communicates to the player an info.
      * @param info
