@@ -26,7 +26,6 @@ public class PublicPlayerState {
         this.ticketCount = ticketCount;
         this.cardCount = cardCount;
         this.routes = List.copyOf(routes);
-        var networkStation = new StationPartition.Builder(43); //?
     }
 
     /**
