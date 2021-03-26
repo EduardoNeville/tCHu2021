@@ -1,7 +1,7 @@
 package ch.epfl.tchu.game;
 
 import ch.epfl.tchu.Preconditions;
-//import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Copy; what is this?????
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Copy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +36,8 @@ public class PublicGameState {
                            Map<PlayerId,PublicPlayerState> playerState,
                            PlayerId lastPlayer){
 
-        Preconditions.checkArgument(ticketsCount>=0);
-        Preconditions.checkArgument(playerState.size()==2);
+        Preconditions.checkArgument(!(ticketsCount<0)); //
+        Preconditions.checkArgument(playerState.size()== PlayerId.COUNT);
 
         this.ticketCounT = ticketsCount;
         this.cardStatE = Objects.requireNonNull(cardState);
@@ -50,7 +50,7 @@ public class PublicGameState {
      * Ticket size
      * @return ticket size
      */
-    public int ticketCount(){
+    public int ticketsCount(){
         return ticketCounT;
     }
 
@@ -87,7 +87,7 @@ public class PublicGameState {
     }
 
     public PublicPlayerState playerState(PlayerId playerId){
-        return new PublicPlayerState(ticketCounT, cardStatE.totalSize(), playerStatE.get(playerId).routes());
+        return new PublicPlayerState(ticketCounT, cardStatE.totalSize(),playerState(playerId).routes());
     }
 
     /**
