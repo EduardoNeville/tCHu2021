@@ -36,19 +36,14 @@ public class PublicGameState {
                            Map<PlayerId,PublicPlayerState> playerState,
                            PlayerId lastPlayer){
 
-        if(cardState == null || currentPlayerId == null || playerState == null)
-            throw new NullPointerException();
-
         Preconditions.checkArgument(ticketsCount>=0);
         Preconditions.checkArgument(playerState.size()==2);
-
-
 
         this.ticketCounT = ticketsCount;
         this.cardStatE = Objects.requireNonNull(cardState);
         this.currentPlayerID = Objects.requireNonNull(currentPlayerId);
-        this.playerStatE = Map.copyOf(playerState);
-        this.lastPlayeR = lastPlayer; //can be null
+        this.playerStatE = Map.copyOf(Objects.requireNonNull(playerState));
+        this.lastPlayeR = lastPlayer;
     }
 
     /**
