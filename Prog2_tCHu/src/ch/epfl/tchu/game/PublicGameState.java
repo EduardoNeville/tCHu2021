@@ -66,7 +66,7 @@ public class PublicGameState {
      * @return
      */
     public PublicCardState cardState(){
-        return new PublicCardState(cardStatE.faceUpCards(), cardStatE.deckSize(), cardStatE.discardsSize());
+        return cardStatE;
     }
 
     /**
@@ -86,7 +86,7 @@ public class PublicGameState {
     }
 
     public PublicPlayerState playerState(PlayerId playerId){
-        return new PublicPlayerState(ticketCounT, cardStatE.totalSize(),playerStatE.get(playerId).routes());
+        return playerStatE.get(playerId);
     }
 
     /**
