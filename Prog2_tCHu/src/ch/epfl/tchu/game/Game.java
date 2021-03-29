@@ -64,6 +64,10 @@ public final class Game {
         //main game loop
         while (true) { //TODO: put ending conditions
             Player currentPlayer = players.get(currentPlayerId);
+
+            if(gameState.lastPlayer() != null)
+                receiveInfo(receiveInfo(players, ));
+
             receiveInfo(players, pInfo.get(currentPlayer).canPlay());
             // USEFUL ?? updateState(players, gameState);
 
@@ -159,11 +163,110 @@ public final class Game {
                     break;
             }
 
+
+            //ending condition
+            if (gameState.lastPlayer() != null && gameState.lastPlayer() == currentPlayerId) {
+                gameHasEnded = true;
+            }
+
+            //last turn announcement
+            if (gameState.lastTurnBegins())
+                receiveInfo(players, pInfo.get(currentPlayer).lastTurnBegins(gameState.currentPlayerState().carCount()));
+
             //change current player
             gameState = gameState.forNextTurn();
         }
 
 
+        updateState(players, gameState);
+        //each number of points has a set of players that got that exact number
+        Map<Integer, Set<PlayerId>> points = new TreeMap<>();
+
+        Set<PlayerId> longestTrailPossessors = longestRoute(players, gameState, pInfo);
+
+        GameState finalGameState = gameState;
+        players.keySet().forEach(id -> {
+            int pointsBeforeLongest = finalGameState.playerState(id).finalPoints();
+            if (longestTrailPossessors.contains(id))
+                pointsBeforeLongest+=LONGEST_TRAIL_BONUS_POINTS;
+
+            Set<PlayerId> ids = points.getOrDefault(id, new TreeSet<>());
+            ids.add(id);
+
+            points.put(pointsBeforeLongest, ids);
+        });
+
+        int maxPoints = -9999; // in case all have negative points
+
+        //set max poitns
+        for (int p : points.keySet()) {
+            if (p>maxPoints)
+                maxPoints = p;
+        }
+
+        List<PlayerId> winners= new ArrayList<>(points.get(maxPoints));
+
+//        winners.size() == 2 ?
+//                receiveInfo(players, pInfo.get(winners.get(0)).won(maxPoints, )),
+//                receiveInfo(players, Info.draw(winners, maxPoints));
+
+
+    }
+
+
+    /**
+     * Calculates the player(s) that have the longest length Trail, output the message that they got the bonus and
+     * returns the players that must be given the points for the bonus
+     *
+     * @param players
+     *          the game playres
+     * @param gameState
+     *          game state
+     * @param playersInfo
+     *          players' Info instances
+     *
+     * @return set of players that are to obtain longestRoute bonus
+     */
+    private static Set<PlayerId> longestRoute(Map<PlayerId, Player> players, GameState gameState, Map<Player, Info> playersInfo){
+
+        //NOTE: I am aware that this is possibly overkill but it was done so that it
+        // would work with any number of players seamlessly (TAs seem to bring up that point often)
+
+        //TODO: simplify this whole thing
+
+        Map<PlayerId, Trail> longestTrails = new HashMap<>();
+        int longestLength = 0;
+
+        //get every playre's longest length
+        players.forEach((id, p) -> {
+            Trail t = Trail.longest(gameState.playerState(id).routes());
+            longestTrails.put(id,t);
+        });
+
+        Map<Integer, Set<PlayerId>> lengths = new TreeMap<>();
+
+        //map the players to their longest route lengths
+        longestTrails.forEach( (id, t) -> {
+            int l = longestTrails.get(id).length();
+            Set<PlayerId> ids = lengths.getOrDefault(t, new TreeSet<>());
+            ids.add(id);
+            lengths.put(l, ids);
+        });
+
+        //find the longest length
+        for (int l : lengths.keySet()) {
+            if (l > longestLength)
+                longestLength = l;
+        }
+
+        //declare the longest length bonus for every player that has a trail of the longest length
+        lengths.get(longestLength).forEach(id ->
+                receiveInfo(
+                        players, playersInfo.get(id).getsLongestTrailBonus(
+                                longestTrails.get(id)
+                        )));
+
+        return lengths.get(longestLength);
     }
 
     /**
