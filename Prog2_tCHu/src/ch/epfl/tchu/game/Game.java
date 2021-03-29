@@ -60,9 +60,10 @@ public final class Game {
             p.receiveInfo(pInfo.get(p).keptTickets(initialTicketsChosen.size()));
         }
 
+        boolean gameHasEnded = false;
 
         //main game loop
-        while (true) { //TODO: put ending conditions
+        while (!gameHasEnded) {
             Player currentPlayer = players.get(currentPlayerId);
 
             if(gameState.lastPlayer() != null)
