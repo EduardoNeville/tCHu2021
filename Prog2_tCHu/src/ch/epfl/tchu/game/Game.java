@@ -66,8 +66,6 @@ public final class Game {
         while (!gameHasEnded) {
             Player currentPlayer = players.get(currentPlayerId);
 
-            if(gameState.lastPlayer() != null)
-                receiveInfo(receiveInfo(players, ));
 
             receiveInfo(players, pInfo.get(currentPlayer).canPlay());
             // USEFUL ?? updateState(players, gameState);
@@ -180,37 +178,65 @@ public final class Game {
 
 
         updateState(players, gameState);
-        //each number of points has a set of players that got that exact number
-        Map<Integer, Set<PlayerId>> points = new TreeMap<>();
-
+//        //each number of points has a set of players that got that exact number
+//        Map<Integer, Set<PlayerId>> points = new TreeMap<>();
+//
+//        Set<PlayerId> longestTrailPossessors = longestRoute(players, gameState, pInfo);
+//
+//        GameState finalGameState = gameState;
+//        players.keySet().forEach(id -> {
+//            int pointsBeforeLongest = finalGameState.playerState(id).finalPoints();
+//            if (longestTrailPossessors.contains(id))
+//                pointsBeforeLongest+=LONGEST_TRAIL_BONUS_POINTS;
+//
+//            Set<PlayerId> ids = points.getOrDefault(id, new TreeSet<>());
+//            ids.add(id);
+//
+//            points.put(pointsBeforeLongest, ids);
+//        });
+//
+//        int maxPoints = -9999; // in case all have negative points
+//
+//        //set max poitns
+//        for (int p : points.keySet()) {
+//            if (p>maxPoints)
+//                maxPoints = p;
+//        }
+//
+//        List<PlayerId> winners= new ArrayList<>(points.get(maxPoints));
+//
+////        winners.size() == 2 ?
+////                receiveInfo(players, pInfo.get(winners.get(0)).won(maxPoints, )),
+////                receiveInfo(players, Info.draw(winners, maxPoints));
+        Map<Integer, PlayerId> points = new TreeMap<>();
         Set<PlayerId> longestTrailPossessors = longestRoute(players, gameState, pInfo);
 
         GameState finalGameState = gameState;
         players.keySet().forEach(id -> {
-            int pointsBeforeLongest = finalGameState.playerState(id).finalPoints();
+            int p = finalGameState.playerState(id).finalPoints();
             if (longestTrailPossessors.contains(id))
-                pointsBeforeLongest+=LONGEST_TRAIL_BONUS_POINTS;
-
-            Set<PlayerId> ids = points.getOrDefault(id, new TreeSet<>());
-            ids.add(id);
-
-            points.put(pointsBeforeLongest, ids);
+                p+=LONGEST_TRAIL_BONUS_POINTS;
+            points.put(p, id);
         });
 
-        int maxPoints = -9999; // in case all have negative points
-
-        //set max poitns
-        for (int p : points.keySet()) {
-            if (p>maxPoints)
-                maxPoints = p;
+        int maxPoints = -9999;
+        for (int l : points.keySet()) {
+            if (l > maxPoints)
+                maxPoints = l;
         }
 
-        List<PlayerId> winners= new ArrayList<>(points.get(maxPoints));
+        Set<Integer> pointsSet = new TreeSet<>(points.keySet());
 
-//        winners.size() == 2 ?
-//                receiveInfo(players, pInfo.get(winners.get(0)).won(maxPoints, )),
-//                receiveInfo(players, Info.draw(winners, maxPoints));
-
+        if(pointsSet.size() == 1)
+            receiveInfo(players, Info.draw(new ArrayList<>(playerNames.values()), maxPoints));
+        else{
+            pointsSet.remove(maxPoints);
+            int loserPoints = pointsSet.stream().mapToInt(Integer::intValue).toArray()[0]; //is there really no easier way?
+            receiveInfo(
+                    players,
+                    pInfo.get(points.get(maxPoints)).won(maxPoints, loserPoints)
+            );
+        }
 
     }
 
@@ -249,7 +275,7 @@ public final class Game {
         //map the players to their longest route lengths
         longestTrails.forEach( (id, t) -> {
             int l = longestTrails.get(id).length();
-            Set<PlayerId> ids = lengths.getOrDefault(t, new TreeSet<>());
+            Set<PlayerId> ids = lengths.getOrDefault(t.length(), new TreeSet<>());
             ids.add(id);
             lengths.put(l, ids);
         });
