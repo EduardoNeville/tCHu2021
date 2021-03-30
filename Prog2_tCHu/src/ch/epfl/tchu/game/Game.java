@@ -180,43 +180,11 @@ public final class Game {
 
 
         updateState(players, gameState);
-//        //each number of points has a set of players that got that exact number
-//        Map<Integer, Set<PlayerId>> points = new TreeMap<>();
-//
-//        Set<PlayerId> longestTrailPossessors = longestRoute(players, gameState, pInfo);
-//
-//        GameState finalGameState = gameState;
-//        players.keySet().forEach(id -> {
-//            int pointsBeforeLongest = finalGameState.playerState(id).finalPoints();
-//            if (longestTrailPossessors.contains(id))
-//                pointsBeforeLongest+=LONGEST_TRAIL_BONUS_POINTS;
-//
-//            Set<PlayerId> ids = points.getOrDefault(id, new TreeSet<>());
-//            ids.add(id);
-//
-//            points.put(pointsBeforeLongest, ids);
-//        });
-//
-//        int maxPoints = -9999; // in case all have negative points
-//
-//        //set max poitns
-//        for (int p : points.keySet()) {
-//            if (p>maxPoints)
-//                maxPoints = p;
-//        }
-//
-//        List<PlayerId> winners= new ArrayList<>(points.get(maxPoints));
-//
-////        winners.size() == 2 ?
-////                receiveInfo(players, pInfo.get(winners.get(0)).won(maxPoints, )),
-////                receiveInfo(players, Info.draw(winners, maxPoints));
-        //declares the winners and returns a set with them
         Set<PlayerId> longestTrailPossessors = longestRouteWinners(players, gameState, pInfo);
 
         int maxPoints = -9999;
         int loserPoints = -9999;
         List<PlayerId> gameWinners = new ArrayList<>();
-
 
         for (PlayerId id : players.keySet()) {
             int p = gameState.playerState(id).finalPoints();
@@ -230,14 +198,19 @@ public final class Game {
             else if(p>maxPoints){
                 loserPoints = maxPoints;
                 maxPoints=p;
-                gameWinners.clear();
-                gameWinners.add(id);
+                gameWinners = new ArrayList<>(List.of(id));
             }
         }
 
+        //declare winner
+        if(gameWinners.size() != 1){
+            //For draws when player count is >2
+            List<String> names = new ArrayList<>();
+            gameWinners.forEach(id -> names.add(playerNames.get(id)));
+            receiveInfo(players, Info.draw(names, maxPoints));
 
-        if(gameWinners.size() == 1)
-            receiveInfo(players, Info.draw(new ArrayList<>(playerNames.values()), maxPoints));
+            //receiveInfo(players, Info.draw(new ArrayList<>(playerNames.values()), maxPoints)); //2 players only
+        }
         else{
             receiveInfo(
                     players,
@@ -279,8 +252,7 @@ public final class Game {
             }
             else if (l>longestLength) {
                 longestLength=l;
-                bonusWinners.clear();
-                bonusWinners.add(id);
+                bonusWinners = new HashSet<>(Set.of(id));
             }
 
             longestTrails.put(id, playerLongest);
