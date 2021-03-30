@@ -230,7 +230,8 @@ public final class Game {
             else if(p>maxPoints){
                 loserPoints = maxPoints;
                 maxPoints=p;
-                gameWinners = new ArrayList<>(List.of(id)); //this or clear?
+                gameWinners.clear();
+                gameWinners.add(id);
             }
         }
 
@@ -278,7 +279,6 @@ public final class Game {
             }
             else if (l>longestLength) {
                 longestLength=l;
-                //maybe a 'niftier' way?
                 bonusWinners.clear();
                 bonusWinners.add(id);
             }
