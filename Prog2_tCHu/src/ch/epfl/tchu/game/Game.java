@@ -20,13 +20,13 @@ public final class Game {
         Preconditions.checkArgument(players.size() == 2 && playerNames.size() == 2);
 
         //Map with the players' Info classes
-        Map<Player, Info> pInfo = new HashMap<>();
+        Map<PlayerId, Info> pInfo = new HashMap<>();
 
 
         //give the players the names of all the players and init the Info classes with the names
         for (PlayerId id : players.keySet()) {
             players.get(id).initPlayers(id, playerNames);
-            pInfo.put(players.get(id), new Info(playerNames.get(id)));
+            pInfo.put(id, new Info(playerNames.get(id)));
         }
 
 
@@ -35,12 +35,14 @@ public final class Game {
 
         //tells players who plays first
         PlayerId currentPlayerId = gameState.currentPlayerId();
-        players.forEach((p, t) -> t.receiveInfo(pInfo.get(players.get(currentPlayerId)).willPlayFirst())); //is this the good way to do?
+        players.forEach((p, t) -> t.receiveInfo(pInfo.get(currentPlayerId).willPlayFirst())); //is this the good way to do?
 
         //tells players initial given tickets
         for(Player p: players.values())
             p.setInitialTicketChoice(gameState.topTickets(INITIAL_TICKETS_COUNT));
            gameState = gameState.withoutTopTickets(INITIAL_TICKETS_COUNT); //remove tickets from deck
+
+        //TODO: receive info ici?
 
 
 //        for (PlayerId id : players.keySet()) {
@@ -52,12 +54,12 @@ public final class Game {
 //            p.receiveInfo(pInfo.get(p).keptTickets(initialTicketsChosen.size()));
 //        }
         //asks players tickets to keep
-        for (Map.Entry<PlayerId, Player> entry : players.entrySet()) {
-            Player p = entry.getValue();
+        for (PlayerId id : players.keySet()) {
+            Player p = players.get(id);
             updateState(players, gameState);
             SortedBag<Ticket> initialTicketsChosen = p.chooseInitialTickets();
-            gameState = gameState.withInitiallyChosenTickets(entry.getKey(), initialTicketsChosen);
-            p.receiveInfo(pInfo.get(p).keptTickets(initialTicketsChosen.size()));
+            gameState = gameState.withInitiallyChosenTickets(id, initialTicketsChosen);
+            p.receiveInfo(pInfo.get(id).keptTickets(initialTicketsChosen.size()));
         }
 
         boolean gameHasEnded = false;
@@ -67,7 +69,7 @@ public final class Game {
             Player currentPlayer = players.get(currentPlayerId);
 
 
-            receiveInfo(players, pInfo.get(currentPlayer).canPlay());
+            receiveInfo(players, pInfo.get(currentPlayerId).canPlay());
             // USEFUL ?? updateState(players, gameState);
 
             updateState(players, gameState);
@@ -76,11 +78,11 @@ public final class Game {
                 case DRAW_TICKETS:
 
                     SortedBag<Ticket> initialTickets = gameState.topTickets(IN_GAME_TICKETS_COUNT);
-                    receiveInfo(players, pInfo.get(currentPlayer).drewTickets(IN_GAME_TICKETS_COUNT));
+                    receiveInfo(players, pInfo.get(currentPlayerId).drewTickets(IN_GAME_TICKETS_COUNT));
 
                     SortedBag<Ticket> chosenTickets = currentPlayer.chooseTickets(initialTickets);
                     gameState = gameState.withChosenAdditionalTickets(initialTickets, chosenTickets);
-                    receiveInfo(players, pInfo.get(currentPlayer).keptTickets(chosenTickets.size()));
+                    receiveInfo(players, pInfo.get(currentPlayerId).keptTickets(chosenTickets.size()));
 
                     break;
 
@@ -96,12 +98,12 @@ public final class Game {
                         if (slot == -1) {
                             gameState.currentPlayerState().withAddedCard(gameState.topCard());
                             gameState = gameState.withoutTopCard();
-                            receiveInfo(players, pInfo.get(currentPlayer).drewBlindCard());
+                            receiveInfo(players, pInfo.get(currentPlayerId).drewBlindCard());
                         } else {
                             Card faceUpCard = gameState.cardState().faceUpCard(slot);
                             gameState.currentPlayerState().withAddedCard(faceUpCard);
                             gameState = gameState.withDrawnFaceUpCard(slot);
-                            receiveInfo(players, pInfo.get(currentPlayer).drewVisibleCard(faceUpCard));
+                            receiveInfo(players, pInfo.get(currentPlayerId).drewVisibleCard(faceUpCard));
                         }
                     }
                     break; //TODO: useless?
@@ -120,7 +122,7 @@ public final class Game {
                         int additionalCardsCount = 0;
 
                         if (chosenRoute.level() == Route.Level.UNDERGROUND) {
-                            receiveInfo(players, pInfo.get(currentPlayer).attemptsTunnelClaim(chosenRoute, initCards));
+                            receiveInfo(players, pInfo.get(currentPlayerId).attemptsTunnelClaim(chosenRoute, initCards));
                             SortedBag.Builder<Card> additionalCardsTunnelBuilder = new SortedBag.Builder<>();
                             //draw additional tunnel cards one by one...
                             for (int i = 0; i < ADDITIONAL_TUNNEL_CARDS; i++) {
@@ -135,7 +137,7 @@ public final class Game {
                             additionalCardsCount = chosenRoute.
                                     additionalClaimCardsCount(initCards, drawnCards);
 
-                            receiveInfo(players, pInfo.get(currentPlayer).drewAdditionalCards(drawnCards, additionalCardsCount));
+                            receiveInfo(players, pInfo.get(currentPlayerId).drewAdditionalCards(drawnCards, additionalCardsCount));
 
                             //player has to play additional cards
                             if (additionalCardsCount >= 1) {
@@ -152,10 +154,10 @@ public final class Game {
                             SortedBag<Card> finalClaimCards = initCards.union(additionalCards);
                             gameState = gameState.
                                     withClaimedRoute(chosenRoute, finalClaimCards);
-                            receiveInfo(players, pInfo.get(currentPlayer).claimedRoute(chosenRoute, finalClaimCards));
+                            receiveInfo(players, pInfo.get(currentPlayerId).claimedRoute(chosenRoute, finalClaimCards));
                             updateState(players, gameState);
                         } else
-                            receiveInfo(players, pInfo.get(currentPlayer).didNotClaimRoute(chosenRoute));
+                            receiveInfo(players, pInfo.get(currentPlayerId).didNotClaimRoute(chosenRoute));
 
                     }
 
@@ -170,7 +172,7 @@ public final class Game {
 
             //last turn announcement
             if (gameState.lastTurnBegins())
-                receiveInfo(players, pInfo.get(currentPlayer).lastTurnBegins(gameState.currentPlayerState().carCount()));
+                receiveInfo(players, pInfo.get(currentPlayerId).lastTurnBegins(gameState.currentPlayerState().carCount()));
 
             //change current player
             gameState = gameState.forNextTurn();
@@ -208,33 +210,37 @@ public final class Game {
 ////        winners.size() == 2 ?
 ////                receiveInfo(players, pInfo.get(winners.get(0)).won(maxPoints, )),
 ////                receiveInfo(players, Info.draw(winners, maxPoints));
-        Map<Integer, PlayerId> points = new TreeMap<>();
-        Set<PlayerId> longestTrailPossessors = longestRoute(players, gameState, pInfo);
-
-        GameState finalGameState = gameState;
-        players.keySet().forEach(id -> {
-            int p = finalGameState.playerState(id).finalPoints();
-            if (longestTrailPossessors.contains(id))
-                p+=LONGEST_TRAIL_BONUS_POINTS;
-            points.put(p, id);
-        });
+        //declares the winners and returns a set with them
+        Set<PlayerId> longestTrailPossessors = longestRouteWinners(players, gameState, pInfo);
 
         int maxPoints = -9999;
-        for (int l : points.keySet()) {
-            if (l > maxPoints)
-                maxPoints = l;
+        int loserPoints = -9999;
+        List<PlayerId> gameWinners = new ArrayList<>();
+
+
+        for (PlayerId id : players.keySet()) {
+            int p = gameState.playerState(id).finalPoints();
+            if (longestTrailPossessors.contains(id)) {
+                p+=LONGEST_TRAIL_BONUS_POINTS;
+            }
+
+            if(p==maxPoints){
+                gameWinners.add(id);
+            }
+            else if(p>maxPoints){
+                loserPoints = maxPoints;
+                maxPoints=p;
+                gameWinners = new ArrayList<>(List.of(id)); //this or clear?
+            }
         }
 
-        Set<Integer> pointsSet = new TreeSet<>(points.keySet());
 
-        if(pointsSet.size() == 1)
+        if(gameWinners.size() == 1)
             receiveInfo(players, Info.draw(new ArrayList<>(playerNames.values()), maxPoints));
         else{
-            pointsSet.remove(maxPoints);
-            int loserPoints = pointsSet.stream().mapToInt(Integer::intValue).toArray()[0]; //is there really no easier way?
             receiveInfo(
                     players,
-                    pInfo.get(points.get(maxPoints)).won(maxPoints, loserPoints)
+                    pInfo.get(gameWinners.get(0)).won(maxPoints, loserPoints)
             );
         }
 
@@ -254,46 +260,40 @@ public final class Game {
      *
      * @return set of players that are to obtain longestRoute bonus
      */
-    private static Set<PlayerId> longestRoute(Map<PlayerId, Player> players, GameState gameState, Map<Player, Info> playersInfo){
+    private static Set<PlayerId> longestRouteWinners(Map<PlayerId, Player> players, GameState gameState, Map<PlayerId, Info> playersInfo){
 
-        //NOTE: I am aware that this is possibly overkill but it was done so that it
-        // would work with any number of players seamlessly (TAs seem to bring up that point often)
-
-        //TODO: simplify this whole thing
+        //works for any number of players
 
         Map<PlayerId, Trail> longestTrails = new HashMap<>();
         int longestLength = 0;
+        Set<PlayerId> bonusWinners = new HashSet<>();
 
-        //get every playre's longest length
-        players.forEach((id, p) -> {
-            Trail t = Trail.longest(gameState.playerState(id).routes());
-            longestTrails.put(id,t);
-        });
+        for (PlayerId id :
+                players.keySet()) {
+            Trail playerLongest = Trail.longest(gameState.playerState(id).routes());
+            int l = playerLongest.length();
 
-        Map<Integer, Set<PlayerId>> lengths = new TreeMap<>();
+            if (l == longestLength) {
+                bonusWinners.add(id);
+            }
+            else if (l>longestLength) {
+                longestLength=l;
+                //maybe a 'niftier' way?
+                bonusWinners.clear();
+                bonusWinners.add(id);
+            }
 
-        //map the players to their longest route lengths
-        longestTrails.forEach( (id, t) -> {
-            int l = longestTrails.get(id).length();
-            Set<PlayerId> ids = lengths.getOrDefault(t.length(), new TreeSet<>());
-            ids.add(id);
-            lengths.put(l, ids);
-        });
-
-        //find the longest length
-        for (int l : lengths.keySet()) {
-            if (l > longestLength)
-                longestLength = l;
+            longestTrails.put(id, playerLongest);
         }
 
-        //declare the longest length bonus for every player that has a trail of the longest length
-        lengths.get(longestLength).forEach(id ->
-                receiveInfo(
-                        players, playersInfo.get(id).getsLongestTrailBonus(
-                                longestTrails.get(id)
-                        )));
+        //declare winners of longest trail bonus
+        bonusWinners.forEach(id -> receiveInfo(
+                players, playersInfo.get(id).getsLongestTrailBonus(
+                        longestTrails.get(id)))
+        );
 
-        return lengths.get(longestLength);
+
+        return bonusWinners;
     }
 
     /**
