@@ -14,13 +14,15 @@ import java.util.*;
 import static ch.epfl.tchu.game.Constants.*;
 
 /**
+ * Game of Tchu.
+ *
  * @author Martin Sanchez Lopez (313238)
  */
 public final class Game {
 
 
     /**
-     * Plays a game with the given players and tickets.
+     * Plays a game with the given players and tickets and rng.
      *
      * @param players     map of the id and their player instances
      * @param playerNames map of the id and their player names
@@ -45,7 +47,7 @@ public final class Game {
         GameState gameState = GameState.initial(tickets, rng);
 
         PlayerId currentPlayerId = gameState.currentPlayerId();
-        Player currentPlayer = players.get(currentPlayerId);
+        Player currentPlayer; //initialized for the big loop
 
         //tells players who plays first
         receiveInfo(players, pInfo.get(currentPlayerId).willPlayFirst());
@@ -56,10 +58,7 @@ public final class Game {
             gameState = gameState.withoutTopTickets(INITIAL_TICKETS_COUNT); //remove tickets from deck
         }
 
-        //TODO: receive info ici?
-
         Map<PlayerId, Integer> ticketsKept = new TreeMap<>();
-
         //asks players tickets to keep
         for (PlayerId id : players.keySet()) {
             Player p = players.get(id);
@@ -68,7 +67,6 @@ public final class Game {
             SortedBag<Ticket> initialTicketsChosen = p.chooseInitialTickets();
             int amountOfTickets = initialTicketsChosen.size();
             gameState = gameState.withInitiallyChosenTickets(id, initialTicketsChosen);
-            p.receiveInfo(pInfo.get(id).keptTickets(amountOfTickets));
             ticketsKept.put(id, amountOfTickets);
         }
 
@@ -76,26 +74,23 @@ public final class Game {
         ticketsKept.forEach((id, n) -> receiveInfo(players, pInfo.get(id).keptTickets(n)));
 
         //main game loop
-        for (;;) {
+        for (; ; ) {
             currentPlayerId = gameState.currentPlayerId();
             currentPlayer = players.get(currentPlayerId);
 
-            receiveInfo(players, pInfo.get(currentPlayerId).canPlay());
             updateState(players, gameState);
+            receiveInfo(players, pInfo.get(currentPlayerId).canPlay());
             switch (currentPlayer.nextTurn()) {
-
                 case DRAW_TICKETS:
-
                     SortedBag<Ticket> initialTickets = gameState.topTickets(IN_GAME_TICKETS_COUNT);
                     receiveInfo(players, pInfo.get(currentPlayerId).drewTickets(IN_GAME_TICKETS_COUNT));
 
                     SortedBag<Ticket> chosenTickets = currentPlayer.chooseTickets(initialTickets);
                     gameState = gameState.withChosenAdditionalTickets(initialTickets, chosenTickets);
                     receiveInfo(players, pInfo.get(currentPlayerId).keptTickets(chosenTickets.size()));
-
                     break;
 
-                case DRAW_CARDS: //TODO: updates and messages
+                case DRAW_CARDS:
                     for (int i = 0; i < 2; i++) {
                         //check deck not empty
                         if (gameState.cardState().isDeckEmpty()) {
@@ -115,59 +110,53 @@ public final class Game {
                             receiveInfo(players, pInfo.get(currentPlayerId).drewVisibleCard(faceUpCard));
                         }
                     }
-                    break; //TODO: useless?
+                    break;
 
                 case CLAIM_ROUTE:
                     Route chosenRoute = currentPlayer.claimedRoute();
-                    //TODO: do we have to check all this here??? piazza answers are unclear
-                    boolean canClaimRoute = gameState.currentPlayerState().canClaimRoute(chosenRoute);
-                    if (canClaimRoute) {
+                    SortedBag<Card> initCards = currentPlayer.initialClaimCards();
 
-                        //TODO: check if initialCards are valid to start claim???
-                        SortedBag<Card> initCards = currentPlayer.initialClaimCards();
+                    //by default no additional cards needed, changes if route is underground and additional cards are needed
+                    SortedBag<Card> additionalCards = SortedBag.of();
+                    int additionalCardsCount = 0;
 
-                        //by default no additional cards needed, changes if route is underground and additional cards are needed
-                        SortedBag<Card> additionalCards = SortedBag.of();
-                        int additionalCardsCount = 0;
+                    if (chosenRoute.level() == Route.Level.UNDERGROUND) {
+                        receiveInfo(players, pInfo.get(currentPlayerId).attemptsTunnelClaim(chosenRoute, initCards));
 
-                        if (chosenRoute.level() == Route.Level.UNDERGROUND) {
-                            receiveInfo(players, pInfo.get(currentPlayerId).attemptsTunnelClaim(chosenRoute, initCards));
-                            SortedBag.Builder<Card> additionalCardsTunnelBuilder = new SortedBag.Builder<>();
-                            //draw additional tunnel cards one by one...
-                            for (int i = 0; i < ADDITIONAL_TUNNEL_CARDS; i++) {
-                                //check deck not empty
-                                if (gameState.cardState().isDeckEmpty()) {
-                                    gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
-                                }
-                                additionalCardsTunnelBuilder.add(gameState.topCard());
-                                gameState = gameState.withoutTopCard();
+                        SortedBag.Builder<Card> additionalCardsTunnelBuilder = new SortedBag.Builder<>();
+                        //draw additional tunnel cards one by one...
+                        for (int i = 0; i < ADDITIONAL_TUNNEL_CARDS; i++) {
+                            //check deck not empty
+                            if (gameState.cardState().isDeckEmpty()) {
+                                gameState = gameState.withCardsDeckRecreatedIfNeeded(rng);
                             }
-                            SortedBag<Card> drawnCards = additionalCardsTunnelBuilder.build();
-                            additionalCardsCount = chosenRoute.
-                                    additionalClaimCardsCount(initCards, drawnCards);
-
-                            receiveInfo(players, pInfo.get(currentPlayerId).drewAdditionalCards(drawnCards, additionalCardsCount));
-
-                            //player has to play additional cards
-                            if (additionalCardsCount >= 1) {
-                                List<SortedBag<Card>> possibleAdditionalCards = gameState.
-                                        currentPlayerState().
-                                        possibleAdditionalCards(additionalCardsCount, initCards, drawnCards);
-
-                                additionalCards = currentPlayer.chooseAdditionalCards(possibleAdditionalCards);
-                            }
-
+                            additionalCardsTunnelBuilder.add(gameState.topCard());
+                            gameState = gameState.withoutTopCard();
                         }
-                        if (!additionalCards.isEmpty() || additionalCardsCount == 0) {
-                            SortedBag<Card> finalClaimCards = initCards.union(additionalCards);
-                            gameState = gameState.
-                                    withClaimedRoute(chosenRoute, finalClaimCards);
-                            receiveInfo(players, pInfo.get(currentPlayerId).claimedRoute(chosenRoute, finalClaimCards));
-                            updateState(players, gameState);
-                        } else
-                            receiveInfo(players, pInfo.get(currentPlayerId).didNotClaimRoute(chosenRoute));
+                        SortedBag<Card> drawnCards = additionalCardsTunnelBuilder.build();
+                        additionalCardsCount = chosenRoute.
+                                additionalClaimCardsCount(initCards, drawnCards);
+
+                        receiveInfo(players, pInfo.get(currentPlayerId).drewAdditionalCards(drawnCards, additionalCardsCount));
+
+                        //player has to play additional cards
+                        if (additionalCardsCount >= 1) {
+                            List<SortedBag<Card>> possibleAdditionalCards = gameState.
+                                    currentPlayerState().
+                                    possibleAdditionalCards(additionalCardsCount, initCards, drawnCards);
+
+                            additionalCards = currentPlayer.chooseAdditionalCards(possibleAdditionalCards);
+                        }
 
                     }
+                    if (!additionalCards.isEmpty() || additionalCardsCount == 0) {
+                        SortedBag<Card> finalClaimCards = initCards.union(additionalCards);
+                        gameState = gameState.
+                                withClaimedRoute(chosenRoute, finalClaimCards);
+                        receiveInfo(players, pInfo.get(currentPlayerId).claimedRoute(chosenRoute, finalClaimCards));
+                    } else
+                        receiveInfo(players, pInfo.get(currentPlayerId).didNotClaimRoute(chosenRoute));
+
                     break;
             }
 
@@ -213,13 +202,10 @@ public final class Game {
         }
 
         //declare winner
-        if (gameWinners.size() == 1) {
+        if (gameWinners.size() == 2) {
             receiveInfo(players, Info.draw(new ArrayList<>(playerNames.values()), maxPoints));
         } else {
-            receiveInfo(
-                    players,
-                    pInfo.get(gameWinners.get(0)).won(maxPoints, loserPoints)
-            );
+            receiveInfo(players, pInfo.get(gameWinners.get(0)).won(maxPoints, loserPoints));
         }
 
     }
@@ -240,7 +226,7 @@ public final class Game {
         int longestLength = 0;
         Set<PlayerId> bonusWinners = new HashSet<>();
 
-        //calculate the longests trails and find the winner(s) at the same time
+        //calculate the longests trails of all the players and find the winner(s)
         for (PlayerId id : players.keySet()) {
             Trail playerLongest = Trail.longest(gameState.playerState(id).routes());
             int l = playerLongest.length();
