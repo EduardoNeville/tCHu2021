@@ -13,9 +13,20 @@ import java.util.*;
 
 import static ch.epfl.tchu.game.Constants.*;
 
+/**
+ * @author Martin Sanchez Lopez (313238)
+ */
 public final class Game {
 
 
+    /**
+     * Plays a game with the given players and tickets.
+     *
+     * @param players     map of the id and their player instances
+     * @param playerNames map of the id and their player names
+     * @param tickets     bag of the tickets of the game
+     * @param rng         random number generator
+     */
     public static void play(Map<PlayerId, Player> players, Map<PlayerId, String> playerNames, SortedBag<Ticket> tickets, Random rng) {
         Preconditions.checkArgument(players.size() == 2 && playerNames.size() == 2);
 
@@ -33,45 +44,43 @@ public final class Game {
         //init gameState
         GameState gameState = GameState.initial(tickets, rng);
 
-        //tells players who plays first
         PlayerId currentPlayerId = gameState.currentPlayerId();
-        players.forEach((p, t) -> t.receiveInfo(pInfo.get(currentPlayerId).willPlayFirst())); //is this the good way to do?
+        Player currentPlayer = players.get(currentPlayerId);
+
+        //tells players who plays first
+        receiveInfo(players, pInfo.get(currentPlayerId).willPlayFirst());
 
         //tells players initial given tickets
-        for(Player p: players.values())
+        for (Player p : players.values()) {
             p.setInitialTicketChoice(gameState.topTickets(INITIAL_TICKETS_COUNT));
-           gameState = gameState.withoutTopTickets(INITIAL_TICKETS_COUNT); //remove tickets from deck
+            gameState = gameState.withoutTopTickets(INITIAL_TICKETS_COUNT); //remove tickets from deck
+        }
 
         //TODO: receive info ici?
 
+        Map<PlayerId, Integer> ticketsKept = new TreeMap<>();
 
-//        for (PlayerId id : players.keySet()) {
-//            Player p = players.get(id);
-//
-//            updateState(players, gameState);
-//            SortedBag<Ticket> initialTicketsChosen = p.chooseInitialTickets();
-//            gameState = gameState.withInitiallyChosenTickets(id, initialTicketsChosen);
-//            p.receiveInfo(pInfo.get(p).keptTickets(initialTicketsChosen.size()));
-//        }
         //asks players tickets to keep
         for (PlayerId id : players.keySet()) {
             Player p = players.get(id);
             updateState(players, gameState);
+
             SortedBag<Ticket> initialTicketsChosen = p.chooseInitialTickets();
+            int amountOfTickets = initialTicketsChosen.size();
             gameState = gameState.withInitiallyChosenTickets(id, initialTicketsChosen);
-            p.receiveInfo(pInfo.get(id).keptTickets(initialTicketsChosen.size()));
+            p.receiveInfo(pInfo.get(id).keptTickets(amountOfTickets));
+            ticketsKept.put(id, amountOfTickets);
         }
 
-        boolean gameHasEnded = false;
+        //give info of tickets kept by players
+        ticketsKept.forEach((id, n) -> receiveInfo(players, pInfo.get(id).keptTickets(n)));
 
         //main game loop
-        while (!gameHasEnded) {
-            Player currentPlayer = players.get(currentPlayerId);
-
+        for (;;) {
+            currentPlayerId = gameState.currentPlayerId();
+            currentPlayer = players.get(currentPlayerId);
 
             receiveInfo(players, pInfo.get(currentPlayerId).canPlay());
-            // USEFUL ?? updateState(players, gameState);
-
             updateState(players, gameState);
             switch (currentPlayer.nextTurn()) {
 
@@ -148,7 +157,6 @@ public final class Game {
                                 additionalCards = currentPlayer.chooseAdditionalCards(possibleAdditionalCards);
                             }
 
-
                         }
                         if (!additionalCards.isEmpty() || additionalCardsCount == 0) {
                             SortedBag<Card> finalClaimCards = initCards.union(additionalCards);
@@ -160,14 +168,12 @@ public final class Game {
                             receiveInfo(players, pInfo.get(currentPlayerId).didNotClaimRoute(chosenRoute));
 
                     }
-
                     break;
             }
 
-
             //ending condition
             if (gameState.lastPlayer() != null && gameState.lastPlayer() == currentPlayerId) {
-                gameHasEnded = true;
+                break;
             }
 
             //last turn announcement
@@ -178,40 +184,38 @@ public final class Game {
             gameState = gameState.forNextTurn();
         }
 
-
+        //final update
         updateState(players, gameState);
+
+        //find longest Route(s) and give bonus info
         Set<PlayerId> longestTrailPossessors = longestRouteWinners(players, gameState, pInfo);
 
-        int maxPoints = -9999;
-        int loserPoints = -9999;
+        int maxPoints = -99999;
+        int loserPoints = -99999;
         List<PlayerId> gameWinners = new ArrayList<>();
 
+        //calculate the points of each players and determine the winner at same time
         for (PlayerId id : players.keySet()) {
             int p = gameState.playerState(id).finalPoints();
             if (longestTrailPossessors.contains(id)) {
-                p+=LONGEST_TRAIL_BONUS_POINTS;
+                p += LONGEST_TRAIL_BONUS_POINTS;
             }
 
-            if(p==maxPoints){
+            if (p == maxPoints) {
                 gameWinners.add(id);
-            }
-            else if(p>maxPoints){
+            } else if (p > maxPoints) {
                 loserPoints = maxPoints;
-                maxPoints=p;
+                maxPoints = p;
                 gameWinners = new ArrayList<>(List.of(id));
+            } else if (p < maxPoints) {
+                loserPoints = p;
             }
         }
 
         //declare winner
-        if(gameWinners.size() != 1){
-            //For draws when player count is >2
-            List<String> names = new ArrayList<>();
-            gameWinners.forEach(id -> names.add(playerNames.get(id)));
-            receiveInfo(players, Info.draw(names, maxPoints));
-
-            //receiveInfo(players, Info.draw(new ArrayList<>(playerNames.values()), maxPoints)); //2 players only
-        }
-        else{
+        if (gameWinners.size() == 1) {
+            receiveInfo(players, Info.draw(new ArrayList<>(playerNames.values()), maxPoints));
+        } else {
             receiveInfo(
                     players,
                     pInfo.get(gameWinners.get(0)).won(maxPoints, loserPoints)
@@ -222,39 +226,31 @@ public final class Game {
 
 
     /**
-     * Calculates the player(s) that have the longest length Trail, output the message that they got the bonus and
+     * Calculates the player(s) that have the longest length Trail, output the message that they won the bonus and
      * returns the players that must be given the points for the bonus
      *
-     * @param players
-     *          the game playres
-     * @param gameState
-     *          game state
-     * @param playersInfo
-     *          players' Info instances
-     *
+     * @param players     the game playres
+     * @param gameState   game state
+     * @param playersInfo players' Info instances
      * @return set of players that are to obtain longestRoute bonus
      */
-    private static Set<PlayerId> longestRouteWinners(Map<PlayerId, Player> players, GameState gameState, Map<PlayerId, Info> playersInfo){
-
-        //works for any number of players
+    private static Set<PlayerId> longestRouteWinners(Map<PlayerId, Player> players, GameState gameState, Map<PlayerId, Info> playersInfo) {
 
         Map<PlayerId, Trail> longestTrails = new HashMap<>();
         int longestLength = 0;
         Set<PlayerId> bonusWinners = new HashSet<>();
 
-        for (PlayerId id :
-                players.keySet()) {
+        //calculate the longests trails and find the winner(s) at the same time
+        for (PlayerId id : players.keySet()) {
             Trail playerLongest = Trail.longest(gameState.playerState(id).routes());
             int l = playerLongest.length();
 
             if (l == longestLength) {
                 bonusWinners.add(id);
-            }
-            else if (l>longestLength) {
-                longestLength=l;
+            } else if (l > longestLength) {
+                longestLength = l;
                 bonusWinners = new HashSet<>(Set.of(id));
             }
-
             longestTrails.put(id, playerLongest);
         }
 
@@ -263,7 +259,6 @@ public final class Game {
                 players, playersInfo.get(id).getsLongestTrailBonus(
                         longestTrails.get(id)))
         );
-
 
         return bonusWinners;
     }
@@ -283,7 +278,6 @@ public final class Game {
      * @param message info to give to players
      */
     private static void receiveInfo(Map<PlayerId, Player> map, String message) {
-        map.forEach((id, p) -> p.receiveInfo(message));
         map.values().forEach((p) -> p.receiveInfo(message));
     }
 
