@@ -1,11 +1,9 @@
 package ch.epfl.tchu.game;
 
 import ch.epfl.tchu.Preconditions;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Copy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * PublicGameState
@@ -85,7 +83,7 @@ public class PublicGameState {
         return currentPlayerID;
     }
 
-    public PublicPlayerState playerState(PlayerId playerId){
+    public PublicPlayerState playerState(PlayerId playerId) {
         return playerStatE.get(playerId);
     }
 
@@ -94,7 +92,7 @@ public class PublicGameState {
      * @return the playerState of the currentplayer
      */
     public PublicPlayerState currentPlayerState(){
-        return playerState(currentPlayerID);
+        return playerState(currentPlayerId());
     }
 
     /**

@@ -164,12 +164,15 @@ public final class GameState extends PublicGameState{
      * @return new deck of cards from shuffled discarded cards or the same gamestate
      */
     public GameState withCardsDeckRecreatedIfNeeded(Random rng){
-        if (privateCardState.isDeckEmpty()){
+
+        if (privateCardState.isDeckEmpty()) {
+
             return new GameState(playerState, lastPlayer(),
-                    tickets,privateCardState.withDeckRecreatedFromDiscards(rng),
+                    tickets, privateCardState.withDeckRecreatedFromDiscards(rng),
                     currentPlayerId());
         }
-        return this;
+        else return this;
+
     }
 
     /**
