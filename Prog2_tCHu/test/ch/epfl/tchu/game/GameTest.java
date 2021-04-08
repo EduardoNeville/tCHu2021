@@ -83,11 +83,11 @@ public class GameTest {
 
         @Override
         public SortedBag<Ticket> chooseInitialTickets() {
-            SortedBag<Ticket> chosen = SortedBag.of();
-            for (int i = 0; i < rng.nextInt(initTickets.size()); i++) {
-                initTickets.get(i);
+            Set<Ticket> chosen = new HashSet<>();
+            for (int i = 0; i < 3; i++) {
+                chosen.add(initTickets.get(i));
             };
-            return SortedBag.of();
+            return SortedBag.of(chosen);
         }
 
         private List<Route> claimableRoutes() {
