@@ -45,6 +45,7 @@ public final class Game {
 
         //init gameState
         GameState gameState = GameState.initial(tickets, rng);
+        System.out.println("GAME: Il restent " + gameState.cardState().deckSize() + " cartes.");
 
         PlayerId currentPlayerId = gameState.currentPlayerId();
         Player currentPlayer; //initialized for the big loop
@@ -75,10 +76,19 @@ public final class Game {
 
         //main game loop
         for (; ; ) {
+            System.out.println(gameState.cardState().deckSize() +
+                   gameState.cardState().discardsSize() +
+                    gameState.playerState(PlayerId.PLAYER_1).cardCount()+
+                    gameState.playerState(PlayerId.PLAYER_2).cardCount() );
+            System.out.println("cartes en jeu : deck" + gameState.cardState().deckSize() +
+                    " discard : "+ gameState.cardState().discardsSize() + " p1 : " +
+                    gameState.playerState(PlayerId.PLAYER_1).cardCount()
+            + " p2 : " + gameState.playerState(PlayerId.PLAYER_2).cardCount());
             currentPlayerId = gameState.currentPlayerId();
             currentPlayer = players.get(currentPlayerId);
 
             updateState(players, gameState);
+            System.out.println("GAME: Il restent " + gameState.cardState().deckSize() + " cartes.");
             receiveInfo(players, pInfo.get(currentPlayerId).canPlay());
             switch (currentPlayer.nextTurn()) {
                 case DRAW_TICKETS:
@@ -208,6 +218,8 @@ public final class Game {
         } else {
             receiveInfo(players, pInfo.get(gameWinners.get(0)).won(maxPoints, loserPoints));
         }
+
+        return;
 
     }
 

@@ -3,6 +3,7 @@ package ch.epfl.tchu.game;
 import ch.epfl.tchu.SortedBag;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Array;
 import java.sql.SQLOutput;
 import java.util.*;
 
@@ -11,8 +12,10 @@ public class GameTest {
     @Test
     public void game(){
         Map<PlayerId, Player> playerMap = new HashMap<>(){{
-            put(PlayerId.PLAYER_1, new TestPlayer(12980312, ChMap.routes()));
-            put(PlayerId.PLAYER_2, new TestPlayer(43213213, ChMap.routes()));
+//            put(PlayerId.PLAYER_1, new TestPlayer(12980312, ChMap.routes()));
+//            put(PlayerId.PLAYER_2, new TestPlayer(43213213, ChMap.routes()));
+            put(PlayerId.PLAYER_1, new TestPlayer(123, ChMap.routes()));
+            put(PlayerId.PLAYER_2, new TestPlayer(1, ChMap.routes()));
         }};
 
         Map<PlayerId, String> playerNames = new HashMap<>(){{
@@ -35,12 +38,13 @@ public class GameTest {
 
         private final Random rng;
         // Toutes les routes de la carte
-        private final List<Route> allRoutes;
+        private final ArrayList<Route> allRoutes;
 
         private int turnCounter;
         private PlayerState ownState;
         private PublicGameState gameState;
         private PlayerId ownId = null;
+        private PlayerId otherId = null;
         SortedBag<Ticket> initTickets;
 
         // Lorsque nextTurn retourne CLAIM_ROUTE
@@ -49,13 +53,17 @@ public class GameTest {
 
         public TestPlayer(long randomSeed, List<Route> allRoutes) {
             this.rng = new Random(randomSeed);
-            this.allRoutes = List.copyOf(allRoutes);
+            this.allRoutes = new ArrayList<>(ChMap.routes());
             this.turnCounter = 0;
         }
 
         @Override
         public void initPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
             this.ownId = ownId;
+            for(PlayerId id: playerNames.keySet()){
+                if (id!=ownId)
+                    otherId = id;
+            }
             System.out.println("inti Players : own = " + ownId + " players names Map = " + playerNames);
         }
 
@@ -97,13 +105,21 @@ public class GameTest {
                     claimable.add(r);
                 }
             }
+
+            List<Route> finalClaimable = new ArrayList<>();
+
+            List<Route> enemyRoutes = gameState.playerState(otherId).routes();
+            for (Route route: claimable){
+                if(!enemyRoutes.contains(route))
+                    finalClaimable.add(route);
+
+            }
+
             return claimable;
         }
 
         @Override
         public TurnKind nextTurn() {
-            if (ownState.carCount() < 0)
-                throw new Error("Car count negatif!");
 
             turnCounter += 1;
             if (turnCounter > TURN_LIMIT)
@@ -111,9 +127,11 @@ public class GameTest {
 
             // Détermine les routes dont ce joueur peut s'emparer
             List<Route> claimableRoutes = claimableRoutes();
-            if (claimableRoutes.isEmpty()) {
+            System.out.println( "Route claimables =" + claimableRoutes);
+            System.out.println("Cars de " + ownId + " " + ownState.carCount() + "routes aquises : " + ownState.routes().size());
+            if (claimableRoutes.isEmpty() && !gameState.cardState().isDeckEmpty()) {
                 return TurnKind.DRAW_CARDS;
-            } else {
+            } else if(!claimableRoutes.isEmpty()) {
                 int routeIndex = rng.nextInt(claimableRoutes.size());
                 Route route = claimableRoutes.get(routeIndex);
                 List<SortedBag<Card>> cards = ownState.possibleClaimCards(route);
@@ -121,6 +139,9 @@ public class GameTest {
                 routeToClaim = route;
                 initialClaimCards = cards.get(0);
                 return TurnKind.CLAIM_ROUTE;
+            }
+            else{
+                return TurnKind.DRAW_TICKETS;
             }
         }
 
@@ -135,11 +156,19 @@ public class GameTest {
 
         @Override
         public int drawSlot() {
-            return rng.nextInt(Constants.FACE_UP_CARDS_COUNT);
+            int i =0;
+            for(Card c:gameState.cardState().faceUpCards()){
+                if(c != null)
+                    return i;
+                i++;
+            }
+            //return rng.nextInt(Constants.FACE_UP_CARDS_COUNT);
+            return 6;
         }
 
         @Override
         public Route claimedRoute() {
+            allRoutes.remove(routeToClaim);
             return routeToClaim;
         }
 
