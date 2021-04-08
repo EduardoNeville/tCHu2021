@@ -140,12 +140,13 @@ public final class Game {
                         receiveInfo(players, pInfo.get(currentPlayerId).drewAdditionalCards(drawnCards, additionalCardsCount));
 
                         //player has to play additional cards
-                        if (additionalCardsCount >= 1) {
+                        if (additionalCardsCount >= 1 ) {
                             List<SortedBag<Card>> possibleAdditionalCards = gameState.
                                     currentPlayerState().
                                     possibleAdditionalCards(additionalCardsCount, initCards, drawnCards);
 
-                            additionalCards = currentPlayer.chooseAdditionalCards(possibleAdditionalCards);
+                            if(!possibleAdditionalCards.isEmpty())
+                                additionalCards = currentPlayer.chooseAdditionalCards(possibleAdditionalCards);
                         }
 
                     }
