@@ -30,7 +30,11 @@ public interface Player {
      */
     void initPlayers(PlayerId ownId, Map<PlayerId, String> playerNames);
 
-    //TODO: comnment
+    /**
+     * Communicates to the Player the initial tickets he was given.
+     * @param tickets
+     *          the tickets given
+     */
     void setInitialTicketChoice(SortedBag<Ticket> tickets);
 
     /**
@@ -49,12 +53,6 @@ public interface Player {
      */
     void updateState(PublicGameState newState, PlayerState ownState);
 
-    /**
-     * Communicates to the Player the initial tickets he was given.
-     * @param tickets
-     *          the tickets given
-     */
-    void selfInitialTicketChoice(SortedBag<Ticket> tickets);
 
     /**
      * Ask the players the tickets they want to keep from the tickets given as the game initialises and returns
