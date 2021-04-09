@@ -45,7 +45,6 @@ public final class Game {
 
         //init gameState
         GameState gameState = GameState.initial(tickets, rng);
-        System.out.println("GAME: Il restent " + gameState.cardState().deckSize() + " cartes.");
 
         PlayerId currentPlayerId = gameState.currentPlayerId();
         Player currentPlayer; //initialized for the big loop
@@ -76,14 +75,6 @@ public final class Game {
 
         //main game loop
         for (; ; ) {
-            System.out.println(gameState.cardState().deckSize() +
-                   gameState.cardState().discardsSize() +
-                    gameState.playerState(PlayerId.PLAYER_1).cardCount()+
-                    gameState.playerState(PlayerId.PLAYER_2).cardCount() );
-            System.out.println("cartes en jeu : deck" + gameState.cardState().deckSize() +
-                    " discard : "+ gameState.cardState().discardsSize() + " p1 : " +
-                    gameState.playerState(PlayerId.PLAYER_1).cardCount()
-            + " p2 : " + gameState.playerState(PlayerId.PLAYER_2).cardCount());
             currentPlayerId = gameState.currentPlayerId();
             currentPlayer = players.get(currentPlayerId);
 
@@ -94,12 +85,11 @@ public final class Game {
 
             System.out.println("Le nombre de cartes en jeux est : " +
                     (gameState.cardState().deckSize() + gameState.cardState().discardsSize()
-                    + gameState.playerState(PlayerId.PLAYER_1).cardCount()
-                    + gameState.playerState(PlayerId.PLAYER_2).cardCount()
-                    + 5));
+                            + gameState.playerState(PlayerId.PLAYER_1).cardCount()
+                            + gameState.playerState(PlayerId.PLAYER_2).cardCount()
+                            + 5));
 
             updateState(players, gameState);
-            System.out.println("GAME: Il restent " + gameState.cardState().deckSize() + " cartes.");
             receiveInfo(players, pInfo.get(currentPlayerId).canPlay());
             switch (currentPlayer.nextTurn()) {
                 case DRAW_TICKETS:
@@ -206,8 +196,8 @@ public final class Game {
         Set<PlayerId> longestTrailPossessors = longestRouteWinners(players, gameState, pInfo);
         System.out.println("Trail calculed");
 
-        int maxPoints = -99999;
-        int loserPoints = -99999;
+        int maxPoints = -99;
+        int loserPoints = -99;
         List<PlayerId> gameWinners = new ArrayList<>();
 
         //calculate the points of each players and determine the winner at same time
@@ -226,7 +216,7 @@ public final class Game {
                 loserPoints = maxPoints;
                 maxPoints = p;
                 gameWinners = new ArrayList<>(List.of(id));
-            } else if (p < maxPoints) {
+            } else{ // p < maxPoints
                 loserPoints = p;
             }
             System.out.println("maxp : " + maxPoints + "  loserp : " + loserPoints + " setsize : " + gameWinners.size());
@@ -238,8 +228,6 @@ public final class Game {
         } else {
             receiveInfo(players, pInfo.get(gameWinners.get(0)).won(maxPoints, loserPoints));
         }
-
-        return;
 
     }
 
