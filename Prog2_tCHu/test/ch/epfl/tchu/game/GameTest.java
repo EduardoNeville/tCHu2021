@@ -86,10 +86,6 @@ public class GameTest {
             this.ownState = ownState;
         }
 
-        @Override
-        public void selfInitialTicketChoice(SortedBag<Ticket> tickets) {
-            //this.initTickets = tickets;
-        }
 
         @Override
         public SortedBag<Ticket> chooseInitialTickets() {

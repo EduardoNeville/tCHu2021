@@ -1,7 +1,6 @@
 package ch.epfl.tchu.game;
 
 import ch.epfl.tchu.Preconditions;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Copy;
 
 import java.util.*;
 
