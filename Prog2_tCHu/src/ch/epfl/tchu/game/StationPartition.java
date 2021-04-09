@@ -89,6 +89,7 @@ public final class StationPartition implements StationConnectivity {
             int id2 = s2.id();
 
 
+
             //Both stations are they own representative
             if(representative(id1) == id1 && representative(id2) == id2){
                 //station1 becomes representative by default
@@ -98,20 +99,18 @@ public final class StationPartition implements StationConnectivity {
             //Both station have a representative
             else if (representative(id1) != id1 && representative(id2) != id2){
                 //default choice: station1's representative become the new representative of station2's 'branch'
-                assignRepresentative(getHighestRepresentative(id2), representative(id1));
+                assignRepresentative(getHighestRepresentative(id2), getHighestRepresentative(id1));
             }
 
             //One station already has another representative
             else if (representative(id1) != id1){
-                assignRepresentative(id2, representative(id1));
+                assignRepresentative(id2, getHighestRepresentative(id1));
             }
             else if (representative(id2) != id2){ //TODO or just else?
-                assignRepresentative(id1, representative(id2));
+                assignRepresentative(id1, getHighestRepresentative(id2));
             }
-
             return this;
         }
-
         /**
          * Returns the representative of the given station id.
          * @param stationId
