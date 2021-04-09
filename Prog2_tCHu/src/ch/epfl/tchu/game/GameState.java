@@ -210,12 +210,12 @@ public final class GameState extends PublicGameState{
 
     /**
      *
-     * @param slot
-     * @return
+     * @param slot position of card swap
+     * @return GameState with playerState changed to fit the card and privatecardState changed
      */
     public GameState withDrawnFaceUpCard(int slot){
         Preconditions.checkArgument(canDrawCards());
-        var playerstate2 = new HashMap<PlayerId,PlayerState>(playerState);
+        var playerstate2 = new HashMap<>(playerState);
         playerstate2.put(currentPlayerId(), playerState(currentPlayerId()).withAddedCard(privateCardState.faceUpCard(slot)));
 
         return new GameState(playerstate2,lastPlayer(),tickets,
