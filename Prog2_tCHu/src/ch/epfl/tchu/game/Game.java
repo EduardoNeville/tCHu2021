@@ -111,12 +111,12 @@ public final class Game {
 
                         int slot = currentPlayer.drawSlot();
                         if (slot == -1) {
-                            gameState.currentPlayerState().withAddedCard(gameState.topCard());
-                            gameState = gameState.withoutTopCard();
+                            //gameState.currentPlayerState().withAddedCard(gameState.topCard());
+                            gameState = gameState.withBlindlyDrawnCard();
                             receiveInfo(players, pInfo.get(currentPlayerId).drewBlindCard());
                         } else {
                             Card faceUpCard = gameState.cardState().faceUpCard(slot);
-                            gameState.currentPlayerState().withAddedCard(faceUpCard);
+                            //gameState.currentPlayerState().withAddedCard(faceUpCard);
                             gameState = gameState.withDrawnFaceUpCard(slot);
                             receiveInfo(players, pInfo.get(currentPlayerId).drewVisibleCard(faceUpCard));
                         }
@@ -165,6 +165,7 @@ public final class Game {
                     }
                     if (additionalCardsCount == 0 || !additionalCards.isEmpty()) {
                         SortedBag<Card> finalClaimCards = initCards.union(additionalCards);
+                        System.out.println("claim : " + finalClaimCards + " draw : " + drawnCards);
                         gameState = gameState
                                 .withClaimedRoute(chosenRoute, finalClaimCards)
                                 .withMoreDiscardedCards(drawnCards);
