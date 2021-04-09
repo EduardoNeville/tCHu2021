@@ -151,22 +151,23 @@ public final class Game {
 
                         receiveInfo(players, pInfo.get(currentPlayerId).drewAdditionalCards(drawnCards, additionalCardsCount));
 
+
                         //player has to play additional cards
-                        if (additionalCardsCount >= 1 ) {
+                        if (additionalCardsCount >= 1) {
                             List<SortedBag<Card>> possibleAdditionalCards = gameState.
                                     currentPlayerState().
                                     possibleAdditionalCards(additionalCardsCount, initCards, drawnCards);
 
-                            if(!possibleAdditionalCards.isEmpty())
+                            if (!possibleAdditionalCards.isEmpty())
                                 additionalCards = currentPlayer.chooseAdditionalCards(possibleAdditionalCards);
                         }
 
                     }
-                    if (!additionalCards.isEmpty() || additionalCardsCount == 0) {
+                    if (additionalCardsCount == 0 || !additionalCards.isEmpty()) {
                         SortedBag<Card> finalClaimCards = initCards.union(additionalCards);
                         gameState = gameState
                                 .withClaimedRoute(chosenRoute, finalClaimCards)
-                                .withMoreDiscardedCards(drawnCards.difference(additionalCards));
+                                .withMoreDiscardedCards(drawnCards);
 
                         receiveInfo(players, pInfo.get(currentPlayerId).claimedRoute(chosenRoute, finalClaimCards));
                     } else {
@@ -216,7 +217,7 @@ public final class Game {
                 loserPoints = maxPoints;
                 maxPoints = p;
                 gameWinners = new ArrayList<>(List.of(id));
-            } else{ // p < maxPoints
+            } else { // p < maxPoints
                 loserPoints = p;
             }
             System.out.println("maxp : " + maxPoints + "  loserp : " + loserPoints + " setsize : " + gameWinners.size());
