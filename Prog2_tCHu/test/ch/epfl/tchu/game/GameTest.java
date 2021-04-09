@@ -11,11 +11,13 @@ public class GameTest {
 
     @Test
     public void game(){
+        List<Route> routes = new ArrayList<>(ChMap.routes());
+
         Map<PlayerId, Player> playerMap = new HashMap<>(){{
 //            put(PlayerId.PLAYER_1, new TestPlayer(12980312, ChMap.routes()));
 //            put(PlayerId.PLAYER_2, new TestPlayer(43213213, ChMap.routes()));
-            put(PlayerId.PLAYER_1, new TestPlayer(123, ChMap.routes()));
-            put(PlayerId.PLAYER_2, new TestPlayer(1, ChMap.routes()));
+            put(PlayerId.PLAYER_1, new TestPlayer(123, routes));
+            put(PlayerId.PLAYER_2, new TestPlayer(1, routes));
         }};
 
         Map<PlayerId, String> playerNames = new HashMap<>(){{
@@ -115,7 +117,7 @@ public class GameTest {
 
             }
 
-            return claimable;
+            return finalClaimable;
         }
 
         @Override
@@ -129,7 +131,7 @@ public class GameTest {
             List<Route> claimableRoutes = claimableRoutes();
             System.out.println( "Route claimables =" + claimableRoutes);
             System.out.println("Cars de " + ownId + " " + ownState.carCount() + "routes aquises : " + ownState.routes().size());
-            if (claimableRoutes.isEmpty() && !gameState.cardState().isDeckEmpty()) {
+            if (claimableRoutes.isEmpty()) {
                 return TurnKind.DRAW_CARDS;
             } else if(!claimableRoutes.isEmpty()) {
                 int routeIndex = rng.nextInt(claimableRoutes.size());
@@ -140,9 +142,11 @@ public class GameTest {
                 initialClaimCards = cards.get(0);
                 return TurnKind.CLAIM_ROUTE;
             }
-            else{
+            else if (gameState.canDrawTickets()){
                 return TurnKind.DRAW_TICKETS;
             }
+
+            return null;
         }
 
         @Override
