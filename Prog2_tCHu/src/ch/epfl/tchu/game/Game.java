@@ -78,6 +78,17 @@ public final class Game {
             currentPlayerId = gameState.currentPlayerId();
             currentPlayer = players.get(currentPlayerId);
 
+            System.out.println("gameState.cardState().deckSize() " + gameState.cardState().deckSize());
+            System.out.println("gameState.cardState().discardsSize() " + gameState.cardState().discardsSize());
+            System.out.println("gameState.playerState(PlayerId.PLAYER_1).cardCount()" + gameState.playerState(PlayerId.PLAYER_1).cardCount());
+            System.out.println("gameState.playerState(PlayerId.PLAYER_2).cardCount()" + gameState.playerState(PlayerId.PLAYER_2).cardCount());
+
+            System.out.println("Le nombre de cartes en jeux est : " +
+                    (gameState.cardState().deckSize() + gameState.cardState().discardsSize()
+                    + gameState.playerState(PlayerId.PLAYER_1).cardCount()
+                    + gameState.playerState(PlayerId.PLAYER_2).cardCount()
+                    + 5));
+
             updateState(players, gameState);
             receiveInfo(players, pInfo.get(currentPlayerId).canPlay());
             switch (currentPlayer.nextTurn()) {
@@ -117,6 +128,7 @@ public final class Game {
                     SortedBag<Card> initCards = currentPlayer.initialClaimCards();
 
                     //by default no additional cards needed, changes if route is underground and additional cards are needed
+                    SortedBag<Card> drawnCards = SortedBag.of();
                     SortedBag<Card> additionalCards = SortedBag.of();
                     int additionalCardsCount = 0;
 
@@ -133,7 +145,7 @@ public final class Game {
                             additionalCardsTunnelBuilder.add(gameState.topCard());
                             gameState = gameState.withoutTopCard();
                         }
-                        SortedBag<Card> drawnCards = additionalCardsTunnelBuilder.build();
+                        drawnCards = additionalCardsTunnelBuilder.build();
                         additionalCardsCount = chosenRoute.
                                 additionalClaimCardsCount(initCards, drawnCards);
 
@@ -152,12 +164,15 @@ public final class Game {
                     }
                     if (!additionalCards.isEmpty() || additionalCardsCount == 0) {
                         SortedBag<Card> finalClaimCards = initCards.union(additionalCards);
-                        gameState = gameState.
-                                withClaimedRoute(chosenRoute, finalClaimCards);
-                        receiveInfo(players, pInfo.get(currentPlayerId).claimedRoute(chosenRoute, finalClaimCards));
-                    } else
-                        receiveInfo(players, pInfo.get(currentPlayerId).didNotClaimRoute(chosenRoute));
+                        gameState = gameState
+                                .withClaimedRoute(chosenRoute, finalClaimCards)
+                                .withMoreDiscardedCards(drawnCards.difference(additionalCards));
 
+                        receiveInfo(players, pInfo.get(currentPlayerId).claimedRoute(chosenRoute, finalClaimCards));
+                    } else {
+                        gameState = gameState.withMoreDiscardedCards(drawnCards);
+                        receiveInfo(players, pInfo.get(currentPlayerId).didNotClaimRoute(chosenRoute));
+                    }
                     break;
             }
 
@@ -179,6 +194,7 @@ public final class Game {
 
         //find longest Route(s) and give bonus info
         Set<PlayerId> longestTrailPossessors = longestRouteWinners(players, gameState, pInfo);
+        System.out.println("Trail calculed");
 
         int maxPoints = -99999;
         int loserPoints = -99999;
@@ -186,10 +202,13 @@ public final class Game {
 
         //calculate the points of each players and determine the winner at same time
         for (PlayerId id : players.keySet()) {
+            System.out.println("entered for loop");
             int p = gameState.playerState(id).finalPoints();
             if (longestTrailPossessors.contains(id)) {
                 p += LONGEST_TRAIL_BONUS_POINTS;
             }
+            System.out.println(p + " maxpoints : " + maxPoints);
+
 
             if (p == maxPoints) {
                 gameWinners.add(id);
@@ -200,6 +219,7 @@ public final class Game {
             } else if (p < maxPoints) {
                 loserPoints = p;
             }
+            System.out.println("maxp : " + maxPoints + "  loserp : " + loserPoints + " setsize : " + gameWinners.size());
         }
 
         //declare winner
