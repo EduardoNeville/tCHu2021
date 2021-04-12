@@ -13,22 +13,20 @@ import java.util.*;
  * @author Eduardo Neville (314667)
  */
 public final class Deck <C extends Comparable<C>> {
-
     private final List<C> deckofCards;
 
-    /**
-     * Private constructor to return the deckofCards
-     * @param sortedBag
-     */
     private Deck(List<C> sortedBag){
         this.deckofCards = List.copyOf(sortedBag);
     }
 
     /**
      * Shuffler for the cards
-     * @param cards given cards
-     * @param rng random variable
+     * @param cards
+     *          given cards
+     * @param rng
+     *          random variable
      * @param <C>
+     *          type of card the deck has
      * @return Shuffled cards
      */
     public static <C extends Comparable<C>> Deck<C> of(SortedBag<C> cards, Random rng){
@@ -73,7 +71,10 @@ public final class Deck <C extends Comparable<C>> {
 
     /**
      * Method returns the first (count) top cards
-     * @param count # of cards from the top
+     * @param count
+     *          # of cards from the top
+     * @throws IllegalArgumentException
+     *          throw if count is smaller that 0 or bigger that the size of the deck
      * @return The first (count) top cards
      */
     public SortedBag<C> topCards(int count){
@@ -83,12 +84,12 @@ public final class Deck <C extends Comparable<C>> {
 
     /**
      * Method returns the DeckofCards without the first (count) top cards
-     * @param count # of cards removed from the top
+     * @param count
+     *          # of cards removed from the top
      * @return DeckofCards without the first (count) top cards
      */
     public Deck<C> withoutTopCards(int count){
         Preconditions.checkArgument(0 <= count && count <= deckofCards.size());
         return new Deck<>(deckofCards.subList(count, deckofCards.size()));
     }
-    
 }
