@@ -28,7 +28,7 @@ public final class Route {
      * A level (~elevation).
      */
     public enum Level {
-       OVERGROUND, UNDERGROUND
+        OVERGROUND, UNDERGROUND
     }
 
     private final String id;
@@ -54,6 +54,10 @@ public final class Route {
      * @param color
      *          color of the route
      *          can be null
+     * @throws IllegalArgumentException
+     *          if station1 is equal to station2
+     * @throws IllegalArgumentException
+     *          if length is smaller than MIN_ROUTE_LENGTH or length is bigger than MAX_ROUTE_LENGTH
      */
     public Route(String id, Station station1, Station station2, int length, Level level, Color color) {
         if (station1 == null || station2 == null || level == null || id==null){
@@ -149,7 +153,7 @@ public final class Route {
         }
         if (!isUnderground){
             for (Color c : colors) {
-                    cardCombinations.add(SortedBag.of(length, Card.of(c)));
+                cardCombinations.add(SortedBag.of(length, Card.of(c)));
             }
         }
         //to avoid having all locomotive combinations multiples times
