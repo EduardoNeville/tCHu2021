@@ -7,7 +7,11 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A Trip.
+ * Trip Class
+ *
+ * Constructor: Trip
+ * Getters: from, to, points
+ * Methods: all, points
  *
  * @author Martin Sanchez Lopez (313238)
  */
@@ -28,6 +32,10 @@ public final class Trip {
      *          points worth of completing the Trip
      * @throws IllegalArgumentException
      *          if the number of points is lower or equal to 0
+     * @throws NullPointerException
+     *          if from is null
+     * @throws NullPointerException
+     *          if to is null
      */
     public Trip(Station from, Station to, int points){
         Preconditions.checkArgument(points > 0);
@@ -39,9 +47,12 @@ public final class Trip {
     /**
      * Return list of trip, for each 'from' station to every 'to' station, as long as they are not the same.
      *
-     * @param from From Station for the trip
-     * @param to To Station for the trip
-     * @param points Points that the trip rewards
+     * @param
+     *      from From Station for the trip
+     * @param
+     *      to To Station for the trip
+     * @param
+     *      points Points that the trip rewards
      * @return ArrayList of all Trips
      */
     public static List<Trip> all(List<Station> from, List<Station> to, int points){
