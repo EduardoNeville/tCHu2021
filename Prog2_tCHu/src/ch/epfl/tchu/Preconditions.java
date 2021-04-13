@@ -1,5 +1,4 @@
 package ch.epfl.tchu;
-//https://cs108.epfl.ch
 
 /**
  * Preconditions Class
@@ -8,12 +7,14 @@ package ch.epfl.tchu;
  * @author Eduardo Neville (314667)
  */
 public final class Preconditions {
-    private Preconditions(){};
+    private Preconditions(){}
 
     /**
      * Checks boolean, throws IAException if false
      * @param shouldBeTrue
+     *          argument that should be true
      * @throws IllegalArgumentException
+     *          if the given parameter is not true
      */
     public static void checkArgument(boolean shouldBeTrue){
         if (!shouldBeTrue){
