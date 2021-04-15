@@ -10,7 +10,7 @@ import java.util.*;
  * Methods: withDrawnFaceUpCard, topDeckCard, withoutTopDeckCard, withDeckRecreatedFromDiscards, withMoreDiscardedCards
  * Constructor: CardState
  *
- * @author Eduardo Neville
+ * @author Eduardo Neville (314667)
  */
 public class CardState extends PublicCardState {
 
@@ -27,7 +27,10 @@ public class CardState extends PublicCardState {
     /**
      * Static Initialization Bloc used to find first 5 cards
      *
-     * @param deck Deck we want to find the 5 cards
+     * @param deck
+     *          Deck we want to find the 5 cards
+     * @throws IllegalArgumentException
+     *          If deck is smaller that 4
      * @return first 5 cards
      */
     public static CardState of(Deck<Card> deck) {
@@ -43,7 +46,10 @@ public class CardState extends PublicCardState {
 
     /**
      * Returns a new card into the faceUp cards from the deck
-     * @param slot the slot take by this new card
+     * @param slot
+     *          the slot take by this new card
+     * @throws IllegalArgumentException
+     *          if slot isn't length 5
      * @return the new set of cards in the table
      */
     public CardState withDrawnFaceUpCard(int slot) {
@@ -59,7 +65,8 @@ public class CardState extends PublicCardState {
 
     /**
      * Method returns the top card of the deck
-     *
+     * @throws IllegalArgumentException
+     *              if deckofCards is empty
      * @return Top card of the deck
      */
     public Card topDeckCard() {
@@ -69,6 +76,8 @@ public class CardState extends PublicCardState {
 
     /**
      * CardState without the top deck card
+     * @throws IllegalArgumentException
+     *              if deckofCards is empty
      * @return new cardstate without top card
      */
     public CardState withoutTopDeckCard() {
@@ -78,7 +87,10 @@ public class CardState extends PublicCardState {
 
     /**
      * Reshuffling the discarded cards to make a new deck
-     * @param rng random paramenter
+     * @param rng
+     *          random paramenter
+     * @throws IllegalArgumentException
+     *          if deckofCards is empty
      * @return new deck of shuffled cards made up of the previously discarded cards
      */
     public CardState withDeckRecreatedFromDiscards(Random rng) {
@@ -89,7 +101,8 @@ public class CardState extends PublicCardState {
 
     /**
      * Adding discarded cards to the discaerded pile
-     * @param additionalDiscards more discarded cards to be added
+     * @param additionalDiscards
+     *                      more discarded cards to be added
      * @return group of discarded cards
      */
     public CardState withMoreDiscardedCards(SortedBag<Card> additionalDiscards) {
