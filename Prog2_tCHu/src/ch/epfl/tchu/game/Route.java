@@ -135,7 +135,7 @@ public final class Route {
      * @return a list of card combinations that are possible to play to claim this route
      */
     public List<SortedBag<Card>> possibleClaimCards(){
-        ArrayList<SortedBag<Card>> cardCombinations = new ArrayList<>();
+        List<SortedBag<Card>> cardCombinations = new ArrayList<>();
         List<Color> colors;
         boolean isUnderground = level == Level.UNDERGROUND;
         if (color == null){
@@ -150,22 +150,16 @@ public final class Route {
                     cardCombinations.add(SortedBag.of(length - i, Card.of(c), i, Card.LOCOMOTIVE));
                 }
             }
+            //add all locomotive combination at end
+            cardCombinations.add(SortedBag.of(length, Card.LOCOMOTIVE));
         }
         if (!isUnderground){
             for (Color c : colors) {
                 cardCombinations.add(SortedBag.of(length, Card.of(c)));
             }
         }
-        //to avoid having all locomotive combinations multiples times
-        if(isUnderground){
-            // BLUE is a random color, it will add a all-Locomotive card combination no matter the given color
-            cardCombinations.add(cardCombination(Color.BLUE, length, length));
-        }
 
-
-        SortedBag<Card>[] cardCombinationsArray = new SortedBag[cardCombinations.size()]; //TODO: "unchecked assignment"
-        cardCombinations.toArray(cardCombinationsArray);
-        return List.of(cardCombinationsArray);
+        return cardCombinations;
     }
 
     /**
@@ -209,28 +203,6 @@ public final class Route {
         return cardCount;
     }
 
-
-    /**
-     * Returns SortedBag<Card> of cards of the color and locomotives depending on parameters.
-     * @param c
-     *          color of the card
-     * @param length
-     *          total number of card for the SortedBag
-     * @param i
-     *          -1 : if NO LOCOMOTIVES ARE TO BE ADDED
-     *          i : the number of locomotives to be added
-     * @return SortedBag<Card> of cards of the color and locomotives depending on parameters
-     */
-    private SortedBag<Card> cardCombination(Color c, int length, int i) {
-        if(i == -1) {
-            return SortedBag.of(length, Card.of(c));
-        }
-        else{
-            //int 0 should work and add nothing
-            return SortedBag.of(length - i, Card.of(c), i, Card.LOCOMOTIVE);
-        }
-    }
-
     /**
      * Returns the number of points that the construction of this road rewards.
      * @return the number of points that the construction of this road rewards
@@ -263,10 +235,4 @@ public final class Route {
         return color;
     }
 
-    /*/FOR DEBUGGING
-    @Override
-    public String toString(){
-        String s = station1 + " - " + station2;
-        return s;
-    }*/
 }
