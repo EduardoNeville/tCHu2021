@@ -17,9 +17,14 @@ public class PublicPlayerState {
 
     /**
      * Constructor for PublicPlayerState
-     * @param ticketCount # of tickets a player has
-     * @param cardCount # of cards a player has
-     * @param routes # of routes a player has
+     * @param ticketCount
+     *              # of tickets a player has
+     * @param cardCount
+     *              # of cards a player has
+     * @param routes
+     *              # of routes a player has
+     * @throws IllegalArgumentException
+     *              if ticketCount is smaller that 0 and cardCount is smaller than 0
      */
     public PublicPlayerState(int ticketCount, int cardCount, List<Route> routes){
         Preconditions.checkArgument(!(ticketCount<0) && cardCount>=0);
@@ -56,13 +61,13 @@ public class PublicPlayerState {
      * Wagon getter
      * @return # of wagons
      */
-        public int carCount(){
-            int total =0;
-            for (Route route: routes) {
-                total = total + route.length();
-            }
-            return Constants.INITIAL_CAR_COUNT - total;
+    public int carCount(){
+        int total =0;
+        for (Route route: routes) {
+            total = total + route.length();
         }
+        return Constants.INITIAL_CAR_COUNT - total;
+    }
 
     /**
      * Points earned
@@ -75,9 +80,6 @@ public class PublicPlayerState {
                 routes()) {
             points += Constants.ROUTE_CLAIM_POINTS.get(r.length());
         }
-
         return points;
-        //return Constants.ROUTE_CLAIM_POINTS.get(routes.size());
     }
-
 }
