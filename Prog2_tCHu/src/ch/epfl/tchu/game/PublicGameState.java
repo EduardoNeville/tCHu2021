@@ -5,7 +5,7 @@ import ch.epfl.tchu.Preconditions;
 import java.util.*;
 
 /**
- * PublicGameState
+ * Class that represents the state of the game accessible to all players.
  *
  * Methods: ticketCount,canDrawTickets, cardState, canDrawCards, currentPlayerId, playerState,
  * currentPlayerState,claimedRoutes,lastPlayer
@@ -41,7 +41,7 @@ public class PublicGameState {
                            Map<PlayerId,PublicPlayerState> playerState,
                            PlayerId lastPlayer){
 
-        Preconditions.checkArgument(ticketsCount>0); //
+        Preconditions.checkArgument(ticketsCount>=0);
         Preconditions.checkArgument(playerState.size()== PlayerId.COUNT);
 
         this.ticketCounT = ticketsCount;
@@ -113,7 +113,7 @@ public class PublicGameState {
      * @return returns the routes of a player
      */
     public List<Route> claimedRoutes(){
-        List<PublicPlayerState> allPublicPlayerState = new ArrayList<PublicPlayerState>(playerStatE.values());
+        List<PublicPlayerState> allPublicPlayerState = new ArrayList<>(playerStatE.values());
         List<Route> allRoutes = new ArrayList<>();
 
         for (PublicPlayerState player: allPublicPlayerState) {
