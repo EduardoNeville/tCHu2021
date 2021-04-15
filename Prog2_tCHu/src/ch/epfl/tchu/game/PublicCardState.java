@@ -25,6 +25,10 @@ public class PublicCardState {
      *          size of the deck of cards
      * @param discardsSize
      *          size of the discard pile
+     * @throws IllegalArgumentException
+     *          if faceUpCards' size is equal to FACE_UP_CARDS_COUNT
+     * @throws IllegalArgumentException
+     *          if deckSize is smaller than 0 and discardSize is smaller than 0
      */
     public PublicCardState(List<Card> faceUpCards, int deckSize, int discardsSize){
         Preconditions.checkArgument(faceUpCards.size() == Constants.FACE_UP_CARDS_COUNT);
