@@ -21,18 +21,27 @@ public class PublicGameState {
 
     /**
      * Constructor for PublicGameState
-     * @param ticketsCount # of tickets
-     * @param cardState cards on the deck
-     * @param currentPlayerId current player
-     * @param playerState Map of playerId and PlayerState
-     * @param lastPlayer last Player
+     * @param ticketsCount
+     *              # of tickets
+     * @param cardState
+     *              cards on the deck
+     * @param currentPlayerId
+     *              current player
+     * @param playerState
+     *              Map of playerId and PlayerState
+     * @param lastPlayer
+     *              last Player
+     * @throws IllegalArgumentException
+     *              thrown if ticketCount is smaller that 0
+     * @throws IllegalArgumentException
+     *              thrown if playerState size isn't the size of PlayerId.COUNT
      */
     public PublicGameState(int ticketsCount, PublicCardState cardState,
-                            PlayerId currentPlayerId,
+                           PlayerId currentPlayerId,
                            Map<PlayerId,PublicPlayerState> playerState,
                            PlayerId lastPlayer){
 
-        Preconditions.checkArgument(!(ticketsCount<0)); //
+        Preconditions.checkArgument(ticketsCount>0); //
         Preconditions.checkArgument(playerState.size()== PlayerId.COUNT);
 
         this.ticketCounT = ticketsCount;
@@ -59,16 +68,16 @@ public class PublicGameState {
     }
 
     /**
-     *
-     * @return
+     * Getter for the cardState
+     * @return cardstate of the game
      */
     public PublicCardState cardState(){
         return cardStatE;
     }
 
     /**
-     *
-     * @return
+     * Checks if you can draw cards
+     * @return true if you can draw a card my checking the cardState is bigger that the initial ticket count
      */
     public boolean canDrawCards(){
         return (cardStatE.deckSize()+cardStatE.discardsSize()>=Constants.INITIAL_TICKETS_COUNT);
@@ -82,6 +91,11 @@ public class PublicGameState {
         return currentPlayerID;
     }
 
+    /**
+     * Getter for the playerState
+     * @param playerId the playerId of the playerstate we want
+     * @return playerstate of the player we want
+     */
     public PublicPlayerState playerState(PlayerId playerId) {
         return playerStatE.get(playerId);
     }
