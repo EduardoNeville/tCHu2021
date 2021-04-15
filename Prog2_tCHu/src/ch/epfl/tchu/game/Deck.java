@@ -53,6 +53,8 @@ public final class Deck <C extends Comparable<C>> {
 
     /**
      * Method topCard finds the top card in the deck
+     * @throws IllegalArgumentException
+     *              thrown if deck is empty
      * @return topCard of the deck
      */
     public C topCard(){
@@ -62,6 +64,8 @@ public final class Deck <C extends Comparable<C>> {
 
     /**
      * Method returns the DeckofCards without the top card
+     * @throws IllegalArgumentException
+     *              thrown if deckofCards is empty 
      * @return DeckofCards without the top card
      */
     public Deck<C> withoutTopCard(){
@@ -74,7 +78,7 @@ public final class Deck <C extends Comparable<C>> {
      * @param count
      *          # of cards from the top
      * @throws IllegalArgumentException
-     *          throw if count is smaller that 0 or bigger that the size of the deck
+     *          thrown if count is smaller that 0 or bigger that the size of the deck
      * @return The first (count) top cards
      */
     public SortedBag<C> topCards(int count){
@@ -86,6 +90,8 @@ public final class Deck <C extends Comparable<C>> {
      * Method returns the DeckofCards without the first (count) top cards
      * @param count
      *          # of cards removed from the top
+     * @throws IllegalArgumentException
+     *          thrown if count isn't between 0 and the deckofCards size
      * @return DeckofCards without the first (count) top cards
      */
     public Deck<C> withoutTopCards(int count){
