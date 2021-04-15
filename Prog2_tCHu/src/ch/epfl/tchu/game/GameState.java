@@ -33,8 +33,10 @@ public final class GameState extends PublicGameState{
 
     /**
      * Initial static constructor that initializes the game
-     * @param tickets tickets in the deck
-     * @param rng used to shuffle the tickets
+     * @param tickets
+     *          tickets in the deck
+     * @param rng
+     *          used to shuffle the tickets
      * @return The initial GameState at the beginning of the match
      */
     public static GameState initial(SortedBag<Ticket> tickets, Random rng){
@@ -84,7 +86,8 @@ public final class GameState extends PublicGameState{
 
     /**
      * Returns the full playerState
-     * @param playerId Player in question
+     * @param playerId
+     *              Player in question
      * @return full playerState of playerId
      */
     public PlayerState playerState(PlayerId playerId){
@@ -103,7 +106,10 @@ public final class GameState extends PublicGameState{
 
     /**
      * Returns the toptickets of the deck
-     * @param count # of tickets returned
+     * @param count
+     *          # of tickets returned
+     * @throws IllegalArgumentException
+     *          thrown if count is smaller than 0 or tickets is smaller than count
      * @return # of tickets at the top that are being returned
      */
     public SortedBag<Ticket> topTickets(int count){
@@ -114,7 +120,10 @@ public final class GameState extends PublicGameState{
 
     /**
      * Returns the deck without the toptickets of the deck
-     * @param count # of tickets that we remove
+     * @param count
+     *          # of tickets that we remove
+     * @throws IllegalArgumentException
+     *          thrown if count is smaller than 0 or tickets is smaller than count
      * @return deck without the toptickets
      */
     public GameState withoutTopTickets(int count){
@@ -126,6 +135,8 @@ public final class GameState extends PublicGameState{
 
     /**
      * Returns the top card of the deck
+     * @throws IllegalArgumentException
+     *                 thrown if privateCardState is an empty deck
      * @return top card of the deck
      */
     public Card topCard(){
@@ -135,6 +146,8 @@ public final class GameState extends PublicGameState{
 
     /**
      * Returns the deck without the top card
+     * @throws IllegalArgumentException
+     *                  thrown if privateCardState is an empty deck
      * @return Returns the deck without the top card
      */
     public GameState withoutTopCard(){
@@ -147,8 +160,9 @@ public final class GameState extends PublicGameState{
 
     /**
      * Returns the Gamestate with more discardedCards added to the deck
-     * @param discardedCards discardedCards in question
-     * @return
+     * @param discardedCards
+     *              discardedCards in question
+     * @return Gamestate with more discardedCards
      */
     public GameState withMoreDiscardedCards(SortedBag<Card> discardedCards){
         return new GameState(playerState,
@@ -160,11 +174,11 @@ public final class GameState extends PublicGameState{
 
     /**
      * Returns a deck of cards from discarded if deck of cards is empty
-     * @param rng random var needed to shuffle the cards
+     * @param rng
+     *          random var needed to shuffle the cards
      * @return new deck of cards from shuffled discarded cards or the same gamestate
      */
     public GameState withCardsDeckRecreatedIfNeeded(Random rng){
-
         if (privateCardState.isDeckEmpty()) {
 
             return new GameState(playerState, lastPlayer(),
@@ -172,13 +186,16 @@ public final class GameState extends PublicGameState{
                     currentPlayerId());
         }
         else return this;
-
     }
 
     /**
      * Added tickets to a player
-     * @param playerId player in question
-     * @param chosenTickets tickets added
+     * @param playerId
+     *          player in question
+     * @param chosenTickets
+     *          tickets added
+     * @throws IllegalArgumentException
+     *          thrown if the players ticket size is //TODO fill this up
      * @return new GameState with added tickets to a player
      */
     public GameState withInitiallyChosenTickets(PlayerId playerId, SortedBag<Ticket> chosenTickets){
@@ -194,8 +211,12 @@ public final class GameState extends PublicGameState{
 
     /**
      * Removed drawnTickets and added the chosenTickets to the player
-     * @param drawnTickets removed tickets
-     * @param chosenTickets added tickets
+     * @param drawnTickets
+     *              removed tickets
+     * @param chosenTickets
+     *              added tickets
+     * @throws IllegalArgumentException
+     *              thrown if drawnTicket doesn't contain chosenTickets
      * @return gameState with removed drawnTickets and added the chosenTickets
      */
     public GameState withChosenAdditionalTickets(SortedBag<Ticket> drawnTickets, SortedBag<Ticket> chosenTickets){
@@ -209,22 +230,27 @@ public final class GameState extends PublicGameState{
     }
 
     /**
-     *
-     * @param slot position of card swap
+     * Returns GameState with playerState changed to fit the card and privatecardState changed
+     * @param slot
+     *          position of card swap
+     * @throws IllegalArgumentException
+     *          thrown if we cannot draw cards
      * @return GameState with playerState changed to fit the card and privatecardState changed
      */
     public GameState withDrawnFaceUpCard(int slot){
         Preconditions.checkArgument(canDrawCards());
-        var playerstate2 = new HashMap<>(playerState);
-        playerstate2.put(currentPlayerId(), playerState(currentPlayerId()).withAddedCard(privateCardState.faceUpCard(slot)));
+        var playerstatecopy = new HashMap<>(playerState);
+        playerstatecopy.put(currentPlayerId(), playerState(currentPlayerId()).withAddedCard(privateCardState.faceUpCard(slot)));
 
-        return new GameState(playerstate2,lastPlayer(),tickets,
+        return new GameState(playerstatecopy,lastPlayer(),tickets,
                 privateCardState.withDrawnFaceUpCard(slot),
                 currentPlayerId());
     }
 
     /**
      * Picked Card from deck to player
+     * @throws IllegalArgumentException
+     *             thrown if we cannot draw cards
      * @return player has a new card
      */
     public GameState withBlindlyDrawnCard(){
@@ -238,8 +264,10 @@ public final class GameState extends PublicGameState{
 
     /**
      * Claimed route
-     * @param route route in question
-     * @param cards cards used to claim the route
+     * @param route
+     *          route in question
+     * @param cards
+     *          cards used to claim the route
      * @return player has new route and defausse has new cards
      */
     public GameState withClaimedRoute(Route route, SortedBag<Card> cards){
