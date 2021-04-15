@@ -198,8 +198,8 @@ public final class Game {
         Set<PlayerId> longestTrailPossessors = longestRouteWinners(players, gameState, pInfo);
         System.out.println("Trail calculed");
 
-        int maxPoints = -99;
-        int loserPoints = -99;
+        int maxPoints = Integer.MIN_VALUE;
+        int loserPoints = Integer.MIN_VALUE;
         List<PlayerId> gameWinners = new ArrayList<>();
 
         //calculate the points of each players and determine the winner at same time
