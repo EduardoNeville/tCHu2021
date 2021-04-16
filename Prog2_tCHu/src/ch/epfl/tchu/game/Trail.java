@@ -61,9 +61,8 @@ public final class Trail {
                             List<Route> extended = new ArrayList<>(forTrail.routes);
                             extended.add(forRoute);
 
-                            Trail newTrail = new Trail(forTrail.station1(), forRoute.stationOpposite(forTrail.station2()), extended, forTrail.length() + forRoute.length());
+                            Trail newTrail = new Trail(forTrail.station1(), forRoute.stationOpposite(station1), extended, forTrail.length() + forRoute.length());
                             PossibleTrails.add(newTrail);
-
 
                         }
                     }
