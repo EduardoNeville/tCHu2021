@@ -67,7 +67,7 @@ public final class GameState extends PublicGameState{
 
     private static Map<PlayerId, PublicPlayerState> makePublic(Map<PlayerId,PlayerState> playerStateMap){
 
-        Map<PlayerId, PlayerState> playerStateTreeMap = new TreeMap<PlayerId, PlayerState>(playerStateMap);
+        Map<PlayerId, PlayerState> playerStateTreeMap = new TreeMap<>(playerStateMap);
 
         PlayerState playerState1 = playerStateTreeMap.get(PlayerId.PLAYER_1);
         PlayerState playerState2 = playerStateTreeMap.get(PlayerId.PLAYER_2);
@@ -77,7 +77,7 @@ public final class GameState extends PublicGameState{
         PublicPlayerState publicPlayerState2 = new PublicPlayerState(playerState2.tickets().size(),
                 playerState2.cards().size(),playerState2.routes());
 
-        Map<PlayerId, PublicPlayerState> publicPlayerStateMap = new TreeMap<PlayerId, PublicPlayerState>();
+        Map<PlayerId, PublicPlayerState> publicPlayerStateMap = new TreeMap<>();
         publicPlayerStateMap.put(PlayerId.PLAYER_1,publicPlayerState1);
         publicPlayerStateMap.put(PlayerId.PLAYER_2,publicPlayerState2);
 
@@ -101,8 +101,6 @@ public final class GameState extends PublicGameState{
     public PlayerState currentPlayerState(){
         return playerState(currentPlayerId());
     }
-
-    //Bloc 1 of methods
 
     /**
      * Returns the toptickets of the deck
@@ -268,7 +266,7 @@ public final class GameState extends PublicGameState{
      *          route in question
      * @param cards
      *          cards used to claim the route
-     * @return player has new route and defausse has new cards
+     * @return player has new route and dicards has new cards
      */
     public GameState withClaimedRoute(Route route, SortedBag<Card> cards){
         Map<PlayerId,PlayerState> withClaimedRoute = new TreeMap<>(playerState);
@@ -277,8 +275,6 @@ public final class GameState extends PublicGameState{
         return new GameState(withClaimedRoute,lastPlayer(),tickets,
                 privateCardState.withMoreDiscardedCards(cards),currentPlayerId());
     }
-
-    //Block 3 of methods
 
     /**
      * Asks were the last turn will begin
