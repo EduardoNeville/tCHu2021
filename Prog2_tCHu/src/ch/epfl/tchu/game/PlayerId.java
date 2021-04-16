@@ -18,9 +18,10 @@ public enum PlayerId {
 
     /**
      * Returns the opposite id from this one.
+     *
      * @return the opposite id from this one
      */
-    public PlayerId next(){
+    public PlayerId next() {
         return (this.equals(PLAYER_1)) ? PLAYER_2 : PLAYER_1;
     }
 

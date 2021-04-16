@@ -17,17 +17,14 @@ public class PublicPlayerState {
 
     /**
      * Constructor for PublicPlayerState
-     * @param ticketCount
-     *              # of tickets a player has
-     * @param cardCount
-     *              # of cards a player has
-     * @param routes
-     *              # of routes a player has
-     * @throws IllegalArgumentException
-     *              if ticketCount is smaller that 0 and cardCount is smaller than 0
+     *
+     * @param ticketCount # of tickets a player has
+     * @param cardCount   # of cards a player has
+     * @param routes      # of routes a player has
+     * @throws IllegalArgumentException if ticketCount is smaller that 0 and cardCount is smaller than 0
      */
-    public PublicPlayerState(int ticketCount, int cardCount, List<Route> routes){
-        Preconditions.checkArgument(!(ticketCount<0) && cardCount>=0);
+    public PublicPlayerState(int ticketCount, int cardCount, List<Route> routes) {
+        Preconditions.checkArgument(!(ticketCount < 0) && cardCount >= 0);
         this.ticketCount = ticketCount;
         this.cardCount = cardCount;
         this.routes = List.copyOf(routes);
@@ -35,6 +32,7 @@ public class PublicPlayerState {
 
     /**
      * Ticket getter
+     *
      * @return # of tickets
      */
     public int ticketCount() {
@@ -43,6 +41,7 @@ public class PublicPlayerState {
 
     /**
      * Card getter
+     *
      * @return # of cards
      */
     public int cardCount() {
@@ -51,6 +50,7 @@ public class PublicPlayerState {
 
     /**
      * Routes getter
+     *
      * @return List of routes
      */
     public List<Route> routes() {
@@ -59,11 +59,12 @@ public class PublicPlayerState {
 
     /**
      * Wagon getter
+     *
      * @return # of wagons
      */
-    public int carCount(){
-        int total =0;
-        for (Route route: routes) {
+    public int carCount() {
+        int total = 0;
+        for (Route route : routes) {
             total = total + route.length();
         }
         return Constants.INITIAL_CAR_COUNT - total;
@@ -71,9 +72,10 @@ public class PublicPlayerState {
 
     /**
      * Points earned
+     *
      * @return # of points earned
      */
-    public int claimPoints(){
+    public int claimPoints() {
         int points = 0;
 
         for (Route r :

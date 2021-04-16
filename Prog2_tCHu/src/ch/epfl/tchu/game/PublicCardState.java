@@ -38,6 +38,7 @@ public class PublicCardState {
 
     /**
      * Returns the total number of cards, the ones face up, the one in the deck and those in the discard.
+     *
      * @return the total number of cards, the ones face up, the one in the deck and those in the discard
      */
     public int totalSize() {
@@ -46,6 +47,7 @@ public class PublicCardState {
 
     /**
      * Return a list of the face up cards.
+     *
      * @return a list of the face up cards
      */
     public List<Card> faceUpCards() {
@@ -67,6 +69,7 @@ public class PublicCardState {
 
     /**
      * Returns true if the deck is empty.
+     *
      * @return true if the deck is empty
      */
     public boolean isDeckEmpty() {
@@ -75,6 +78,7 @@ public class PublicCardState {
 
     /**
      * Returns the number of cards discarded.
+     *
      * @return the number of cards discarded
      */
     public int discardsSize() {
@@ -83,6 +87,7 @@ public class PublicCardState {
 
     /**
      * Returns the number of cards in the deck.
+     *
      * @return the number of cards in the deck
      */
     public int deckSize() {

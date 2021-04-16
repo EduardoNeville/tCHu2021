@@ -43,13 +43,10 @@ public final class Route {
      * @param level    level of the route
      * @param color    color of the route
      *                 can be null
-     * @throws IllegalArgumentException
-     *                  if station1 is equal to station2
-     * @throws IllegalArgumentException
-     *                  if length is smaller than MIN_ROUTE_LENGTH
-     *                  or length is bigger than MAX_ROUTE_LENGTH
-     *
-     * @throws NullPointerException if id, station1, station2 or level is null
+     * @throws IllegalArgumentException if station1 is equal to station2
+     * @throws IllegalArgumentException if length is smaller than MIN_ROUTE_LENGTH
+     *                                  or length is bigger than MAX_ROUTE_LENGTH
+     * @throws NullPointerException     if id, station1, station2 or level is null
      */
     public Route(String id, Station station1, Station station2, int length, Level level, Color color) {
         Preconditions.checkArgument(!station1.equals(station2));
@@ -65,6 +62,7 @@ public final class Route {
 
     /**
      * Returns the id of the route.
+     *
      * @return the id of the route
      */
     public String id() {
@@ -73,6 +71,7 @@ public final class Route {
 
     /**
      * Returns the station 1 of this route.
+     *
      * @return the station 1 of this route
      */
     public Station station1() {
@@ -81,6 +80,7 @@ public final class Route {
 
     /**
      * Returns the station 2 of this route.
+     *
      * @return the station 2 of this route
      */
     public Station station2() {
@@ -89,6 +89,7 @@ public final class Route {
 
     /**
      * Returns the a list with both stations of this route.
+     *
      * @return the a list with both stations of this route
      */
     public List<Station> stations() {
@@ -110,6 +111,7 @@ public final class Route {
 
     /**
      * Returns a list of card combinations that are possible to play to claim this route.
+     *
      * @return a list of card combinations that are possible to play to claim this route
      */
     public List<SortedBag<Card>> possibleClaimCards() {
@@ -181,6 +183,7 @@ public final class Route {
 
     /**
      * Returns the number of points that the construction of this road rewards.
+     *
      * @return the number of points that the construction of this road rewards
      */
     public int claimPoints() {
@@ -189,6 +192,7 @@ public final class Route {
 
     /**
      * Returns the length of this Route.
+     *
      * @return the length of this Route
      */
     public int length() {
@@ -197,6 +201,7 @@ public final class Route {
 
     /**
      * Retuns the level of this Route.
+     *
      * @return the level of this Route
      */
     public Level level() {
@@ -205,6 +210,7 @@ public final class Route {
 
     /**
      * Returns the color of this Route.
+     *
      * @return the color of this Route
      */
     public Color color() {
