@@ -21,7 +21,7 @@ public final class Route {
 
 
     /**
-     * A Route level (elevation).
+     * A level (~elevation).
      */
     public enum Level {
         OVERGROUND, UNDERGROUND
