@@ -48,6 +48,8 @@ public final class Route {
      * @throws IllegalArgumentException
      *                  if length is smaller than MIN_ROUTE_LENGTH
      *                  or length is bigger than MAX_ROUTE_LENGTH
+     *
+     * @throws NullPointerException if id, station1, station2 or level is null
      */
     public Route(String id, Station station1, Station station2, int length, Level level, Color color) {
         Preconditions.checkArgument(!station1.equals(station2));
