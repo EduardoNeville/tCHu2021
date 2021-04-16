@@ -3,10 +3,6 @@ package ch.epfl.tchu.game;
 import ch.epfl.tchu.Preconditions;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.gui.Info;
-//import ch.epfl.tchu.game.Constants.*;
-import ch.epfl.tchu.game.Player.TurnKind.*;
-import ch.epfl.tchu.gui.StringsFr;
-import com.sun.source.tree.Tree;
 
 
 import java.util.*;
@@ -77,17 +73,6 @@ public final class Game {
         for (; ; ) {
             currentPlayerId = gameState.currentPlayerId();
             currentPlayer = players.get(currentPlayerId);
-
-            System.out.println("gameState.cardState().deckSize() " + gameState.cardState().deckSize());
-            System.out.println("gameState.cardState().discardsSize() " + gameState.cardState().discardsSize());
-            System.out.println("gameState.playerState(PlayerId.PLAYER_1).cardCount()" + gameState.playerState(PlayerId.PLAYER_1).cardCount());
-            System.out.println("gameState.playerState(PlayerId.PLAYER_2).cardCount()" + gameState.playerState(PlayerId.PLAYER_2).cardCount());
-
-            System.out.println("Le nombre de cartes en jeux est : " +
-                    (gameState.cardState().deckSize() + gameState.cardState().discardsSize()
-                            + gameState.playerState(PlayerId.PLAYER_1).cardCount()
-                            + gameState.playerState(PlayerId.PLAYER_2).cardCount()
-                            + 5));
 
             updateState(players, gameState);
             receiveInfo(players, pInfo.get(currentPlayerId).canPlay());
@@ -165,7 +150,6 @@ public final class Game {
                     }
                     if (additionalCardsCount == 0 || !additionalCards.isEmpty()) {
                         SortedBag<Card> finalClaimCards = initCards.union(additionalCards);
-                        System.out.println("claim : " + finalClaimCards + " draw : " + drawnCards);
                         gameState = gameState
                                 .withClaimedRoute(chosenRoute, finalClaimCards)
                                 .withMoreDiscardedCards(drawnCards);
@@ -196,7 +180,6 @@ public final class Game {
 
         //find longest Route(s) and give bonus info
         Set<PlayerId> longestTrailPossessors = longestRouteWinners(players, gameState, pInfo);
-        System.out.println("Trail calculed");
 
         int maxPoints = Integer.MIN_VALUE;
         int loserPoints = Integer.MIN_VALUE;
@@ -204,12 +187,10 @@ public final class Game {
 
         //calculate the points of each players and determine the winner at same time
         for (PlayerId id : players.keySet()) {
-            System.out.println("entered for loop");
             int p = gameState.playerState(id).finalPoints();
             if (longestTrailPossessors.contains(id)) {
                 p += LONGEST_TRAIL_BONUS_POINTS;
             }
-            System.out.println(p + " maxpoints : " + maxPoints);
 
 
             if (p == maxPoints) {
@@ -221,7 +202,6 @@ public final class Game {
             } else { // p < maxPoints
                 loserPoints = p;
             }
-            System.out.println("maxp : " + maxPoints + "  loserp : " + loserPoints + " setsize : " + gameWinners.size());
         }
 
         //declare winner
@@ -238,7 +218,7 @@ public final class Game {
      * Calculates the player(s) that have the longest length Trail, output the message that they won the bonus and
      * returns the players that must be given the points for the bonus
      *
-     * @param players     the game playres
+     * @param players     the game players
      * @param gameState   game state
      * @param playersInfo players' Info instances
      * @return set of players that are to obtain longestRoute bonus
