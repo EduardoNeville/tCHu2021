@@ -1,10 +1,6 @@
 package ch.epfl.tchu.game;
 
-import ch.epfl.tchu.Preconditions;
-
-import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
