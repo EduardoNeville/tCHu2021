@@ -2,6 +2,12 @@ package ch.epfl.tchu.game;
 
 import java.util.List;
 
+/**
+ * A player id.
+ *
+ * @author Eduardo Neville (314667)
+ * @author Martin Sanchez Lopez (313238)
+ */
 public enum PlayerId {
     PLAYER_1,
     PLAYER_2;
@@ -10,11 +16,12 @@ public enum PlayerId {
 
     public static final int COUNT = ALL.size();
 
+    /**
+     * Returns the opposite id from this one.
+     * @return the opposite id from this one
+     */
     public PlayerId next(){
-        if (this.equals(PLAYER_1)){
-            return PLAYER_2;
-        }
-        return PLAYER_1;
+        return (this.equals(PLAYER_1)) ? PLAYER_2 : PLAYER_1;
     }
 
 
