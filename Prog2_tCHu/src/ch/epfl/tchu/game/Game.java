@@ -110,7 +110,7 @@ public final class Game {
                         updateState(players, gameState);
 
                         int slot = currentPlayer.drawSlot();
-                        if (slot == -1) {
+                        if (slot == DECK_SLOT) {
                             //gameState.currentPlayerState().withAddedCard(gameState.topCard());
                             gameState = gameState.withBlindlyDrawnCard();
                             receiveInfo(players, pInfo.get(currentPlayerId).drewBlindCard());
