@@ -85,7 +85,7 @@ public final class Trail {
      * @return Display name for the trail
      */
     public String toString(Trail trail) {
-        StringBuilder TrailText = null;
+        StringBuilder TrailText= new StringBuilder();
         for (Route route: routes) {
             TrailText.append(" - ").append(route.toString());
         }
