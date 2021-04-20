@@ -19,9 +19,9 @@ public class Serdes {
             i -> Integer.toString(i),
             Integer::parseInt);
 
-    public static final Serde<String> STRING_SERDE = Serde.of();
+    public static final Serde<String> STRING_SERDE = Serde.of(); //TODO
 
-    public static final Serde<PlayerId> PLAYER_ID_SERDE = Serde.oneOf(PlayerId.ALL); //TODO deserialization
+    public static final Serde<PlayerId> PLAYER_ID_SERDE = Serde.oneOf(PlayerId.ALL);
 
     public static final Serde<Player.TurnKind> TURN_KIND_SERDE = Serde.oneOf(Player.TurnKind.ALL);
 
