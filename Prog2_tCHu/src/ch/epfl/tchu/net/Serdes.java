@@ -85,7 +85,6 @@ public class Serdes{
 
             object -> {
                 String[] a = object.split(Pattern.quote(";"),-1);
-                Arrays.asList(a).forEach(System.out::println);
 
                 return new PlayerState(SORTED_BAG_TICKET_SERDE.deserialize(a[0]),
                         SORTED_BAG_CARD_SERDE.deserialize(a[1]),
