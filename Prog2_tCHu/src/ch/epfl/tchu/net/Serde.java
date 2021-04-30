@@ -64,6 +64,8 @@ public interface Serde<E> {
         return new Serde<>() {
             @Override
             public String serialize(T object) {
+                if(object == null)
+                    return "";
                 return Integer.toString(list.indexOf(object));
             }
 

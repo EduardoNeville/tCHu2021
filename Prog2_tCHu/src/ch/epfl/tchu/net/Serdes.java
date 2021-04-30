@@ -39,21 +39,21 @@ public class Serdes{
 
     //Part 2
 
-    public static final Serde<List<String>> LIST_String_SERDE = Serde.listOf(STRING_SERDE, " , ");
+    public static final Serde<List<String>> LIST_String_SERDE = Serde.listOf(STRING_SERDE, ",");
 
-    public static final Serde<List<Card>> LIST_CARD_SERDE = Serde.listOf(CARD_SERDE, " , ");
+    public static final Serde<List<Card>> LIST_CARD_SERDE = Serde.listOf(CARD_SERDE, ",");
 
-    public static final Serde<List<Route>> LIST_ROUTE_SERDE = Serde.listOf(ROUTE_SERDE, " , ");
+    public static final Serde<List<Route>> LIST_ROUTE_SERDE = Serde.listOf(ROUTE_SERDE, ",");
 
-    public static final Serde<SortedBag<Card>> SORTED_BAG_CARD_SERDE = Serde.bagOf(CARD_SERDE, " , ");
+    public static final Serde<SortedBag<Card>> SORTED_BAG_CARD_SERDE = Serde.bagOf(CARD_SERDE, ",");
 
-    public static final Serde<SortedBag<Ticket>> SORTED_BAG_TICKET_SERDE = Serde.bagOf(TICKET_SERDE, " , ");
+    public static final Serde<SortedBag<Ticket>> SORTED_BAG_TICKET_SERDE = Serde.bagOf(TICKET_SERDE, ",");
 
-    public static final Serde<List<SortedBag<Card>>> LIST_SORTED_BAG_CARD_SERDE = Serde.listOf(SORTED_BAG_CARD_SERDE, " ; ");
+    public static final Serde<List<SortedBag<Card>>> LIST_SORTED_BAG_CARD_SERDE = Serde.listOf(SORTED_BAG_CARD_SERDE, ";");
 
     //PublicCardState
     public static final Serde<PublicCardState> PUBLIC_CARD_STATE_SERDE = Serde.of(
-            object -> String.format("%s:%s:%s",
+            object -> String.format("%s;%s;%s",
                     LIST_CARD_SERDE.serialize(object.faceUpCards()),
                     INTEGER_SERDE.serialize(object.deckSize()),
                     INTEGER_SERDE.serialize(object.discardsSize())),
@@ -67,7 +67,7 @@ public class Serdes{
 
     //PublicPlayerState
     public static final Serde<PublicPlayerState> PUBLIC_PLAYER_STATE_SERDE = Serde.of(
-            object -> String.format("%s:%s:%s",
+            object -> String.format("%s;%s;%s",
                     INTEGER_SERDE.serialize(object.ticketCount()) ,
                     INTEGER_SERDE.serialize(object.cardCount()) ,
                     LIST_ROUTE_SERDE.serialize(object.routes())),
@@ -81,7 +81,7 @@ public class Serdes{
 
     //PlayerState
     public static final Serde<PlayerState> PLAYER_STATE_SERDE = Serde.of(
-            object -> String.format("%s:%s:%s",
+            object -> String.format("%s;%s;%s",
                     SORTED_BAG_TICKET_SERDE.serialize(object.tickets()),
                     SORTED_BAG_CARD_SERDE.serialize(object.cards()),
                     LIST_ROUTE_SERDE.serialize(object.routes())),
@@ -94,7 +94,7 @@ public class Serdes{
             });
 
     //Public Game State
-    public static final Serde<PublicGameState> PUBLIC_GAME_STATE_SERDES = Serde.of(
+    public static final Serde<PublicGameState> PUBLIC_GAME_STATE_SERDE = Serde.of(
             object -> String.format("%s:%s:%s:%s:%s:%s",
                     INTEGER_SERDE.serialize(object.ticketsCount()) ,
                     PUBLIC_CARD_STATE_SERDE.serialize(object.cardState()),
