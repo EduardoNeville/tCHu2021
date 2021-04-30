@@ -42,11 +42,15 @@ public interface Serde<E> {
         return new Serde<>() {
             @Override
             public String serialize(T object) {
+                if(object == null)
+                    return "";
                 return serialization.apply(object);
             }
 
             @Override
             public T deserialize(String string) {
+                if(string.isEmpty())
+                    return null;
                 return deserialization.apply(string);
             }
         };
@@ -71,6 +75,9 @@ public interface Serde<E> {
 
             @Override
             public T deserialize(String string) {
+                if(string.isEmpty()) {
+                    return null;
+                }
                 return list.get(Integer.parseInt(string));
             }
         };
@@ -97,6 +104,9 @@ public interface Serde<E> {
 
             @Override
             public List<T> deserialize(String string) {
+                if(string.isEmpty())
+                    return List.of();
+
                 List<T> deserializedList = new ArrayList<>();
                 String[] stringArray = string.split(Pattern.quote(c), -1);
                 Arrays.stream(stringArray).forEach(s -> deserializedList.add(serde.deserialize(s)));
@@ -126,6 +136,8 @@ public interface Serde<E> {
 
             @Override
             public SortedBag<T> deserialize(String string) {
+                if(string.isEmpty())
+                    return SortedBag.of();
                 List<T> deserializedList = new ArrayList<>();
                 String[] stringArray = string.split(Pattern.quote(c), -1);
                 Arrays.stream(stringArray).forEach(s -> deserializedList.add(serde.deserialize(s)));

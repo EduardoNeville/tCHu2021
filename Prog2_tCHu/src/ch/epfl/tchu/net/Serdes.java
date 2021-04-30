@@ -4,10 +4,7 @@ import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -59,7 +56,7 @@ public class Serdes{
                     INTEGER_SERDE.serialize(object.discardsSize())),
 
             object -> {
-                String[] a = object.split(Pattern.quote(object), -1);
+                String[] a = object.split(Pattern.quote(";"), -1);
                 return new PublicCardState(LIST_CARD_SERDE.deserialize(a[0]),
                                     INTEGER_SERDE.deserialize(a[1]),
                                 INTEGER_SERDE.deserialize(a[2]));
@@ -73,7 +70,7 @@ public class Serdes{
                     LIST_ROUTE_SERDE.serialize(object.routes())),
 
             object -> {
-                String[] a = object.split(Pattern.quote(object), -1);
+                String[] a = object.split(Pattern.quote(";"), -1);
                 return new PublicPlayerState(INTEGER_SERDE.deserialize(a[0]),
                         INTEGER_SERDE.deserialize(a[1]),
                         LIST_ROUTE_SERDE.deserialize(a[2]));
@@ -87,7 +84,9 @@ public class Serdes{
                     LIST_ROUTE_SERDE.serialize(object.routes())),
 
             object -> {
-                String[] a = object.split(Pattern.quote(object),-1);
+                String[] a = object.split(Pattern.quote(";"),-1);
+                Arrays.asList(a).forEach(System.out::println);
+
                 return new PlayerState(SORTED_BAG_TICKET_SERDE.deserialize(a[0]),
                         SORTED_BAG_CARD_SERDE.deserialize(a[1]),
                         LIST_ROUTE_SERDE.deserialize(a[2]));
@@ -104,7 +103,7 @@ public class Serdes{
                     PLAYER_ID_SERDE.serialize(object.lastPlayer())),
 
             object -> {
-                String[] a = object.split(Pattern.quote(object),-1);
+                String[] a = object.split(Pattern.quote(":"),-1);
                 Map<PlayerId,PublicPlayerState> playerStateMap = new EnumMap<>(PlayerId.class);
                 playerStateMap.put(PlayerId.PLAYER_1, PUBLIC_PLAYER_STATE_SERDE.deserialize(a[3]));
                 playerStateMap.put(PlayerId.PLAYER_2, PUBLIC_PLAYER_STATE_SERDE.deserialize(a[4]));
