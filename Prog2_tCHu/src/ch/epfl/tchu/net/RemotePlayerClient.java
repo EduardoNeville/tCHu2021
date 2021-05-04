@@ -18,7 +18,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 /**
  * Remote player client that connects a player to the proxy on the server to give the players actions.
  */
-public class RemotePlayerClient {
+public final class RemotePlayerClient {
     private final Player player;
     private final String address;
     private final int port;
@@ -115,9 +115,8 @@ public class RemotePlayerClient {
                         LIST_SORTED_BAG_CARD_SERDE.deserialize(message[1])
                 );
                 return SORTED_BAG_CARD_SERDE.serialize(additionalCardBag);
+            default: throw new Error();
         }
-
-        return null;
     }
 
 }
