@@ -14,7 +14,7 @@ import java.util.List;
  * Getters: toString, station1, station2, length
  * Methods: longest
  *
- * @author Eduardo Neville
+ * @author Eduardo Neville (314667)
  */
 public final class Trail {
 
