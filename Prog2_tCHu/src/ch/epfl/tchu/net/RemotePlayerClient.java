@@ -75,7 +75,7 @@ public final class RemotePlayerClient {
             case INIT_PLAYERS:
                 String[] names = message[2].split(Pattern.quote(","), -1);
                 Map<PlayerId, String> map = Map.of(PLAYER_1, STRING_SERDE.deserialize(names[0]),
-                        PLAYER_2, names[1]);
+                        PLAYER_2, STRING_SERDE.deserialize(names[1]));
                 player.initPlayers(PLAYER_ID_SERDE.deserialize(message[1]), map);
                 return null;
             case RECEIVE_INFO:
