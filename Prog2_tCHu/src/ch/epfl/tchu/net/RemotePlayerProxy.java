@@ -91,7 +91,7 @@ public class RemotePlayerProxy implements Player {
 
     @Override
     public SortedBag<Ticket> chooseTickets(SortedBag<Ticket> options) {
-        sendMessage(CHOOSE_TICKETS.name());
+        sendMessage(CHOOSE_TICKETS.name(), SORTED_BAG_TICKET_SERDE.serialize(options));
 
         return SORTED_BAG_TICKET_SERDE.deserialize(receiveMessage());
     }
@@ -112,13 +112,13 @@ public class RemotePlayerProxy implements Player {
     @Override
     public SortedBag<Card> initialClaimCards() {
         sendMessage(CARDS.name());
-        return null;
+        return SORTED_BAG_CARD_SERDE.deserialize(receiveMessage());
     }
 
     @Override
     public SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options) {
 
-        sendMessage(CHOOSE_ADDITIONAL_CARDS.name());
-        return null;
+        sendMessage(CHOOSE_ADDITIONAL_CARDS.name(), LIST_SORTED_BAG_CARD_SERDE.serialize(options));
+        return SORTED_BAG_CARD_SERDE.deserialize(receiveMessage());
     }
 }

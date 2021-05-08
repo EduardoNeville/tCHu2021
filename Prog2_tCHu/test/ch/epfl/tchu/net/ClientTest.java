@@ -9,17 +9,21 @@ import java.util.Map;
 
 
 public class ClientTest {
+
     public static void main(String[] args) {
         System.out.println("Starting client!");
         RemotePlayerClient playerClient =
                 new RemotePlayerClient(new TestPlayer(),
                         "localhost",
                         5108);
-        playerClient.   run();
+        playerClient.run();
         System.out.println("Client done!");
     }
 
     private final static class TestPlayer implements Player {
+        private SortedBag<Ticket> initTickets= SortedBag.of();
+
+
         @Override
         public void initPlayers(PlayerId ownId,
                                 Map<PlayerId, String> names) {
@@ -29,52 +33,60 @@ public class ClientTest {
 
         @Override
         public void setInitialTicketChoice(SortedBag<Ticket> tickets) {
-
+            tickets.forEach(s -> System.out.print(s.text()));
+            System.out.println("\n");
+            initTickets = tickets;
         }
 
         @Override
         public void receiveInfo(String info) {
-
+            System.out.printf("info string: %s\n", info);
         }
 
         @Override
         public void updateState(PublicGameState newState, PlayerState ownState) {
-
+            System.out.printf("new PGState: %s\n", newState);
+            System.out.printf("new own PlayerState: %s\n", ownState);
         }
 
         @Override
         public SortedBag<Ticket> chooseInitialTickets() {
-            return null;
+            System.out.print("choosing first 2 tickets of :");
+            initTickets.forEach(s -> System.out.print(s.text()));
+            System.out.println("\n");
+            return SortedBag.of(1, initTickets.get(0), 1, initTickets.get(1));
         }
 
         @Override
         public TurnKind nextTurn() {
-            return null;
+            return TurnKind.CLAIM_ROUTE;
         }
 
         @Override
         public SortedBag<Ticket> chooseTickets(SortedBag<Ticket> options) {
-            return null;
+            System.out.printf("choosing first too of %s\n", options);
+            return SortedBag.of(1, options.get(0),1, options.get(1));
         }
 
         @Override
         public int drawSlot() {
-            return 0;
+            System.out.println("returning slot 3");
+            return 3;
         }
 
         @Override
         public Route claimedRoute() {
-            return null;
+            return ChMap.routes().get(1);
         }
 
         @Override
         public SortedBag<Card> initialClaimCards() {
-            return null;
+            return SortedBag.of(1, Card.RED);
         }
 
         @Override
         public SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options) {
-            return null;
+            return options.get(0);
         }
 
         // … autres méthodes de Player

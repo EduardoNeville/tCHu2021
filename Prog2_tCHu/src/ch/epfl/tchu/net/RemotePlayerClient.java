@@ -6,6 +6,7 @@ import ch.epfl.tchu.game.*;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -25,9 +26,10 @@ public final class RemotePlayerClient {
 
     /**
      * Constructs a remote player client.
-     * @param player player associated with this client
+     *
+     * @param player  player associated with this client
      * @param address address of the proxy server
-     * @param port port of the proxy server
+     * @param port    port of the proxy server
      */
     public RemotePlayerClient(Player player, String address, int port) {
         this.player = Objects.requireNonNull(player);
@@ -50,12 +52,15 @@ public final class RemotePlayerClient {
                              new OutputStreamWriter(s.getOutputStream(),
                                      US_ASCII))) {
 //            MessageId messageId = MessageId.valueOf(r.readLine());
-            String[] messageReceived = r.readLine().split(Pattern.quote(" "), -1);
-            String playerResponse = response(messageReceived);
-            if (playerResponse != null) {
-                w.write(playerResponse);
-                w.write("\n");
-                w.flush();
+            String line;
+            while ( (line = r.readLine()) != null) {
+                String[] messageReceived = line.split(Pattern.quote(" "), -1);
+                String playerResponse = response(messageReceived);
+                if (playerResponse != null) {
+                    w.write(playerResponse);
+                    w.write("\n");
+                    w.flush();
+                }
             }
 
         } catch (IOException e) {
@@ -65,6 +70,7 @@ public final class RemotePlayerClient {
 
     /**
      * Returns a serialized response if the game expects a response, null if no response is needed.
+     *
      * @param message server's message
      * @return a serialized response if the game expects a response, null if no response is needed
      */
@@ -115,7 +121,8 @@ public final class RemotePlayerClient {
                         LIST_SORTED_BAG_CARD_SERDE.deserialize(message[1])
                 );
                 return SORTED_BAG_CARD_SERDE.serialize(additionalCardBag);
-            default: throw new Error();
+            default:
+                throw new Error();
         }
     }
 
