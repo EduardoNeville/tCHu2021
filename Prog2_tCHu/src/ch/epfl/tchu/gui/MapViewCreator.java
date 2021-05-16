@@ -3,6 +3,7 @@ package ch.epfl.tchu.gui;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.Card;
 import ch.epfl.tchu.game.Route;
+import ch.epfl.tchu.game.Trail;
 import javafx.beans.property.ObjectProperty;
 import ch.epfl.tchu.gui.ActionHandler.*;
 import javafx.scene.Group;
@@ -26,39 +27,49 @@ class MapViewCreator {
         void chooseCards(List<SortedBag<Card>> options,ChooseCardsHandler handler);
     }
 
-    private Group caseGroup(){
+    //TODO is this correct?
+    private Group caseGroup(Route route){
 
-        Circle circle1Wagon = new Circle();
-        Circle circle2Wagon = new Circle();
+        Circle circle1Wagon = new Circle(3);
+        Circle circle2Wagon = new Circle(3);
+
         Rectangle rectangleWagon = new Rectangle();
         rectangleWagon.getStyleClass().add("filled");
 
         Group wagonGroup = new Group(circle1Wagon,circle2Wagon,rectangleWagon);
         wagonGroup.getStyleClass().addAll("car");
 
-        Rectangle caseRectangle = new Rectangle();
-        caseRectangle.getStyleClass().addAll("track", "filled");
+        Rectangle voieRectangle = new Rectangle();
+        voieRectangle.getStyleClass().addAll("track", "filled");
 
-        Group caseGroup = new Group(caseRectangle,wagonGroup);
-        caseGroup.setId("AT1_STG_1_1");
+        Group caseGroup = new Group(voieRectangle,wagonGroup);
+        //Has to be changed
+        caseGroup.setId(route.level().name());
         return caseGroup;
     }
 
-    private Group routeGroup(){
-        Group routeGroup = new Group(caseGroup());
-        routeGroup.getStyleClass().addAll("route","UNDERGROUN","NEUTRAL");
-        routeGroup.setId("AT1_STG_1");
+    private Group routeGroup(Route route){
+        Group routeGroup = new Group(caseGroup(route));
+        routeGroup.getStyleClass().addAll("route",
+                                            route.level().name(),
+                                            route.color() == null ? "NEUTRAL" : route.color().name());
+        routeGroup.setId(route.id());
         return routeGroup;
     }
 
+    //TODO are these the correct attributes?
     public ObservableGameState createMapView(ObjectProperty<ClaimRouteHandler> claimRouteHandlerObjectProperty,
                                              CardChooser cardChooser){
         ImageView imageView = new ImageView();
+        //TODO what route to call here if needed?
+
         Pane mapView = new Pane(routeGroup(),imageView);
         mapView.getStylesheets().addAll("map.css","colors.css");
 
+        //TODO how to implement nodes into observable...
+        ObservableGameState observableGameState = new ObservableGameState();
 
-        return
+        return observableGameState;
     }
 
 }
