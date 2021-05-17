@@ -2,12 +2,15 @@ package ch.epfl.tchu.gui;
 
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.Card;
+import ch.epfl.tchu.game.ChMap;
 import ch.epfl.tchu.game.Route;
 import ch.epfl.tchu.game.Trail;
 import javafx.beans.property.ObjectProperty;
 import ch.epfl.tchu.gui.ActionHandler.*;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
@@ -28,7 +31,7 @@ class MapViewCreator {
     }
 
     //TODO is this correct?
-    private Group caseGroup(Route route){
+    private static Group caseGroup(Route route){
 
         Circle circle1Wagon = new Circle(3);
         Circle circle2Wagon = new Circle(3);
@@ -48,7 +51,7 @@ class MapViewCreator {
         return caseGroup;
     }
 
-    private Group routeGroup(Route route){
+    private static Group routeGroup(Route route){
         Group routeGroup = new Group(caseGroup(route));
         routeGroup.getStyleClass().addAll("route",
                                             route.level().name(),
@@ -58,18 +61,20 @@ class MapViewCreator {
     }
 
     //TODO are these the correct attributes?
-    public ObservableGameState createMapView(ObjectProperty<ClaimRouteHandler> claimRouteHandlerObjectProperty,
-                                             CardChooser cardChooser){
+    public static Node createMapView(ObservableGameState observableGameState,
+                                     ObjectProperty<ClaimRouteHandler> claimRouteHandlerObjectProperty,
+                                     CardChooser cardChooser){
         ImageView imageView = new ImageView();
         //TODO what route to call here if needed?
 
-        Pane mapView = new Pane(routeGroup(),imageView);
+        Pane mapView = new Pane(imageView);
         mapView.getStylesheets().addAll("map.css","colors.css");
+//        ChMap.routes().forEach(r -> mapView.getChildren().add(routeGroup(r)));
 
         //TODO how to implement nodes into observable...
-        ObservableGameState observableGameState = new ObservableGameState();
+//        ObservableGameState observableGameState = new ObservableGameState();
 
-        return observableGameState;
+        return mapView;
     }
 
 }
