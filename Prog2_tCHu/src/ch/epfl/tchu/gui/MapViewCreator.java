@@ -31,10 +31,14 @@ class MapViewCreator {
     }
 
     //TODO is this correct?
-    private static Group caseGroup(Route route){
+    private static Group caseGroup(){
 
         Circle circle1Wagon = new Circle(3);
+        circle1Wagon.setCenterX(12);
+        circle1Wagon.setCenterY(6);
         Circle circle2Wagon = new Circle(3);
+        circle2Wagon.setCenterX(24);
+        circle2Wagon.setCenterY(6);
 
         Rectangle rectangleWagon = new Rectangle();
         rectangleWagon.getStyleClass().add("filled");
@@ -44,19 +48,23 @@ class MapViewCreator {
 
         Rectangle voieRectangle = new Rectangle();
         voieRectangle.getStyleClass().addAll("track", "filled");
+        voieRectangle.setWidth(36d);
+        voieRectangle.setHeight(12d);
 
-        Group caseGroup = new Group(voieRectangle,wagonGroup);
-        //Has to be changed
-        caseGroup.setId(route.level().name());
-        return caseGroup;
+        return new Group(voieRectangle, wagonGroup);
     }
 
     private static Group routeGroup(Route route){
-        Group routeGroup = new Group(caseGroup(route));
+        Group routeGroup = new Group();
         routeGroup.getStyleClass().addAll("route",
                                             route.level().name(),
                                             route.color() == null ? "NEUTRAL" : route.color().name());
         routeGroup.setId(route.id());
+        for(int i = 1 ; i<= route.length(); i++){
+            Group box = caseGroup();
+            routeGroup.getChildren().add(box);
+            box.setId(routeGroup.getId() + "_" + i);
+        }
         return routeGroup;
     }
 
@@ -69,7 +77,9 @@ class MapViewCreator {
 
         Pane mapView = new Pane(imageView);
         mapView.getStylesheets().addAll("map.css","colors.css");
-//        ChMap.routes().forEach(r -> mapView.getChildren().add(routeGroup(r)));
+        ChMap.routes().forEach(r -> mapView.getChildren().add(routeGroup(r)));
+//        mapView.getChildren().addAll();
+//        mapView.getChildren().addAll(routeGroup().getChildren().sorted());
 
         //TODO how to implement nodes into observable...
 //        ObservableGameState observableGameState = new ObservableGameState();
