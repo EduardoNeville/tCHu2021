@@ -27,11 +27,10 @@ class MapViewCreator {
 
     @FunctionalInterface
     interface CardChooser {
-        void chooseCards(List<SortedBag<Card>> options,ChooseCardsHandler handler);
+        void chooseCards(List<SortedBag<Card>> options, ChooseCardsHandler handler);
     }
 
-    //TODO is this correct?
-    private static Group caseGroup(){
+    private static Group caseGroup() {
 
         Circle circle1Wagon = new Circle(3);
         circle1Wagon.setCenterX(12);
@@ -43,24 +42,24 @@ class MapViewCreator {
         Rectangle rectangleWagon = new Rectangle();
         rectangleWagon.getStyleClass().add("filled");
 
-        Group wagonGroup = new Group(circle1Wagon,circle2Wagon,rectangleWagon);
+        Group wagonGroup = new Group(circle1Wagon, circle2Wagon, rectangleWagon);
         wagonGroup.getStyleClass().addAll("car");
 
-        Rectangle voieRectangle = new Rectangle();
-        voieRectangle.getStyleClass().addAll("track", "filled");
-        voieRectangle.setWidth(36d);
-        voieRectangle.setHeight(12d);
+        Rectangle rectanglePath = new Rectangle();
+        rectanglePath.getStyleClass().addAll("track", "filled");
+        rectanglePath.setWidth(36d);
+        rectanglePath.setHeight(12d);
 
-        return new Group(voieRectangle, wagonGroup);
+        return new Group(rectanglePath, wagonGroup);
     }
 
-    private static Group routeGroup(Route route){
+    private static Group routeGroup(Route route) {
         Group routeGroup = new Group();
         routeGroup.getStyleClass().addAll("route",
-                                            route.level().name(),
-                                            route.color() == null ? "NEUTRAL" : route.color().name());
+                route.level().name(),
+                route.color() == null ? "NEUTRAL" : route.color().name());
         routeGroup.setId(route.id());
-        for(int i = 1 ; i<= route.length(); i++){
+        for (int i = 1; i <= route.length(); i++) {
             Group box = caseGroup();
             routeGroup.getChildren().add(box);
             box.setId(routeGroup.getId() + "_" + i);
@@ -68,21 +67,40 @@ class MapViewCreator {
         return routeGroup;
     }
 
-    //TODO are these the correct attributes?
     public static Node createMapView(ObservableGameState observableGameState,
                                      ObjectProperty<ClaimRouteHandler> claimRouteHandlerObjectProperty,
-                                     CardChooser cardChooser){
+                                     CardChooser cardChooser) {
+
+        ClaimRouteHandler claimRouteH = claimRouteHandlerObjectProperty.getValue();
         ImageView imageView = new ImageView();
-        //TODO what route to call here if needed?
-
         Pane mapView = new Pane(imageView);
-        mapView.getStylesheets().addAll("map.css","colors.css");
-        ChMap.routes().forEach(r -> mapView.getChildren().add(routeGroup(r)));
-//        mapView.getChildren().addAll();
-//        mapView.getChildren().addAll(routeGroup().getChildren().sorted());
+        mapView.getStylesheets().addAll("map.css", "colors.css");
 
-        //TODO how to implement nodes into observable...
-//        ObservableGameState observableGameState = new ObservableGameState();
+        //add routes to the pane and set their activation conditions and listeners
+        ChMap.routes().forEach(r -> {
+            Group routeGroup = routeGroup(r);
+
+            mapView.getChildren().add(routeGroup);
+            //add class if route gets an owner
+            observableGameState.getRouteOwners(r).addListener((o, oV, nV)-> {
+                if (o.getValue() != null)
+                    routeGroup.getStyleClass().add(o.getValue().name());
+            });
+
+            routeGroup.disableProperty().bind(
+                    claimRouteHandlerObjectProperty.isNull()
+                            .or(observableGameState.getPlayerClaimableRoute(r).not()));
+
+            routeGroup.setOnMouseClicked(e -> {
+                List<SortedBag<Card>> possibleClaimCards = observableGameState.possibleClaimCards(r);
+                if(possibleClaimCards.size() == 1)
+                    claimRouteH.onClaimRoute(r, possibleClaimCards.get(0));
+                ChooseCardsHandler chooseCardsH =
+                        chosenCards -> claimRouteH.onClaimRoute(r, chosenCards);
+                cardChooser.chooseCards(possibleClaimCards, chooseCardsH);
+            });
+
+        });
 
         return mapView;
     }
