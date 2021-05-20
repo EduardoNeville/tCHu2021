@@ -5,8 +5,6 @@ import ch.epfl.tchu.game.*;
 
 import static ch.epfl.tchu.game.Constants.*;
 
-import com.sun.javafx.UnmodifiableArrayList;
-import com.sun.javafx.collections.UnmodifiableListSet;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,7 +13,7 @@ import java.util.*;
 
 public final class ObservableGameState {
     private final PlayerId player;
-    private PublicGameState currentPublicGameState = null;
+    private PublicGameState gameState = null;
     private PlayerState currentPlayerState = null;
 
     private final IntegerProperty ticketAmount = new SimpleIntegerProperty(0);
@@ -40,14 +38,10 @@ public final class ObservableGameState {
 
         faceUpCards = createFaceUpCards();
 
-        Map<PlayerId, IntegerProperty> initializedMap = new EnumMap<>(PlayerId.class);
-        for (PlayerId id : PlayerId.ALL) {
-            initializedMap.put(id, new SimpleIntegerProperty(0));
-        }
-        playerTicketCount = Map.copyOf(initializedMap);
-        playerCardCount = Map.copyOf(initializedMap);
-        playerCarCount = Map.copyOf(initializedMap);
-        playerConstructionPoints = Map.copyOf(initializedMap);
+        playerTicketCount = initMap();
+        playerCardCount = initMap();
+        playerCarCount = initMap();
+        playerConstructionPoints = initMap();
 
         for (Card c : Card.ALL) {
             playerCardsCount.put(c, new SimpleIntegerProperty(0));
@@ -55,21 +49,29 @@ public final class ObservableGameState {
 
     }
 
+    private Map<PlayerId, IntegerProperty> initMap(){
+        Map<PlayerId, IntegerProperty> map = new EnumMap<>(PlayerId.class);
+        for (PlayerId id : PlayerId.ALL) {
+            map.put(id, new SimpleIntegerProperty(0));
+        }
+        return map;
+    }
+
     public void setState(PublicGameState newPublicGameState, PlayerState newPlayerState) {
-        currentPublicGameState = newPublicGameState;
+        gameState = newPublicGameState;
         currentPlayerState = newPlayerState;
-        ticketAmount.set((newPublicGameState.ticketsCount() * 100) / ChMap.tickets().size());
-        cardAmount.set((newPublicGameState.cardState().deckSize() * 100) / TOTAL_CARDS_COUNT);
+        ticketAmount.set((gameState.ticketsCount() * 100) / ChMap.tickets().size());
+        cardAmount.set((gameState.cardState().deckSize() * 100) / TOTAL_CARDS_COUNT);
         for (int slot : FACE_UP_CARD_SLOTS) {
-            Card newCard = newPublicGameState.cardState().faceUpCard(slot);
+            Card newCard = gameState.cardState().faceUpCard(slot);
             faceUpCards.get(slot).set(newCard);
         }
         for (PlayerId id : PlayerId.ALL) {
-            PublicPlayerState publicPlayerState = newPublicGameState.playerState(id);
-            playerTicketCount.get(id).set(publicPlayerState.ticketCount());
-            playerCardCount.get(id).set(publicPlayerState.cardCount());
-            playerCarCount.get(id).set(publicPlayerState.carCount());
-            playerConstructionPoints.get(id).set(publicPlayerState.claimPoints());
+            PublicPlayerState publicPlayerState = gameState.playerState(id);
+            playerTicketCount.get(id).setValue(publicPlayerState.ticketCount());
+            playerCardCount.get(id).setValue(publicPlayerState.cardCount());
+            playerCarCount.get(id).setValue(publicPlayerState.carCount());
+            playerConstructionPoints.get(id).setValue(publicPlayerState.claimPoints());
         }
 
         newPlayerState.tickets().forEach(t -> {
@@ -83,7 +85,7 @@ public final class ObservableGameState {
         for (int i = 0; i < ChMap.routes().size(); i++) {
             playerClaimableRoutes.get(i).set(
                     //boolean : three conditions
-                    newPublicGameState.currentPlayerId() == player
+                    gameState.currentPlayerId() == player
                             && routeOwners.get(i).getValue() == null
                             && newPlayerState.canClaimRoute(ChMap.routes().get(i)));
 
@@ -146,11 +148,11 @@ public final class ObservableGameState {
     }
 
     public boolean canDrawTickets() {
-        return currentPublicGameState.canDrawTickets();
+        return gameState.canDrawTickets();
     }
 
     public boolean canDrawCards() {
-        return currentPublicGameState.canDrawCards();
+        return gameState.canDrawCards();
     }
 
     public List<SortedBag<Card>> possibleClaimCards(Route route) {
