@@ -3,14 +3,12 @@ package ch.epfl.tchu.gui;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.Card;
 import ch.epfl.tchu.game.ChMap;
+import ch.epfl.tchu.game.PlayerId;
 import ch.epfl.tchu.game.Route;
-import ch.epfl.tchu.game.Trail;
 import javafx.beans.property.ObjectProperty;
 import ch.epfl.tchu.gui.ActionHandler.*;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
@@ -71,7 +69,6 @@ class MapViewCreator {
                                      ObjectProperty<ClaimRouteHandler> claimRouteHandlerObjectProperty,
                                      CardChooser cardChooser) {
 
-        ClaimRouteHandler claimRouteH = claimRouteHandlerObjectProperty.getValue();
         ImageView imageView = new ImageView();
         Pane mapView = new Pane(imageView);
         mapView.getStylesheets().addAll("map.css", "colors.css");
@@ -93,8 +90,8 @@ class MapViewCreator {
 
             routeGroup.setOnMouseClicked(e -> {
                 List<SortedBag<Card>> possibleClaimCards = observableGameState.possibleClaimCards(r);
-                if(possibleClaimCards.size() == 1)
-                    claimRouteH.onClaimRoute(r, possibleClaimCards.get(0));
+                ClaimRouteHandler claimRouteH = claimRouteHandlerObjectProperty.getValue();
+
                 ChooseCardsHandler chooseCardsH =
                         chosenCards -> claimRouteH.onClaimRoute(r, chosenCards);
                 cardChooser.chooseCards(possibleClaimCards, chooseCardsH);

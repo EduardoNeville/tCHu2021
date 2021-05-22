@@ -9,8 +9,11 @@ import ch.epfl.tchu.game.*;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.text.Text;
 import javafx.stage.*;
 
 import java.util.List;
@@ -35,13 +38,27 @@ public final class Stage9Test extends Application {
 
         Node mapView = MapViewCreator
                 .createMapView(gameState, claimRoute, Stage9Test::chooseCards);
-        Node cardsView = DecksViewCreator
-                .createCardsView(gameState, drawTickets, drawCard);
-        Node handView = DecksViewCreator
-                .createHandView(gameState);
+//        Node cardsView = DecksViewCreator
+//                .createCardsView(gameState, drawTickets, drawCard);
+//        Node handView = DecksViewCreator
+//                .createHandView(gameState);
+
+        Map<PlayerId, String> playerNames =
+                Map.of(PLAYER_1, "Ada", PLAYER_2, "Charles");
+        ObservableList<Text> infos = FXCollections.observableArrayList(
+                new Text("Première information.\n"),
+                new Text("\nSeconde information.\n"));
+        Node infoView = InfoViewCreator
+                .createInfoView(PLAYER_1, playerNames, gameState, infos);
+
 
         BorderPane mainPane =
-                new BorderPane(mapView, null, cardsView, handView, null);
+                new BorderPane(mapView, null, null, null, infoView);
+
+//        BorderPane mainPane =
+//                new BorderPane(mapView, null, null, null, null);
+
+//                new BorderPane(mapView, null, cardsView, handView, null);
         primaryStage.setScene(new Scene(mainPane));
         primaryStage.show();
 
@@ -56,6 +73,7 @@ public final class Stage9Test extends Application {
 
         PublicPlayerState p2State =
                 new PublicPlayerState(0, 0, ChMap.routes().subList(3, 6));
+
 
         Map<PlayerId, PublicPlayerState> pubPlayerStates =
                 Map.of(PLAYER_1, p1State, PLAYER_2, p2State);
@@ -83,4 +101,7 @@ public final class Stage9Test extends Application {
     private static void drawCard(int slot) {
         System.out.printf("Tirage de cartes (emplacement %s)!\n", slot);
     }
+
+
+
 }
