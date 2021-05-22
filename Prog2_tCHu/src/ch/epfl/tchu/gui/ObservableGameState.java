@@ -30,7 +30,7 @@ public final class ObservableGameState {
     private final ObservableList<Ticket> playerTickets = FXCollections.observableArrayList();
     private final Map<Card, IntegerProperty> playerCardsCount = new EnumMap<>(Card.class);
     private final List<BooleanProperty> playerClaimableRoutes
-            = new ArrayList<>(Collections.nCopies(ChMap.routes().size(), new SimpleBooleanProperty(false))); //or simple array?
+            = new ArrayList<>(); //or simple array?
 
 
     public ObservableGameState(PlayerId playerId) {
@@ -46,6 +46,8 @@ public final class ObservableGameState {
         for (Card c : Card.ALL) {
             playerCardsCount.put(c, new SimpleIntegerProperty(0));
         }
+        for (int i=0; i<ChMap.routes().size(); i++)
+            playerClaimableRoutes.add(new SimpleBooleanProperty(false));
 
     }
 
