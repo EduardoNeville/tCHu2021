@@ -227,7 +227,6 @@ public final class GameState extends PublicGameState {
      * @throws IllegalArgumentException thrown if we cannot draw cards
      */
     public GameState withDrawnFaceUpCard(int slot) {
-        Preconditions.checkArgument(canDrawCards());
         var playerstatecopy = new HashMap<>(playerState);
         playerstatecopy.put(currentPlayerId(), playerState(currentPlayerId()).withAddedCard(privateCardState.faceUpCard(slot)));
 
@@ -243,7 +242,6 @@ public final class GameState extends PublicGameState {
      * @throws IllegalArgumentException thrown if we cannot draw cards
      */
     public GameState withBlindlyDrawnCard() {
-        Preconditions.checkArgument(canDrawCards());
 
         Map<PlayerId, PlayerState> drawnCards = new TreeMap<>(playerState);
         drawnCards.put(currentPlayerId(), currentPlayerState().withAddedCard(topCard()));
