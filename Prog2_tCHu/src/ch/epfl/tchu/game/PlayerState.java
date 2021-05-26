@@ -73,16 +73,6 @@ public class PlayerState extends PublicPlayerState {
     }
 
     /**
-     * PlayerState with card added
-     *
-     * @param card new card
-     * @return PlayerState with new card added
-     */
-    public PlayerState withAddedCard(Card card) {
-        return new PlayerState(tickets, cards.union(SortedBag.of(card)), routes());
-    }
-
-    /**
      * PlayerState with cards added
      *
      * @param additionalCards new cards
