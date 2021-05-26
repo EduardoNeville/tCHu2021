@@ -37,15 +37,6 @@ public class PublicCardState {
     }
 
     /**
-     * Returns the total number of cards, the ones face up, the one in the deck and those in the discard.
-     *
-     * @return the total number of cards, the ones face up, the one in the deck and those in the discard
-     */
-    public int totalSize() {
-        return (faceUpCardsSize + deckSize + discardsSize);
-    }
-
-    /**
      * Return a list of the face up cards.
      *
      * @return a list of the face up cards
