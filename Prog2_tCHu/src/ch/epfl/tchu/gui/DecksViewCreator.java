@@ -23,25 +23,27 @@ class DecksViewCreator {
 
     private static StackPane nodeForCard(Card card){
         Rectangle outside = new Rectangle(60,90);
+        outside.getStyleClass().add("outside");
+
 
         Rectangle inside = new Rectangle(40,70);
-        inside.getStyleClass().add("inside");
+        inside.getStyleClass().addAll("inside", "filled");
 
         Rectangle image = new Rectangle(40,70);
         image.getStyleClass().add("train-image");
 
-        StackPane cardColour = new StackPane(outside, inside);
+        StackPane cardPane = new StackPane(outside, inside, image);
 
 
         if (card != null)
-            if (!card.name().equals(Card.LOCOMOTIVE.name()))
-                cardColour.getStyleClass().addAll(card.name(), "card");
+            if (!card.equals(Card.LOCOMOTIVE))
+                cardPane.getStyleClass().addAll(card.color().name(), "card");
             else
-                cardColour.getStyleClass().addAll("NEUTRAL", "card");
+                cardPane.getStyleClass().addAll("NEUTRAL", "card");
         else
-            cardColour.getStyleClass().addAll("", "card");
+            cardPane.getStyleClass().addAll("", "card");
 
-        return cardColour;
+        return cardPane;
     }
 
     public static HBox createHandView(ObservableGameState observableGameState){
@@ -50,18 +52,22 @@ class DecksViewCreator {
         innerBox.setId("hand-pane");
 
         for (Card cardInLoop: Card.ALL) {
-            ReadOnlyIntegerProperty count = observableGameState.getPlayerCardsCount(cardInLoop);
             StackPane card = nodeForCard(cardInLoop);
-            card.visibleProperty().bind(Bindings.greaterThan(count, 0));
-            Text counter = new Text();
 
+            Text counter = new Text();
             counter.getStyleClass().add("count");
+            card.getChildren().addAll(counter);
+
+            ReadOnlyIntegerProperty count = observableGameState.getPlayerCardsCount(cardInLoop);
+            card.visibleProperty().bind(Bindings.greaterThan(count, 0));
+
             //TODO verify that asString works if not use
             //Bindings.convert(observableGameState.getPlayerCardsCount(cardInLoop));
             counter.textProperty().bind(observableGameState.getPlayerCardsCount(cardInLoop).asString());
+            innerBox.getChildren().add(card);
         }
 
-        ListView<Ticket> ticketListView = new ListView<>();
+        ListView<Ticket> ticketListView = new ListView<>(observableGameState.getPlayerTickets());
         ticketListView.setId("tickets");
 
         HBox theBigBox = new HBox(ticketListView,innerBox);
@@ -73,28 +79,36 @@ class DecksViewCreator {
     public static VBox createCardsView(ObservableGameState observableGameState,
                                         ObjectProperty<ActionHandler.DrawTicketsHandler> drawTicketsHandlerObjectProperty,
                                         ObjectProperty<ActionHandler.DrawCardHandler> drawCardHandlerObjectProperty){
-
-        Button cardButton = sideButton(StringsFr.CARDS,observableGameState.cardAmountProperty());
-        cardButton.getStyleClass().add("gauged");
+        VBox faceUpCardVBox = new VBox();
 
         Button ticketsButton = sideButton(StringsFr.TICKETS,observableGameState.ticketAmountProperty());
         ticketsButton.getStyleClass().add("gauged");
-        VBox faceUpCardVBox = new VBox();
+        faceUpCardVBox.getChildren().add(ticketsButton);
+        ticketsButton.setOnMouseClicked(e -> drawTicketsHandlerObjectProperty.get().onDrawTickets());
 
+        //face up cards
         for (int i : Constants.FACE_UP_CARD_SLOTS) {
             StackPane card = nodeForCard(null);
             observableGameState.faceUpCard(i).addListener((observableValue,old,newValue) ->{
-                if (!newValue.name().equals(Card.LOCOMOTIVE.name()))
+                if (!newValue.name().equals(Card.LOCOMOTIVE.name())) {
                     card.getStyleClass().set(0,newValue.name());
-                else
-                    card.getStyleClass().set(0,"NEUTRAL");});
+                }
+                else {
+                    card.getStyleClass().set(0,"NEUTRAL");
+                }
+            });
+            card.setOnMouseClicked(e -> drawCardHandlerObjectProperty.get().onDrawCard(i));
             faceUpCardVBox.getChildren().add(card);
         }
 
+
+        Button cardButton = sideButton(StringsFr.CARDS,observableGameState.cardAmountProperty());
+        cardButton.getStyleClass().add("gauged");
         cardButton.setOnMouseClicked(e -> drawCardHandlerObjectProperty.get().onDrawCard(Constants.DECK_SLOT));
-        ticketsButton.setOnMouseClicked(e -> drawTicketsHandlerObjectProperty.get().onDrawTickets());
+        faceUpCardVBox.getChildren().add(cardButton);
 
         faceUpCardVBox.getStylesheets().addAll("decks.css", "colors.css");
+        faceUpCardVBox.setId("card-pane");
         return faceUpCardVBox;
     }
 
