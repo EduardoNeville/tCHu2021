@@ -99,4 +99,13 @@ public final class Ticket implements Comparable<Ticket> {
         return trips.get(0).from().toString() + " - " + text;
 
     }
+
+    /**
+     * Returns a String of the text representation of this Ticket.
+     * @return a String of the text representation of this Ticket
+     */
+    @Override
+    public String toString() {
+        return text();
+    }
 }
