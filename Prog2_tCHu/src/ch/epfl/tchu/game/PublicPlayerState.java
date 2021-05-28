@@ -70,18 +70,16 @@ public class PublicPlayerState {
         return Constants.INITIAL_CAR_COUNT - total;
     }
 
+    
     /**
      * Points earned
-     *
      * @return # of points earned
      */
-    public int claimPoints() {
-        int points = 0;
-
-        for (Route r :
-                routes()) {
-            points += Constants.ROUTE_CLAIM_POINTS.get(r.length());
+    public int claimPoints(){
+        int claimPoints = 0;
+        for (Route route: routes) {
+            claimPoints = claimPoints + Constants.ROUTE_CLAIM_POINTS.get(route.length());
         }
-        return points;
+        return claimPoints;
     }
 }
