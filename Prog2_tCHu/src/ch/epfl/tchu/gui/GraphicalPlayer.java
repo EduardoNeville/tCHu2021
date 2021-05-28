@@ -66,13 +66,11 @@ public class GraphicalPlayer {
         Node handView = DecksViewCreator
                 .createHandView(oGameState);
 
-        Map<PlayerId, String> playerNames =
-                Map.of(PLAYER_1, "Ada", PLAYER_2, "Charles");
         ObservableList<Text> infos = FXCollections.observableArrayList(
                 new Text("Première information.\n"),
                 new Text("\nSeconde information.\n"));
         Node infoView = InfoViewCreator
-                .createInfoView(PLAYER_1, playerNames, oGameState, infoList);
+                .createInfoView(playerId, names, oGameState, infoList);
 
 
         BorderPane mainPane =
@@ -101,9 +99,9 @@ public class GraphicalPlayer {
     public void receiveInfo(String message) {
         assert isFxApplicationThread();
         if (infoList.size() < 5)
-            infoList.add(new Text(message));
+            infoList.add(new Text(message + "\n"));
         else {
-            infoList.add(0, new Text(message));
+            infoList.add(0, new Text(message + "\n"));
             infoList.remove(5);
         }
     }
