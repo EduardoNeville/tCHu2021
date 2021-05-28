@@ -152,7 +152,7 @@ public class GraphicalPlayer {
 
         ListView<Ticket> listView = new ListView<>(FXCollections.observableList(tickets.toList()));
         ObservableList<Ticket> selectedItems = listView.getSelectionModel().getSelectedItems();
-        Button confirmButton = new Button();
+        Button confirmButton = new Button("Choisir");
         confirmButton.disableProperty().bind(
                 Bindings.size(selectedItems).
                         lessThanOrEqualTo(selectedItems.size() - 2));
@@ -193,7 +193,7 @@ public class GraphicalPlayer {
 
         ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(cardOptions));
         ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
-        Button confirmButton = new Button();
+        Button confirmButton = new Button("Choisir");
         confirmButton.disableProperty().bind(
                 Bindings.size(selectedItems).isNotEqualTo(1));
 
@@ -222,7 +222,7 @@ public class GraphicalPlayer {
 
         ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(cardOptions));
         ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
-        Button confirmButton = new Button();
+        Button confirmButton = new Button("Choisir");
 
 
         Stage selectionWindow = choiceWindow(StringsFr.CHOOSE_ADDITIONAL_CARDS,
