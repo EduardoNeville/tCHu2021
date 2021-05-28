@@ -42,7 +42,6 @@ public final class RemotePlayerClient {
      * Runs the client player which will listens for the proxy's messages and responds accordingly.
      */
     public void run() {
-        System.out.println("running");
         try (Socket s = new Socket(address, port);
              BufferedReader r =
                      new BufferedReader(
@@ -90,7 +89,7 @@ public final class RemotePlayerClient {
                 return null;
             case UPDATE_STATE:
                 player.updateState(
-                        PUBLIC_GAME_STATE_SERDES.deserialize(message[1]),
+                        PUBLIC_GAME_STATE_SERDE.deserialize(message[1]),
                         PLAYER_STATE_SERDE.deserialize(message[2])
                 );
                 return null;
