@@ -107,7 +107,7 @@ public class GraphicalPlayerAdapter implements Player{
 
     /**
      * drawSlot method being overridden from Player
-     * @return deckSlot
+     * @return the deck slot
      */
     @Override
     public int drawSlot() {

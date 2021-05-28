@@ -41,6 +41,15 @@ public final class InfoViewCreator {
         return textFlow;
     }
 
+    /**
+     * Returns a Node with the information that can be viewed
+     * @param idOfUser Id of the User
+     * @param playerNames Names of the players
+     * @param oGameState State of the game from the perspective of the observable player
+     * @param infoList observable list of information
+     * @return Node with the information that can be viewed
+     */
+
     public static Node createInfoView(PlayerId idOfUser,
                                       Map<PlayerId, String> playerNames,
                                       ObservableGameState oGameState,

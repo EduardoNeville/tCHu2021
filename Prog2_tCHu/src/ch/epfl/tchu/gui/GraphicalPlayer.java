@@ -17,6 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -26,9 +27,11 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static ch.epfl.tchu.gui.StringsFr.AND_SEPARATOR;
 import static javafx.application.Platform.isFxApplicationThread;
 
 /**
@@ -196,6 +199,8 @@ public class GraphicalPlayer {
         }
 
         ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(cardOptions));
+        listView.setCellFactory(v ->
+                new TextFieldListCell<>(new CardBagStringConverter()));
         ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
         Button confirmButton = new Button(StringsFr.CHOOSE);
         confirmButton.disableProperty().bind(
@@ -225,6 +230,8 @@ public class GraphicalPlayer {
         Preconditions.checkArgument(!cardOptions.isEmpty());
 
         ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(cardOptions));
+        listView.setCellFactory(v ->
+                new TextFieldListCell<>(new CardBagStringConverter()));
         ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
         Button confirmButton = new Button(StringsFr.CHOOSE);
 
@@ -273,7 +280,19 @@ public class GraphicalPlayer {
 
         @Override
         public String toString(SortedBag<Card> cards) {
-            return null;
+            StringBuilder cardStringBuilder = new StringBuilder();
+            ArrayList<String> cardsArray = new ArrayList<>();
+
+            for (Card c : cards.toSet()) {
+                int cCount = cards.countOf(c);
+                cardsArray.add(cCount + " " + Info.cardName(c, cCount));
+            }
+            if (cardsArray.size() > 1) {
+                cardStringBuilder.append(String.join(", ", cardsArray.subList(0, cardsArray.size() - 1)));
+                cardStringBuilder.append(AND_SEPARATOR);
+            }
+
+            return cardStringBuilder.append(cardsArray.get(cardsArray.size() - 1)).toString();
         }
 
         @Override
