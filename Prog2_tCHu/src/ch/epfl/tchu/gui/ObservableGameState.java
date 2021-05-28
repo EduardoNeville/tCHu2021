@@ -25,8 +25,7 @@ public final class ObservableGameState {
     private final IntegerProperty ticketAmount = new SimpleIntegerProperty(0);
     private final IntegerProperty cardAmount = new SimpleIntegerProperty(0);
     private final List<ObjectProperty<Card>> faceUpCards;
-    private final List<ObjectProperty<PlayerId>> routeOwners
-            = new ArrayList<>(Collections.nCopies(ChMap.routes().size(), new SimpleObjectProperty<>(null))); //or simple array?
+    private final Map<Route,ObjectProperty<PlayerId>> routeOwners = new HashMap<>(); //or simple array?
 
     private final Map<PlayerId, IntegerProperty> playerTicketCount;// = new EnumMap(PlayerId.class);
     private final Map<PlayerId, IntegerProperty> playerCardCount;// = new EnumMap(PlayerId.class);
@@ -35,8 +34,7 @@ public final class ObservableGameState {
 
     private final ObservableList<Ticket> playerTickets = FXCollections.observableArrayList();
     private final Map<Card, IntegerProperty> playerCardsCount = new EnumMap<>(Card.class);
-    private final List<BooleanProperty> playerClaimableRoutes
-            = new ArrayList<>();
+    private final Map<Route,BooleanProperty> playerClaimableRoutes = new HashMap<>();
 
     /**
      * Creates an observable game state with the given player as the associated player to this instance.
@@ -56,8 +54,10 @@ public final class ObservableGameState {
         for (Card c : Card.ALL) {
             playerCardsCount.put(c, new SimpleIntegerProperty(0));
         }
-        for (int i = 0; i < ChMap.routes().size(); i++)
-            playerClaimableRoutes.add(new SimpleBooleanProperty(false));
+        for (Route route: ChMap.routes()) {
+            playerClaimableRoutes.put(route,new SimpleBooleanProperty());
+            routeOwners.put(route, new SimpleObjectProperty<>());
+        }
     }
 
     /**
@@ -96,6 +96,7 @@ public final class ObservableGameState {
             playerCardCount.get(id).setValue(publicPlayerState.cardCount());
             playerCarCount.get(id).setValue(publicPlayerState.carCount());
             playerConstructionPoints.get(id).setValue(publicPlayerState.claimPoints());
+            publicPlayerState.routes().forEach(route -> routeOwners.get(route).set(id));
         }
 
         currentPlayerState.tickets().forEach(t -> {
@@ -103,18 +104,15 @@ public final class ObservableGameState {
                 playerTickets.add(t);
             }
         });
-        SortedBag<Card> cards = currentPlayerState.cards();
-        cards.forEach(c -> playerCardsCount.get(c).set(cards.countOf(c)));
+        Card.ALL.forEach(c -> playerCardsCount.get(c).set(currentPlayerState.cards().countOf(c)));
 
-        for (int i = 0; i < ChMap.routes().size(); i++) {
-            playerClaimableRoutes.get(i).set(
+        for (Route route : ChMap.routes()) {
+            playerClaimableRoutes.get(route).set(
                     //boolean : three conditions for the route to be claimable by the player
                     gameState.currentPlayerId() == player
-                            && routeOwners.get(i).getValue() == null
-                            && currentPlayerState.canClaimRoute(ChMap.routes().get(i)));
-
+                            &&routeOwners.get(route).getValue() == null
+                            && currentPlayerState.canClaimRoute(route));
         }
-
     }
 
     /**
@@ -154,7 +152,7 @@ public final class ObservableGameState {
      * @return a read only property of the owner of a route
      */
     public ReadOnlyObjectProperty<PlayerId> getRouteOwners(Route route) {
-        return routeOwners.get(ChMap.routes().indexOf(route));
+        return routeOwners.get(route);
     }
 
     /**
@@ -216,7 +214,7 @@ public final class ObservableGameState {
      * @return a read only property of whether the associated player can claim the given route
      */
     public ReadOnlyBooleanProperty getPlayerClaimableRoute(Route route) {
-        return playerClaimableRoutes.get(ChMap.routes().indexOf(route));
+        return playerClaimableRoutes.get(route);
     }
 
     /**

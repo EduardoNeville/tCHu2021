@@ -3,7 +3,6 @@ package ch.epfl.tchu.gui;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.Card;
 import ch.epfl.tchu.game.ChMap;
-import ch.epfl.tchu.game.PlayerId;
 import ch.epfl.tchu.game.Route;
 import javafx.beans.property.ObjectProperty;
 import ch.epfl.tchu.gui.ActionHandler.*;
@@ -20,6 +19,7 @@ import java.util.List;
  * Class MapViewCreator
  *
  * @author Eduardo Neville (314667)
+ * @author Martin Sanchez Lopez (313238)
  */
 class MapViewCreator {
 
@@ -65,6 +65,14 @@ class MapViewCreator {
         return routeGroup;
     }
 
+    /**
+     * Creates the map view part of the interface
+     *
+     * @param observableGameState game state
+     * @param claimRouteHandlerObjectProperty handler for route claiming
+     * @param cardChooser handler for card choosing
+     * @return a node of the map view of the gui
+     */
     public static Node createMapView(ObservableGameState observableGameState,
                                      ObjectProperty<ClaimRouteHandler> claimRouteHandlerObjectProperty,
                                      CardChooser cardChooser) {
@@ -85,8 +93,7 @@ class MapViewCreator {
             });
 
             routeGroup.disableProperty().bind(
-                    claimRouteHandlerObjectProperty.isNull()
-                            .or(observableGameState.getPlayerClaimableRoute(r).not()));
+                    claimRouteHandlerObjectProperty.isNull().or(observableGameState.getPlayerClaimableRoute(r).not()));
 
             routeGroup.setOnMouseClicked(e -> {
                 List<SortedBag<Card>> possibleClaimCards = observableGameState.possibleClaimCards(r);

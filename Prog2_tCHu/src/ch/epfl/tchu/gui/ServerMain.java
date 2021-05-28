@@ -37,7 +37,7 @@ public final class ServerMain extends Application {
      * Starts the application. Creates a server, waits for a connection and then
      * initializes a tchu game with two players, a local one and the one connected to this server via a proxy.
      *
-     * @throws Exception
+     * @throws Exception For any connection errors
      */
     @Override
     public void start(Stage stage) throws Exception {
@@ -58,7 +58,11 @@ public final class ServerMain extends Application {
             Map<PlayerId, Player> players = Map.of(PLAYER_1, localPlayer, PLAYER_2, proxy);
             Map<PlayerId, String> nameMap = Map.of(PLAYER_1, names.get(0), PLAYER_2, names.get(1));
 
-            new Thread(() -> Game.play(players, nameMap, SortedBag.of(ChMap.tickets()), new Random())).start();
+            new Thread(() -> Game.play(
+                    players,
+                    nameMap,
+                    SortedBag.of(ChMap.tickets()),
+                    new Random())).start();
     }
 
 }

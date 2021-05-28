@@ -39,7 +39,7 @@ public final class ClientMain extends Application {
      * Starts the application. Tries to connect to the server and then
      * initializes the gui for the local player.
      *
-     * @throws Exception
+     * @throws Exception for any connection errors
      */
     @Override
     public void start(Stage stage) throws Exception {

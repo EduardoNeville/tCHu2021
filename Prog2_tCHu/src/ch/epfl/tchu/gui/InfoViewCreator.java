@@ -12,9 +12,12 @@ import javafx.scene.text.TextFlow;
 
 import java.util.Map;
 
-public class InfoViewCreator {
-
-
+/**
+ * InfoViewCreator class
+ *
+ * @author Martin Sanchez Lopez (313238)
+ */
+public final class InfoViewCreator {
 
     private static TextFlow playerStats(PlayerId playerId, String name, ObservableGameState observableGameState){
         TextFlow textFlow = new TextFlow();
@@ -35,17 +38,13 @@ public class InfoViewCreator {
                         observableGameState.getPlayerConstructionPoints(playerId)));
 
         textFlow.getChildren().addAll(circle, statsText);
-
         return textFlow;
     }
 
-
-
-
     public static Node createInfoView(PlayerId idOfUser,
-                               Map<PlayerId, String> playerNames,
-                               ObservableGameState oGameState,
-                               ObservableList<Text> infoList){
+                                      Map<PlayerId, String> playerNames,
+                                      ObservableGameState oGameState,
+                                      ObservableList<Text> infoList){
 
 
         VBox topNode = new VBox();
@@ -57,7 +56,7 @@ public class InfoViewCreator {
                 playerStats(idOfUser, playerNames.get(idOfUser), oGameState));
         PlayerId otherId = idOfUser.next();
         playerStats.getChildren().add(
-            playerStats(otherId, playerNames.get(otherId), oGameState));
+                playerStats(otherId, playerNames.get(otherId), oGameState));
 
 
         TextFlow messages = new TextFlow();

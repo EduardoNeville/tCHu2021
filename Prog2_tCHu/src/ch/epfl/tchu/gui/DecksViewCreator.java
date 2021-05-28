@@ -64,8 +64,6 @@ class DecksViewCreator {
             ReadOnlyIntegerProperty count = observableGameState.getPlayerCardsCount(cardInLoop);
             card.visibleProperty().bind(Bindings.greaterThan(count, 0));
 
-            //TODO verify that asString works if not use
-            //Bindings.convert(observableGameState.getPlayerCardsCount(cardInLoop));
             counter.textProperty().bind(observableGameState.getPlayerCardsCount(cardInLoop).asString());
             innerBox.getChildren().add(card);
         }
@@ -80,11 +78,11 @@ class DecksViewCreator {
     }
 
     /**
-     * createCardsView
+     * Create the cards view
      * @param observableGameState the state of the game for the player being observed
      * @param drawTicketsHandlerObjectProperty Object Property that handles the tickets drawn by player
      * @param drawCardHandlerObjectProperty Object Property that handles the cards drawn by player
-     * @return creates the
+     * @return creates the cards view
      */
     public static VBox createCardsView(ObservableGameState observableGameState,
                                        ObjectProperty<ActionHandler.DrawTicketsHandler> drawTicketsHandlerObjectProperty,

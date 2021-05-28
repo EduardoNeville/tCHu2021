@@ -94,10 +94,10 @@ public class GraphicalPlayer {
     public void receiveInfo(String message) {
         assert isFxApplicationThread();
         if (infoList.size() < 5)
-            infoList.add(new Text(message + "\n"));
+            infoList.add(new Text(message));
         else {
-            infoList.add(0, new Text(message + "\n"));
-            infoList.remove(5);
+            infoList.add(new Text(message));
+            infoList.remove(0);
         }
     }
 
@@ -152,10 +152,14 @@ public class GraphicalPlayer {
 
         ListView<Ticket> listView = new ListView<>(FXCollections.observableList(tickets.toList()));
         ObservableList<Ticket> selectedItems = listView.getSelectionModel().getSelectedItems();
-        Button confirmButton = new Button("Choisir");
+        Button confirmButton = new Button(StringsFr.CHOOSE);
         confirmButton.disableProperty().bind(Bindings.lessThan(Bindings.size(selectedItems),tickets.size() -2));
+        //  Bindings.size(selectedItems).
+        //        lessThanOrEqualTo(selectedItems.size() - 2));
 
         Stage selectionWindow = choiceWindow(StringsFr.TICKETS_CHOICE,
+                String.format(StringsFr.CHOOSE_TICKETS,tickets.size()-Constants.DISCARDABLE_TICKETS_COUNT,
+                        StringsFr.plural(tickets.size()-Constants.DISCARDABLE_TICKETS_COUNT)),
                 listView, confirmButton);
 
         confirmButton.setOnAction((e) -> {
@@ -163,9 +167,7 @@ public class GraphicalPlayer {
                     chooseTicketsHandler.onChooseTickets(SortedBag.of(selectedItems));
                 }
         );
-
         selectionWindow.show();
-
     }
 
     /**
@@ -195,11 +197,11 @@ public class GraphicalPlayer {
 
         ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(cardOptions));
         ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
-        Button confirmButton = new Button("Choisir");
+        Button confirmButton = new Button(StringsFr.CHOOSE);
         confirmButton.disableProperty().bind(
                 Bindings.size(selectedItems).isNotEqualTo(1));
 
-        Stage selectionWindow = choiceWindow(StringsFr.CARDS_CHOICE,
+        Stage selectionWindow = choiceWindow(StringsFr.CARDS_CHOICE,StringsFr.CHOOSE_CARDS,
                 listView, confirmButton);
 
         confirmButton.setOnAction((e) -> {
@@ -224,10 +226,10 @@ public class GraphicalPlayer {
 
         ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(cardOptions));
         ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
-        Button confirmButton = new Button("Choisir");
+        Button confirmButton = new Button(StringsFr.CHOOSE);
 
 
-        Stage selectionWindow = choiceWindow(StringsFr.CHOOSE_ADDITIONAL_CARDS,
+        Stage selectionWindow = choiceWindow(StringsFr.CARDS_CHOICE,StringsFr.CHOOSE_ADDITIONAL_CARDS,
                 listView, confirmButton);
 
         confirmButton.setOnAction((e) -> {
@@ -239,7 +241,7 @@ public class GraphicalPlayer {
         selectionWindow.show();
     }
 
-    private <T> Stage choiceWindow(String string,
+    private <T> Stage choiceWindow(String string,String string2,
                                    ListView<T> listView,
                                    Button button) {
         Stage choiceWindow = new Stage(StageStyle.UTILITY);
@@ -253,8 +255,8 @@ public class GraphicalPlayer {
         Scene chooserScene = new Scene(choiceBox);
         chooserScene.getStylesheets().add("chooser.css");
 
-
-        TextFlow textFlow = new TextFlow(new Text(string));
+        choiceWindow.setTitle(string);
+        TextFlow textFlow = new TextFlow(new Text(string2));
 
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
