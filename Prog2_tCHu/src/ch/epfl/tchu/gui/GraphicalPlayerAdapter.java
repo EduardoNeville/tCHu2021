@@ -5,66 +5,169 @@ import ch.epfl.tchu.game.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import static javafx.application.Platform.runLater;
 
-public class GraphicalPlayerAdapter implements Player {
-    //TODO FIX this!
-    GraphicalPlayer graphicalPlayer = new GraphicalPlayer(, );
+/**
+ * GraphicalPlayerAdapter class
+ *
+ * @author Eduardo Neville (314677)
+ */
 
+public class GraphicalPlayerAdapter implements Player{
+
+    private GraphicalPlayer graphicalPlayer;
+
+    private final ArrayBlockingQueue<SortedBag<Ticket>> sortedBagsTickets = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<SortedBag<Card>> sortedBagsCards = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<TurnKind> turnKinds = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<Integer> drawCardIndex = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<Route> routes = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<Integer> deckSlot = new ArrayBlockingQueue<>(1);
+
+    public GraphicalPlayerAdapter(){
+
+    }
+
+    //TODO check for correctness on this one \|/
+
+    /**
+     * initPlayers method being overridden from Player
+     * @param ownId
+     *          id of the player
+     * @param playerNames Names of initial players
+     */
     @Override
     public void initPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-
+        runLater(() -> graphicalPlayer = new GraphicalPlayer(ownId, playerNames));
     }
 
+    /**
+     * setInitialTicketChoice method being overridden from Player
+     * @param tickets Player tickets
+     */
     @Override
     public void setInitialTicketChoice(SortedBag<Ticket> tickets) {
-
+        runLater(() -> graphicalPlayer.
+                    chooseTickets(tickets,
+                            (ticketChoice) -> blockinQ(sortedBagsTickets)));
+                                            //TODO check if its correct!
     }
 
+    /**
+     * receiveInfo method being overridden from Player
+     * @param info Information from
+     */
     @Override
     public void receiveInfo(String info) {
-        runLater(() -> graphicalPlayer.receiveInfo(info));
+       runLater(() -> graphicalPlayer.receiveInfo(info));
     }
 
+    /**+
+     * updateState method being overridden from Player
+     * @param newState
+     *          new public game state
+     * @param ownState new playerState
+     */
     @Override
     public void updateState(PublicGameState newState, PlayerState ownState) {
-
+        runLater(() -> graphicalPlayer.setState(newState, ownState));
     }
 
+    /**
+     * chooseInitialTickets method being overridden from Player
+     * @return SortedBag of Player Tickets
+     */
     @Override
     public SortedBag<Ticket> chooseInitialTickets() {
-        return null;
+        return blockinQ(sortedBagsTickets);
     }
 
+    /**
+     * nextTurn method being overridden from Player
+     * @return the next Turn kind?
+     */
     @Override
-    public TurnKind nextTurn() {
-        return null;
+    public TurnKind nextTurn(){
+        runLater(() -> graphicalPlayer.startTurn(
+                () -> turnKinds.add(TurnKind.DRAW_TICKETS),
+                (index) -> {
+                                            turnKinds.add(TurnKind.DRAW_CARDS);
+                                            blockinQ(drawCardIndex);
+                                            },
+                (route, cardDeck) -> {
+                                            turnKinds.add(TurnKind.CLAIM_ROUTE);
+                                            blockinQ(routes);
+                                            blockinQ(sortedBagsCards);
+                })
+        );
+        return blockinQ(turnKinds);
     }
 
+    /**
+     * chooseTickets method being overridden from Player
+     * @param ts
+     * @return A sortedBag of the chosen Tickets
+     */
     @Override
-    public SortedBag<Ticket> chooseTickets(SortedBag<Ticket> options) {
-        runLater(() -> graphicalPlayer.chooseTickets(ts, ???));
-        return options; //TODO is this correct?
+    public SortedBag<Ticket> chooseTickets(SortedBag<Ticket> ts) {
+        setInitialTicketChoice(ts);
+        return chooseInitialTickets();
     }
 
+    /**
+     * drawSlot method being overridden from Player
+     * @return deckSlot
+     */
     @Override
     public int drawSlot() {
-        return 0;
+        return blockinQ(deckSlot);
     }
 
+    /**
+     * claimedRoute method being overridden from Player
+     * @return The route claimed by player
+     */
     @Override
     public Route claimedRoute() {
-        return null;
+        return
     }
 
+    /**
+     * initialClaimCards method being overridden from Player
+     * @return the cards claimed at the beginning
+     */
     @Override
     public SortedBag<Card> initialClaimCards() {
-        return null;
+        runLater(() -> graphicalPlayer.chooseClaimCards(
+                () ->
+                ,() -> ));
+        return blockinQ(sortedBagsCards);
     }
 
+    /**
+     * chooseAdditionalCards method being overridden from Player
+     * @param options
+     *          list of options the player can choose from to finalise claim
+     * @return a sortedbag of the chosen cards
+     */
     @Override
     public SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options) {
-        return null;
+        runLater(() -> graphicalPlayer.chooseAdditionalCards(options,
+                (cardSortedBag) -> {
+                    sortedBagsCards.add(SortedBag.of(Card.ALL));
+                    blockinQ(sortedBagsCards);
+                }));
+        return blockinQ(sortedBagsCards);
+    }
+
+    private <T> T blockinQ(ArrayBlockingQueue<T> blockingQueue){
+        try {
+            return blockingQueue.take();
+        } catch (InterruptedException e) {
+            throw new IllegalArgumentException();
+        }
     }
 }
