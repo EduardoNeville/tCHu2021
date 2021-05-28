@@ -151,12 +151,11 @@ public class GraphicalPlayer {
         Preconditions.checkArgument(tickets.size() == 3 || tickets.size() == 5);
 
         ListView<Ticket> listView = new ListView<>(FXCollections.observableList(tickets.toList()));
-        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         ObservableList<Ticket> selectedItems = listView.getSelectionModel().getSelectedItems();
-        Button confirmButton = new Button("Choisir");
-        confirmButton.disableProperty().bind(
-                Bindings.size(selectedItems).
-                        lessThanOrEqualTo(selectedItems.size() - 2));
+        Button confirmButton = new Button();
+        confirmButton.disableProperty().bind(Bindings.lessThan(Bindings.size(selectedItems),tickets.size() -2));
+              //  Bindings.size(selectedItems).
+                //        lessThanOrEqualTo(selectedItems.size() - 2));
 
         Stage selectionWindow = choiceWindow(StringsFr.TICKETS_CHOICE,
                 listView, confirmButton);
@@ -177,6 +176,10 @@ public class GraphicalPlayer {
      */
     public void drawCard(DrawCardHandler drawCardHandler) {
         assert isFxApplicationThread();
+        drawCardH.set( (slot) -> {
+            emptyHandlers();
+            drawCardHandler.onDrawCard(slot);
+        });
     }
 
     /**
@@ -194,7 +197,7 @@ public class GraphicalPlayer {
 
         ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(cardOptions));
         ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
-        Button confirmButton = new Button("Choisir");
+        Button confirmButton = new Button();
         confirmButton.disableProperty().bind(
                 Bindings.size(selectedItems).isNotEqualTo(1));
 
@@ -223,7 +226,7 @@ public class GraphicalPlayer {
 
         ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(cardOptions));
         ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
-        Button confirmButton = new Button("Choisir");
+        Button confirmButton = new Button();
 
 
         Stage selectionWindow = choiceWindow(StringsFr.CHOOSE_ADDITIONAL_CARDS,
@@ -239,8 +242,8 @@ public class GraphicalPlayer {
     }
 
     private <T> Stage choiceWindow(String string,
-                                       ListView<T> listView,
-                                       Button button) {
+                                   ListView<T> listView,
+                                   Button button) {
         Stage choiceWindow = new Stage(StageStyle.UTILITY);
         choiceWindow.initOwner(primaryStage);
         choiceWindow.initModality(Modality.WINDOW_MODAL);
@@ -270,7 +273,7 @@ public class GraphicalPlayer {
 
         @Override
         public String toString(SortedBag<Card> cards) {
-            return null; //TODO : do this
+            return null;
         }
 
         @Override
