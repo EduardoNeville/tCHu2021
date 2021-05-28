@@ -20,7 +20,8 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- *                A tchu application which runs a tchu game. Serves as a server and runs a player interface for the local player.
+ * A tchu application which connects to a remote tchu game.
+ * Connect to the server and runs a player interface for the local player.
  *
  * @author Martin Sanchez Lopez (313238)
  */
@@ -35,8 +36,8 @@ public final class ClientMain extends Application {
     }
 
     /**
-     *          S    tarts the application. Creates a server, waits for a connection and then
-     *                  initializes a tchu game with two players, a local one and the one connected to this server via a proxy.
+     * Starts the application. Tries to connect to the server and then
+     * initializes the gui for the local player.
      *
      * @throws Exception
      */
@@ -55,11 +56,8 @@ public final class ClientMain extends Application {
             port = Integer.parseInt(args.get(1));
         }
 
-        System.out.println(hostname + " " + port);
-
         GraphicalPlayerAdapter localPlayer = new GraphicalPlayerAdapter();
         RemotePlayerClient client = new RemotePlayerClient(localPlayer, hostname, port);
-        System.out.println("connceted");
 
         new Thread((client::run)).start();
     }
