@@ -63,6 +63,7 @@ class DecksViewCreator {
 
             ReadOnlyIntegerProperty count = observableGameState.getPlayerCardsCount(cardInLoop);
             card.visibleProperty().bind(Bindings.greaterThan(count, 0));
+            counter.visibleProperty().bind(Bindings.greaterThan(count, 1));
 
             //TODO verify that asString works if not use
             //Bindings.convert(observableGameState.getPlayerCardsCount(cardInLoop));
@@ -84,7 +85,7 @@ class DecksViewCreator {
      * @param observableGameState the state of the game for the player being observed
      * @param drawTicketsHandlerObjectProperty Object Property that handles the tickets drawn by player
      * @param drawCardHandlerObjectProperty Object Property that handles the cards drawn by player
-     * @return creates the
+     * @return creates the bottom cards view
      */
     public static VBox createCardsView(ObservableGameState observableGameState,
                                        ObjectProperty<ActionHandler.DrawTicketsHandler> drawTicketsHandlerObjectProperty,
@@ -131,7 +132,7 @@ class DecksViewCreator {
         Rectangle gaugeForeground = new Rectangle(50,5);
         gaugeForeground.getStyleClass().add("foreground");
         Rectangle gaugeBackground = new Rectangle(50,5);
-        gaugeForeground.getStyleClass().add("background");
+        gaugeBackground.getStyleClass().add("background");
 
         gaugeForeground.widthProperty().bind(percentage.multiply(50).divide(100));
 
