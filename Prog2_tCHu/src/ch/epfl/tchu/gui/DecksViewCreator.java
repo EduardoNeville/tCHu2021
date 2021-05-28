@@ -63,6 +63,7 @@ class DecksViewCreator {
 
             ReadOnlyIntegerProperty count = observableGameState.getPlayerCardsCount(cardInLoop);
             card.visibleProperty().bind(Bindings.greaterThan(count, 0));
+            counter.visibleProperty().bind(Bindings.greaterThan(count, 1));
 
             counter.textProperty().bind(observableGameState.getPlayerCardsCount(cardInLoop).asString());
             innerBox.getChildren().add(card);
