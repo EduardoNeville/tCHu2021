@@ -12,8 +12,6 @@ import javafx.scene.control.Button;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.*;
 
-import java.util.List;
-
 /**
  * Private class DecksViewCreator
  *
@@ -46,6 +44,11 @@ class DecksViewCreator {
         return cardPane;
     }
 
+    /**
+     * createHandView explained in @return
+     * @param observableGameState the game state of the observed player
+     * @return creates the HBox that represents the Cards and Tickets the observed player has
+     */
     public static HBox createHandView(ObservableGameState observableGameState){
 
         HBox innerBox = new HBox();
@@ -76,14 +79,22 @@ class DecksViewCreator {
         return theBigBox;
     }
 
+    /**
+     * createCardsView
+     * @param observableGameState the state of the game for the player being observed
+     * @param drawTicketsHandlerObjectProperty Object Property that handles the tickets drawn by player
+     * @param drawCardHandlerObjectProperty Object Property that handles the cards drawn by player
+     * @return creates the
+     */
     public static VBox createCardsView(ObservableGameState observableGameState,
-                                        ObjectProperty<ActionHandler.DrawTicketsHandler> drawTicketsHandlerObjectProperty,
-                                        ObjectProperty<ActionHandler.DrawCardHandler> drawCardHandlerObjectProperty){
+                                       ObjectProperty<ActionHandler.DrawTicketsHandler> drawTicketsHandlerObjectProperty,
+                                       ObjectProperty<ActionHandler.DrawCardHandler> drawCardHandlerObjectProperty){
         VBox faceUpCardVBox = new VBox();
 
         Button ticketsButton = sideButton(StringsFr.TICKETS,observableGameState.ticketAmountProperty());
         ticketsButton.getStyleClass().add("gauged");
         faceUpCardVBox.getChildren().add(ticketsButton);
+        ticketsButton.disableProperty().bind(drawTicketsHandlerObjectProperty.isNull());
         ticketsButton.setOnMouseClicked(e -> drawTicketsHandlerObjectProperty.get().onDrawTickets());
 
         //face up cards
@@ -97,14 +108,17 @@ class DecksViewCreator {
                     card.getStyleClass().set(0,"NEUTRAL");
                 }
             });
+            card.disableProperty().bind(drawCardHandlerObjectProperty.isNull());
             card.setOnMouseClicked(e -> drawCardHandlerObjectProperty.get().onDrawCard(i));
+
             faceUpCardVBox.getChildren().add(card);
         }
 
-
         Button cardButton = sideButton(StringsFr.CARDS,observableGameState.cardAmountProperty());
         cardButton.getStyleClass().add("gauged");
-        cardButton.setOnMouseClicked(e -> drawCardHandlerObjectProperty.get().onDrawCard(Constants.DECK_SLOT));
+        cardButton.disableProperty().bind(drawCardHandlerObjectProperty.isNull());
+        cardButton.setOnMouseClicked(e ->
+        drawCardHandlerObjectProperty.get().onDrawCard(Constants.DECK_SLOT));
         faceUpCardVBox.getChildren().add(cardButton);
 
         faceUpCardVBox.getStylesheets().addAll("decks.css", "colors.css");
