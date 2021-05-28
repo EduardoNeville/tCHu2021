@@ -122,7 +122,7 @@ class SerdesTest {
                 PLAYER_2, new PublicPlayerState(20, 21, List.of()));
         PublicGameState gs =
                 new PublicGameState(40, cs, PLAYER_2, ps, null);
-        Serde<PublicGameState> s = Serdes.PUBLIC_GAME_STATE_SERDE;
+        Serde<PublicGameState> s = Serdes.PUBLIC_GAME_STATE_SERDES;
         assertEquals("40:6,7,2,0,6;30;31:1:10;11;0,1:20;21;:", s.serialize(gs));
 //        assertEquals(gs, s.deserialize(s.serialize(gs)));
         assertEquals(gs.currentPlayerState().carCount(),

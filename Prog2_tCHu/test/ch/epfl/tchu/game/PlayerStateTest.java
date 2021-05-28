@@ -98,7 +98,7 @@ class PlayerStateTest {
         var playerState = new PlayerState(SortedBag.of(), SortedBag.of(), List.of());
         for (int i = 0; i < cards.size(); i += 1) {
             var cardToAdd = cards.get(i);
-            playerState = playerState.withAddedCard(cardToAdd);
+            playerState = playerState.withAddedCards(SortedBag.of(cardToAdd));
             assertEquals(SortedBag.of(cards.subList(0, i + 1)), playerState.cards());
         }
     }

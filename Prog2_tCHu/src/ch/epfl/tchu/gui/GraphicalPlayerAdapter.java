@@ -1,12 +1,12 @@
 package ch.epfl.tchu.gui;
 
+import ch.epfl.tchu.Preconditions;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 import static javafx.application.Platform.runLater;
 
@@ -20,8 +20,9 @@ public class GraphicalPlayerAdapter implements Player{
 
     private GraphicalPlayer graphicalPlayer;
 
-    private final ArrayBlockingQueue<SortedBag<Ticket>> sortedBagsTickets = new ArrayBlockingQueue<>(1);
-    private final ArrayBlockingQueue<SortedBag<Card>> sortedBagsCards = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<List<SortedBag<Card>>> sortedBagListCards = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<SortedBag<Ticket>> sortedBagTickets = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<SortedBag<Card>> sortedBagCards = new ArrayBlockingQueue<>(1);
     private final ArrayBlockingQueue<TurnKind> turnKinds = new ArrayBlockingQueue<>(1);
     private final ArrayBlockingQueue<Integer> drawCardIndex = new ArrayBlockingQueue<>(1);
     private final ArrayBlockingQueue<Route> routes = new ArrayBlockingQueue<>(1);
@@ -50,10 +51,10 @@ public class GraphicalPlayerAdapter implements Player{
      */
     @Override
     public void setInitialTicketChoice(SortedBag<Ticket> tickets) {
+        Preconditions.checkArgument(sortedBagTickets.isEmpty());
         runLater(() -> graphicalPlayer.
                     chooseTickets(tickets,
-                            (ticketChoice) -> blockinQ(sortedBagsTickets)));
-                                            //TODO check if its correct!
+                            (ticketChoice) -> sortedBagTickets.add(ticketChoice)));
     }
 
     /**
@@ -82,7 +83,8 @@ public class GraphicalPlayerAdapter implements Player{
      */
     @Override
     public SortedBag<Ticket> chooseInitialTickets() {
-        return blockinQ(sortedBagsTickets);
+        Preconditions.checkArgument(sortedBagTickets.isEmpty());
+        return blockingQ(sortedBagTickets);
     }
 
     /**
@@ -91,19 +93,22 @@ public class GraphicalPlayerAdapter implements Player{
      */
     @Override
     public TurnKind nextTurn(){
+        Preconditions.checkArgument(turnKinds.isEmpty());
         runLater(() -> graphicalPlayer.startTurn(
                 () -> turnKinds.add(TurnKind.DRAW_TICKETS),
                 (index) -> {
                                             turnKinds.add(TurnKind.DRAW_CARDS);
-                                            blockinQ(drawCardIndex);
+                                            drawCardIndex.add(index);
                                             },
-                (route, cardDeck) -> {
+                (route, bag) -> {
                                             turnKinds.add(TurnKind.CLAIM_ROUTE);
-                                            blockinQ(routes);
-                                            blockinQ(sortedBagsCards);
+                                            Preconditions.checkArgument(routes.isEmpty()
+                                                    && sortedBagCards.isEmpty());
+                                            routes.add(route);
+                                            sortedBagCards.add(bag);
                 })
         );
-        return blockinQ(turnKinds);
+        return blockingQ(turnKinds);
     }
 
     /**
@@ -123,7 +128,8 @@ public class GraphicalPlayerAdapter implements Player{
      */
     @Override
     public int drawSlot() {
-        return blockinQ(deckSlot);
+        Preconditions.checkArgument(deckSlot.isEmpty());
+        return blockingQ(deckSlot);
     }
 
     /**
@@ -132,7 +138,7 @@ public class GraphicalPlayerAdapter implements Player{
      */
     @Override
     public Route claimedRoute() {
-        return
+        return blockingQ(routes);
     }
 
     /**
@@ -141,10 +147,7 @@ public class GraphicalPlayerAdapter implements Player{
      */
     @Override
     public SortedBag<Card> initialClaimCards() {
-        runLater(() -> graphicalPlayer.chooseClaimCards(
-                () ->
-                ,() -> ));
-        return blockinQ(sortedBagsCards);
+        return blockingQ(sortedBagCards);
     }
 
     /**
@@ -157,17 +160,17 @@ public class GraphicalPlayerAdapter implements Player{
     public SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options) {
         runLater(() -> graphicalPlayer.chooseAdditionalCards(options,
                 (cardSortedBag) -> {
-                    sortedBagsCards.add(SortedBag.of(Card.ALL));
-                    blockinQ(sortedBagsCards);
+                    sortedBagCards.add(SortedBag.of(Card.ALL));
+                    blockingQ(sortedBagCards);
                 }));
-        return blockinQ(sortedBagsCards);
+        return blockingQ(sortedBagCards);
     }
 
-    private <T> T blockinQ(ArrayBlockingQueue<T> blockingQueue){
+    private <T> T blockingQ(ArrayBlockingQueue<T> blockingQueue){
         try {
             return blockingQueue.take();
         } catch (InterruptedException e) {
-            throw new IllegalArgumentException();
+            throw new Error();
         }
     }
 }

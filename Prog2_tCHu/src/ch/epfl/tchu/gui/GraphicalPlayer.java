@@ -59,19 +59,12 @@ public class GraphicalPlayer {
         primaryStage.setTitle("tCHu — " + names.get(playerId));
         primaryStage.setScene(new Scene(new BorderPane()));
 
-//        ObjectProperty<ClaimRouteHandler> claimRoute =
-//                new SimpleObjectProperty<>(Stage9Test::claimRoute);
-//        ObjectProperty<DrawTicketsHandler> drawTickets =
-//                new SimpleObjectProperty<>(this::drawTickets);
-//        ObjectProperty<DrawCardHandler> drawCard =
-//                new SimpleObjectProperty<>(this::drawCard);
-
         Node mapView = MapViewCreator
                 .createMapView(oGameState, claimRouteH, ((options, handler) -> chooseClaimCards(options, handler)));
-//        Node cardsView = DecksViewCreator
-//                .createCardsView(gameState, drawTickets, drawCard);
-//        Node handView = DecksViewCreator
-//                .createHandView(gameState);
+        Node cardsView = DecksViewCreator
+                .createCardsView(oGameState, drawTicketH, drawCardH);
+        Node handView = DecksViewCreator
+                .createHandView(oGameState);
 
         Map<PlayerId, String> playerNames =
                 Map.of(PLAYER_1, "Ada", PLAYER_2, "Charles");
@@ -83,7 +76,7 @@ public class GraphicalPlayer {
 
 
         BorderPane mainPane =
-                new BorderPane(mapView, null, null, null, infoView);
+                new BorderPane(mapView, null, cardsView, handView, infoView);
 
 //        BorderPane mainPane =
 //                new BorderPane(mapView, null, null, null, null);

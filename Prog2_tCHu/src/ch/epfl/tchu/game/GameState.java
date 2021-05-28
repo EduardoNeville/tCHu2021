@@ -228,7 +228,8 @@ public final class GameState extends PublicGameState {
      */
     public GameState withDrawnFaceUpCard(int slot) {
         var playerstatecopy = new HashMap<>(playerState);
-        playerstatecopy.put(currentPlayerId(), playerState(currentPlayerId()).withAddedCard(privateCardState.faceUpCard(slot)));
+        playerstatecopy.put(currentPlayerId(), playerState(currentPlayerId())
+                .withAddedCards(SortedBag.of(privateCardState.faceUpCard(slot))));
 
         return new GameState(playerstatecopy, lastPlayer(), tickets,
                 privateCardState.withDrawnFaceUpCard(slot),
@@ -244,7 +245,7 @@ public final class GameState extends PublicGameState {
     public GameState withBlindlyDrawnCard() {
 
         Map<PlayerId, PlayerState> drawnCards = new TreeMap<>(playerState);
-        drawnCards.put(currentPlayerId(), currentPlayerState().withAddedCard(topCard()));
+        drawnCards.put(currentPlayerId(), currentPlayerState().withAddedCards(SortedBag.of(topCard())));
 
         return new GameState(drawnCards, lastPlayer(), tickets, privateCardState.withoutTopDeckCard(), currentPlayerId());
     }
