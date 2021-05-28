@@ -149,7 +149,7 @@ public class GraphicalPlayer {
         assert isFxApplicationThread();
         Preconditions.checkArgument(tickets.size() == 3 || tickets.size() == 5);
 
-        ListView listView = new ListView();
+        ListView listView = new ListView(FXCollections.observableList(tickets.toList()));
         ObservableList selectedItems = listView.getSelectionModel().getSelectedItems();
         Button confirmButton = new Button();
         confirmButton.disableProperty().bind(
