@@ -48,6 +48,7 @@ public final class Game {
         //tells players who plays first
         receiveInfo(players, pInfo.get(currentPlayerId).willPlayFirst());
 
+
         //tells players initial given tickets
         for (Player p : players.values()) {
             p.setInitialTicketChoice(gameState.topTickets(INITIAL_TICKETS_COUNT));

@@ -6,9 +6,12 @@ import ch.epfl.tchu.game.*;
 
 import static ch.epfl.tchu.gui.ActionHandler.*;
 
+import ch.epfl.tchu.net.ChatMessage;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -44,9 +47,12 @@ public class GraphicalPlayer {
 
     private final ObservableGameState oGameState;
     private final ObservableList<Text> infoList = FXCollections.observableArrayList();
+    private final ObservableList<ChatMessage> chatList = FXCollections.observableArrayList();
+    private final StringProperty chatMessage = new SimpleStringProperty(null);
     private final ObjectProperty<DrawTicketsHandler> drawTicketH = new SimpleObjectProperty<>();
     private final ObjectProperty<DrawCardHandler> drawCardH = new SimpleObjectProperty<>();
     private final ObjectProperty<ClaimRouteHandler> claimRouteH = new SimpleObjectProperty<>();
+    private final ObjectProperty<ChatHandler> chatHandlerH = new SimpleObjectProperty<>();
 
 
     /**
@@ -55,8 +61,10 @@ public class GraphicalPlayer {
      * @param playerId this instance's player
      * @param names the player names
      */
-    public GraphicalPlayer(PlayerId playerId, Map<PlayerId, String> names) {
+    public GraphicalPlayer(PlayerId playerId, Map<PlayerId, String> names, ChatHandler chatHandler) {
         oGameState = new ObservableGameState(playerId);
+        chatHandlerH.set(chatHandler);
+
 
         this.primaryStage = new Stage();
         primaryStage.setTitle("tCHu — " + names.get(playerId));
@@ -70,7 +78,7 @@ public class GraphicalPlayer {
                 .createHandView(oGameState);
 
         Node infoView = InfoViewCreator
-                .createInfoView(playerId, names, oGameState, infoList);
+                .createInfoView(playerId, names, oGameState, infoList, chatList, chatMessage, chatHandlerH); //TODO : give message property and chat list
 
 
         BorderPane mainPane =
@@ -271,6 +279,17 @@ public class GraphicalPlayer {
 
         choiceWindow.setScene(chooserScene);
         return choiceWindow;
+    }
+
+//    public void sendMessage(ChatHandler chatHandler){
+//        Preconditions.checkArgument(chatMessage != null);
+//        chatHandler.onSend(chatMessage.get());
+////        chatMessage.set(null);
+//    }
+
+    public void receiveMessage(ChatMessage message){
+        //TODO: set the message id or something for color
+        chatList.add(message);
     }
 
     /**

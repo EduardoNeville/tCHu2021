@@ -6,9 +6,11 @@ import ch.epfl.tchu.game.*;
 //TODO
 //TODO
 
+import ch.epfl.tchu.net.ChatMessage;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.*;
@@ -48,15 +50,23 @@ public final class Stage9Test extends Application {
         ObservableList<Text> infos = FXCollections.observableArrayList(
                 new Text("Première information.\n"),
                 new Text("\nSeconde information.\n"));
+        ObservableList<ChatMessage> chat = FXCollections.observableArrayList();
+        ChatHandler chatHandler = (m) -> System.out.println(m);
         Node infoView = InfoViewCreator
-                .createInfoView(PLAYER_1, playerNames, gameState, infos);
+                .createInfoView(PLAYER_1,
+                        playerNames,
+                        gameState,
+                        infos,
+                        chat,
+                        new SimpleStringProperty("test"),
+                        new SimpleObjectProperty<>(chatHandler));
 
 
 //        BorderPane mainPane =
 //                new BorderPane(mapView, null, null, null, infoView);
 
         BorderPane mainPane =
-                new BorderPane(mapView, null, cardsView, handView, null);
+                new BorderPane(mapView, null, cardsView, handView, infoView);
 //        BorderPane mainPane =
 //                new BorderPane(mapView, null, null, null, null);
 

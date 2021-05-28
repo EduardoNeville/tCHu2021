@@ -5,13 +5,19 @@
     -fx-padding: 10;
 }
 
-#player-stats Circle {
+Circle {
     -fx-stroke: dimgrey;
     -fx-stroke-width: 1;
 }
 
+#chat-element {
+    -fx-padding: 5;
+}
+
+
 #game-info {
     -fx-padding: 10;
     -fx-pref-width: 220;
+    -fx-max-width: 220;
     -fx-line-spacing: 3;
 }

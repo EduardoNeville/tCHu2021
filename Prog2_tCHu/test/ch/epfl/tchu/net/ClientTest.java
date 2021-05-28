@@ -2,6 +2,7 @@ package ch.epfl.tchu.net;
 
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
+import ch.epfl.tchu.gui.ActionHandler;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -88,6 +89,7 @@ public class ClientTest {
         public SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options) {
             return options.get(0);
         }
+
 
         // … autres méthodes de Player
     }

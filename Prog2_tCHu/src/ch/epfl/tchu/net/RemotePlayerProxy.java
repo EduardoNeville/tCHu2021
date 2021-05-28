@@ -2,6 +2,7 @@ package ch.epfl.tchu.net;
 
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
+import ch.epfl.tchu.gui.ActionHandler;
 
 import static ch.epfl.tchu.net.Serdes.*;
 import static ch.epfl.tchu.net.MessageId.*;
@@ -17,7 +18,7 @@ import java.util.Map;
  *
  * @author Eduardo Neville (314677)
  */
-public class RemotePlayerProxy implements Player {
+public class RemotePlayerProxy implements Player, ChatUser {
     BufferedReader reader;
     BufferedWriter writer;
 
@@ -182,4 +183,16 @@ public class RemotePlayerProxy implements Player {
         sendMessage(CHOOSE_ADDITIONAL_CARDS.name(), LIST_SORTED_BAG_CARD_SERDE.serialize(options));
         return SORTED_BAG_CARD_SERDE.deserialize(receiveMessage());
     }
+
+
+    @Override
+    public void receiveChatMessage(ChatMessage message) {
+
+    }
+
+    @Override
+    public void receiveChatMessageHandler(ActionHandler.ChatHandler chatHandler) {
+
+    }
+
 }

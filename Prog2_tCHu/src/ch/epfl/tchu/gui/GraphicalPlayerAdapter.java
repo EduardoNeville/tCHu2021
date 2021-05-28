@@ -2,6 +2,7 @@ package ch.epfl.tchu.gui;
 
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
+import ch.epfl.tchu.net.ChatMessage;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,7 @@ import static javafx.application.Platform.runLater;
  * @author Eduardo Neville (314677)
  */
 
-public class GraphicalPlayerAdapter implements Player{
+public class GraphicalPlayerAdapter implements Player, ChatUser{
 
     private GraphicalPlayer graphicalPlayer;
 
@@ -24,6 +25,8 @@ public class GraphicalPlayerAdapter implements Player{
     private final ArrayBlockingQueue<TurnKind> turnKinds = new ArrayBlockingQueue<>(1);
     private final ArrayBlockingQueue<Route> routes = new ArrayBlockingQueue<>(1);
     private final ArrayBlockingQueue<Integer> deckSlot = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<String> messagesOutgoing = new ArrayBlockingQueue<>(1);
+    private ActionHandler.ChatHandler chatHandler;
 
     /**
      * initPlayers method being overridden from Player
@@ -33,7 +36,8 @@ public class GraphicalPlayerAdapter implements Player{
      */
     @Override
     public void initPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        runLater(() -> graphicalPlayer = new GraphicalPlayer(ownId, playerNames));
+//        this.chatHandler = e -> sendChatMessage();
+        runLater(() -> graphicalPlayer = new GraphicalPlayer(ownId, playerNames, chatHandler));
     }
 
     /**
@@ -148,6 +152,17 @@ public class GraphicalPlayerAdapter implements Player{
                 sortedBagsCards::add));
         return blockingQ(sortedBagsCards);
     }
+
+    @Override
+    public void receiveChatMessage(ChatMessage message) {
+        runLater( () -> graphicalPlayer.receiveMessage(message));
+    }
+
+    @Override
+    public void receiveChatMessageHandler(ActionHandler.ChatHandler chatHandler) {
+        this.chatHandler = chatHandler;
+    }
+
 
     private <T> T blockingQ(ArrayBlockingQueue<T> blockingQueue){
         try {

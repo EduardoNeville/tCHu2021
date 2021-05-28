@@ -2,6 +2,7 @@ package ch.epfl.tchu.gui;
 
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
+import ch.epfl.tchu.net.ChatMessage;
 
 /**
  * Interface that has different functional interfaces intended as handlers for various game actions.
@@ -43,6 +44,11 @@ public interface ActionHandler {
      */
     interface ChooseCardsHandler{
         void onChooseCards(SortedBag<Card> cards);
+    }
+
+
+    interface ChatHandler{
+        void onSend(ChatMessage message);
     }
 
 

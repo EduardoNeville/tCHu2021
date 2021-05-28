@@ -19,11 +19,22 @@ public final class Stage11Test extends Application {
         SortedBag<Ticket> tickets = SortedBag.of(ChMap.tickets());
         Map<PlayerId, String> names =
                 Map.of(PLAYER_1, "Ada", PLAYER_2, "Charles");
-        Map<PlayerId, Player> players =
-                Map.of(PLAYER_1, new GraphicalPlayerAdapter(),
-                        PLAYER_2, new GraphicalPlayerAdapter());
+
+        GraphicalPlayerAdapter p1 = new GraphicalPlayerAdapter();
+        GraphicalPlayerAdapter p2 = new GraphicalPlayerAdapter();
         Random rng = new Random();
-        new Thread(() -> Game.play(players, names, tickets, rng))
+
+        new Thread(() -> {
+            try {
+                Chat.run(Map.of(PLAYER_1, p1,
+                        PLAYER_2, p2), names);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        new Thread(() -> Game.play(Map.of(PLAYER_1, p1,
+                PLAYER_2, p2), names, tickets, rng))
                 .start();
     }
 }

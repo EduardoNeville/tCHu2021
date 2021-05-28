@@ -1,12 +1,22 @@
 package ch.epfl.tchu.gui;
 
 import ch.epfl.tchu.game.PlayerId;
+import ch.epfl.tchu.net.ChatMessage;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Sphere;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
@@ -49,11 +59,13 @@ public final class InfoViewCreator {
      * @param infoList observable list of information
      * @return Node with the information that can be viewed
      */
-
     public static Node createInfoView(PlayerId idOfUser,
                                       Map<PlayerId, String> playerNames,
                                       ObservableGameState oGameState,
-                                      ObservableList<Text> infoList){
+                                      ObservableList<Text> infoList,
+                                      ObservableList<ChatMessage> chatList,
+                                      StringProperty outGoingMessages,
+                                      ObjectProperty<ActionHandler.ChatHandler> chatHandler){
 
 
         VBox topNode = new VBox();
@@ -67,13 +79,55 @@ public final class InfoViewCreator {
         playerStats.getChildren().add(
                 playerStats(otherId, playerNames.get(otherId), oGameState));
 
-
         TextFlow messages = new TextFlow();
         messages.setId("game-info");
+        messages.setMaxWidth(170);
         Bindings.bindContent(messages.getChildren(), infoList);
 
-        topNode.getChildren().addAll(playerStats, new Separator(), messages);
+        TextFlow chat = new TextFlow();
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setLayoutY(10);
+        scrollPane.setPrefWidth(170);
+        scrollPane.setPrefHeight(150);
+        scrollPane.setContent(chat);
+        chat.setMaxWidth(40d);
+        chat.getStyleClass().add("colors.css");
+        chatList.addListener(new ListChangeListener<>() {
+            @Override
+            public void onChanged(Change<? extends ChatMessage> change) {
+                if (change.next()){
+                    Circle circle = new Circle(5);
+                    circle.getStyleClass().addAll("filled");
 
+                    ChatMessage msg = chatList.get(chatList.size()-1); //latest message
+
+                    //Pane with the message text and colored circle
+                    TextFlow textFlow = new TextFlow(circle, new Text(" " + msg.toString()));
+                    textFlow.setMaxWidth(170);
+                    textFlow.setId("chat-element");
+                    textFlow.getStyleClass().addAll(msg.senderId().name(), "info.css");
+
+                    chat.getChildren().addAll(textFlow);
+
+                    scrollPane.layout(); //to refresh v max
+                    scrollPane.setVvalue(scrollPane.getVmax()); //scroll to bottom
+                }
+            }
+        });
+
+        TextField textField = new TextField();
+        messages.setId("chat-input");
+        outGoingMessages.bind(textField.textProperty());
+        textField.setOnAction(e -> {
+            chatHandler.get().onSend(new ChatMessage(textField.getText(), idOfUser));
+            textField.setText(null);
+        });
+
+
+
+
+        topNode.getChildren().addAll(playerStats, new Separator(), messages,new Separator(), scrollPane, textField);
         return topNode;
     }
+
 }

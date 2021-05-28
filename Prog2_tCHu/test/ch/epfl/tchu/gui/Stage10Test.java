@@ -61,7 +61,9 @@ public class Stage10Test extends Application {
     public void start(Stage primaryStage) {
         Map<PlayerId, String> playerNames =
                 Map.of(PLAYER_1, "Ada", PLAYER_2, "Charles");
-        GraphicalPlayer p = new GraphicalPlayer(PLAYER_1, playerNames);
+
+        ChatHandler chatHandler = System.out::println;
+        GraphicalPlayer p = new GraphicalPlayer(PLAYER_1, playerNames, chatHandler);
         setState(p);
 
         DrawTicketsHandler drawTicketsH =
