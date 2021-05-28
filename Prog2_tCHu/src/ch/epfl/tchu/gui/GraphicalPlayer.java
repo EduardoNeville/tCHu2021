@@ -151,6 +151,7 @@ public class GraphicalPlayer {
         Preconditions.checkArgument(tickets.size() == 3 || tickets.size() == 5);
 
         ListView<Ticket> listView = new ListView<>(FXCollections.observableList(tickets.toList()));
+        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         ObservableList<Ticket> selectedItems = listView.getSelectionModel().getSelectedItems();
         Button confirmButton = new Button("Choisir");
         confirmButton.disableProperty().bind(
@@ -269,7 +270,7 @@ public class GraphicalPlayer {
 
         @Override
         public String toString(SortedBag<Card> cards) {
-            return null;
+            return null; //TODO : do this
         }
 
         @Override
