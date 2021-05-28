@@ -1,5 +1,6 @@
 package ch.epfl.tchu.gui;
 
+import ch.epfl.tchu.Preconditions;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
 
@@ -19,12 +20,19 @@ public class GraphicalPlayerAdapter implements Player{
 
     private GraphicalPlayer graphicalPlayer;
 
-    private final ArrayBlockingQueue<SortedBag<Ticket>> sortedBagsTickets = new ArrayBlockingQueue<>(1);
-    private final ArrayBlockingQueue<SortedBag<Card>> sortedBagsCards = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<List<SortedBag<Card>>> sortedBagListCards = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<SortedBag<Ticket>> sortedBagTickets = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<SortedBag<Card>> sortedBagCards = new ArrayBlockingQueue<>(1);
     private final ArrayBlockingQueue<TurnKind> turnKinds = new ArrayBlockingQueue<>(1);
     private final ArrayBlockingQueue<Integer> drawCardIndex = new ArrayBlockingQueue<>(1);
     private final ArrayBlockingQueue<Route> routes = new ArrayBlockingQueue<>(1);
     private final ArrayBlockingQueue<Integer> deckSlot = new ArrayBlockingQueue<>(1);
+
+    public GraphicalPlayerAdapter(){
+
+    }
+
+    //TODO check for correctness on this one \|/
 
     /**
      * initPlayers method being overridden from Player
@@ -44,7 +52,8 @@ public class GraphicalPlayerAdapter implements Player{
     @Override
     public void setInitialTicketChoice(SortedBag<Ticket> tickets) {
         runLater(() -> graphicalPlayer.
-                    chooseTickets(tickets,sortedBagsTickets::add));
+                    chooseTickets(tickets,
+                            (ticketChoice) -> sortedBagTickets.add(ticketChoice)));
     }
 
     /**
@@ -73,7 +82,7 @@ public class GraphicalPlayerAdapter implements Player{
      */
     @Override
     public SortedBag<Ticket> chooseInitialTickets() {
-        return blockingQ(sortedBagsTickets);
+        return blockingQ(sortedBagTickets);
     }
 
     /**
@@ -85,27 +94,29 @@ public class GraphicalPlayerAdapter implements Player{
         runLater(() -> graphicalPlayer.startTurn(
                 () -> turnKinds.add(TurnKind.DRAW_TICKETS),
                 (index) -> {
-                    turnKinds.add(TurnKind.DRAW_CARDS);
-                    deckSlot.add(index);
-                    },
-                (route, cardDeck) ->{
+                                            turnKinds.add(TurnKind.DRAW_CARDS);
+                                            drawCardIndex.add(index);
+                                            },
+                (route, bag) -> {
                                             turnKinds.add(TurnKind.CLAIM_ROUTE);
+                                            Preconditions.checkArgument(routes.isEmpty()
+                                                    && sortedBagCards.isEmpty());
                                             routes.add(route);
-                                            sortedBagsCards.add(cardDeck);}
-        ));
+                                            sortedBagCards.add(bag);
+                })
+        );
         return blockingQ(turnKinds);
     }
 
     /**
      * chooseTickets method being overridden from Player
-     * @param ts tickets the player chooses
+     * @param ts
      * @return A sortedBag of the chosen Tickets
      */
     @Override
     public SortedBag<Ticket> chooseTickets(SortedBag<Ticket> ts) {
-        runLater(() -> graphicalPlayer.chooseTickets(ts,
-                sortedBagsTickets::add));
-        return blockingQ(sortedBagsTickets);
+        setInitialTicketChoice(ts);
+        return chooseInitialTickets();
     }
 
     /**
@@ -114,10 +125,6 @@ public class GraphicalPlayerAdapter implements Player{
      */
     @Override
     public int drawSlot() {
-        if (deckSlot.isEmpty()){
-            runLater(() -> graphicalPlayer.drawCard(
-                    deckSlot::add));
-        }
         return blockingQ(deckSlot);
     }
 
@@ -127,7 +134,7 @@ public class GraphicalPlayerAdapter implements Player{
      */
     @Override
     public Route claimedRoute() {
-        return routes.remove();
+        return blockingQ(routes);
     }
 
     /**
@@ -136,7 +143,7 @@ public class GraphicalPlayerAdapter implements Player{
      */
     @Override
     public SortedBag<Card> initialClaimCards() {
-        return sortedBagsCards.remove();
+        return blockingQ(sortedBagCards);
     }
 
     /**
@@ -148,17 +155,18 @@ public class GraphicalPlayerAdapter implements Player{
     @Override
     public SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options) {
         runLater(() -> graphicalPlayer.chooseAdditionalCards(options,
-                sortedBagsCards::add));
-        return blockingQ(sortedBagsCards);
+                (cardSortedBag) -> {
+                    sortedBagCards.add(SortedBag.of(Card.ALL));
+                    blockingQ(sortedBagCards);
+                }));
+        return blockingQ(sortedBagCards);
     }
-    
+
     private <T> T blockingQ(ArrayBlockingQueue<T> blockingQueue){
         try {
             return blockingQueue.take();
         } catch (InterruptedException e) {
-            throw new IllegalArgumentException();
+            throw new Error();
         }
     }
 }
-t
-    @Override
