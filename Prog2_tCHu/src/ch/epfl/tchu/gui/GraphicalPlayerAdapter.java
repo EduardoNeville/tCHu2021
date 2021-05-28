@@ -32,7 +32,6 @@ public class GraphicalPlayerAdapter implements Player{
 
     }
 
-    //TODO check for correctness on this one \|/
 
     /**
      * initPlayers method being overridden from Player
@@ -53,7 +52,7 @@ public class GraphicalPlayerAdapter implements Player{
     public void setInitialTicketChoice(SortedBag<Ticket> tickets) {
         runLater(() -> graphicalPlayer.
                     chooseTickets(tickets,
-                            (ticketChoice) -> sortedBagTickets.add(ticketChoice)));
+                            sortedBagTickets::add));
     }
 
     /**

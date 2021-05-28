@@ -31,11 +31,11 @@ public class RemotePlayerProxy implements Player {
     private void sendMessage(String...argument){
         String fnna = String.join(" ", argument) + "\n";
 
-        try{
-                writer.write(fnna);
-                writer.flush();
-                }catch (IOException e){
-            throw new UncheckedIOException(e);
+        try {
+            writer.write(fnna);
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

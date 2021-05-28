@@ -49,16 +49,16 @@ public final class ServerMain extends Application {
         else
             names = List.of(args.get(0), args.get(1));
 
-        ServerSocket serverSocket = new ServerSocket( 5108);
-        Socket socket = serverSocket.accept();
+        ServerSocket serverSocket = new ServerSocket(5108);
+            Socket socket = serverSocket.accept();
 
-        RemotePlayerProxy proxy = new RemotePlayerProxy(socket);
-        GraphicalPlayerAdapter localPlayer = new GraphicalPlayerAdapter();
+            RemotePlayerProxy proxy = new RemotePlayerProxy(socket);
+            GraphicalPlayerAdapter localPlayer = new GraphicalPlayerAdapter();
 
-        Map<PlayerId, Player> players = Map.of(PLAYER_1, localPlayer, PLAYER_2, proxy);
-        Map<PlayerId, String> nameMap = Map.of(PLAYER_1, names.get(0), PLAYER_2, names.get(1));
+            Map<PlayerId, Player> players = Map.of(PLAYER_1, localPlayer, PLAYER_2, proxy);
+            Map<PlayerId, String> nameMap = Map.of(PLAYER_1, names.get(0), PLAYER_2, names.get(1));
 
-        new Thread(() -> Game.play(players, nameMap, SortedBag.of(ChMap.tickets()), new Random()));
+            new Thread(() -> Game.play(players, nameMap, SortedBag.of(ChMap.tickets()), new Random())).start();
     }
 
 }
