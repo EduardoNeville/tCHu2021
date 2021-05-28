@@ -4,23 +4,19 @@ import ch.epfl.tchu.Preconditions;
 import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.*;
 
-import static ch.epfl.tchu.game.PlayerId.PLAYER_1;
-import static ch.epfl.tchu.game.PlayerId.PLAYER_2;
 import static ch.epfl.tchu.gui.ActionHandler.*;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableObjectValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -30,45 +26,46 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
 
-import java.net.SocketTimeoutException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static javafx.application.Platform.isFxApplicationThread;
 
+/**
+ * Class that serves as the graphical interface for the player.
+ *
+ * @author Martin Sanchez Lopez (313238)
+ */
 public class GraphicalPlayer {
     private final Stage primaryStage;
 
     private final ObservableGameState oGameState;
-    private final PlayerId playerId;
-    private final Map<PlayerId, String> names;
     private final ObservableList<Text> infoList = FXCollections.observableArrayList();
     private final ObjectProperty<DrawTicketsHandler> drawTicketH = new SimpleObjectProperty<>();
     private final ObjectProperty<DrawCardHandler> drawCardH = new SimpleObjectProperty<>();
     private final ObjectProperty<ClaimRouteHandler> claimRouteH = new SimpleObjectProperty<>();
 
 
+    /**
+     * Constructs a graphical player with as it's associated player the one given as argument
+     * and launches the game's UI.
+     * @param playerId this instance's player
+     * @param names the player names
+     */
     public GraphicalPlayer(PlayerId playerId, Map<PlayerId, String> names) {
         oGameState = new ObservableGameState(playerId);
-        this.playerId = playerId;
-        this.names = names;
 
         this.primaryStage = new Stage();
         primaryStage.setTitle("tCHu — " + names.get(playerId));
         primaryStage.setScene(new Scene(new BorderPane()));
 
         Node mapView = MapViewCreator
-                .createMapView(oGameState, claimRouteH, ((options, handler) -> chooseClaimCards(options, handler)));
+                .createMapView(oGameState, claimRouteH, (this::chooseClaimCards));
         Node cardsView = DecksViewCreator
                 .createCardsView(oGameState, drawTicketH, drawCardH);
         Node handView = DecksViewCreator
                 .createHandView(oGameState);
 
-        ObservableList<Text> infos = FXCollections.observableArrayList(
-                new Text("Première information.\n"),
-                new Text("\nSeconde information.\n"));
         Node infoView = InfoViewCreator
                 .createInfoView(playerId, names, oGameState, infoList);
 
@@ -76,26 +73,24 @@ public class GraphicalPlayer {
         BorderPane mainPane =
                 new BorderPane(mapView, null, cardsView, handView, infoView);
 
-//        BorderPane mainPane =
-//                new BorderPane(mapView, null, null, null, null);
-
-//                new BorderPane(mapView, null, cardsView, handView, null);
         primaryStage.setScene(new Scene(mainPane));
         primaryStage.show();
-
-        PlayerState p1State =
-                new PlayerState(SortedBag.of(ChMap.tickets().subList(0, 3)),
-                        SortedBag.of(1, Card.WHITE, 3, Card.RED),
-                        ChMap.routes().subList(0, 3));
-
-//        setState(oGameState, p1State);
     }
 
 
+    /**
+     * Updates the state of the game with the new given game and public states
+     * @param newPublicGameState new public game state
+     * @param newPlayerState new player state
+     */
     public void setState(PublicGameState newPublicGameState, PlayerState newPlayerState) {
         oGameState.setState(newPublicGameState, newPlayerState);
     }
 
+    /**
+     * Adds the given message to the info panel of the UI
+     * @param message message to be communicated
+     */
     public void receiveInfo(String message) {
         assert isFxApplicationThread();
         if (infoList.size() < 5)
@@ -107,6 +102,12 @@ public class GraphicalPlayer {
     }
 
 
+    /**
+     * Assigns the action handlers of the actions a player can do during his turn
+     * @param drawTicketsHandler the handler that handles ticket drawing
+     * @param drawCardHandler the handler that handles card drawing
+     * @param claimRouteHandler the handler that handles route claiming
+     */
     public void startTurn(DrawTicketsHandler drawTicketsHandler,
                           DrawCardHandler drawCardHandler,
                           ClaimRouteHandler claimRouteHandler) {
@@ -114,43 +115,43 @@ public class GraphicalPlayer {
         Preconditions.checkArgument(drawTicketsHandler != null &&
                 drawCardHandler != null && claimRouteHandler != null);
         if (oGameState.canDrawTickets())
-            drawTicketH.set(new DrawTicketsHandler() {
-                @Override
-                public void onDrawTickets() {
-                    emptyHandlers();
-                    drawTicketsHandler.onDrawTickets();
-                }
+            drawTicketH.set( () -> {
+                emptyHandlers();
+                drawTicketsHandler.onDrawTickets();
             });
         if (oGameState.canDrawCards())
-            drawCardH.set(new DrawCardHandler() {
-                @Override
-                public void onDrawCard(int slot) {
-                    emptyHandlers();
-                    drawCardHandler.onDrawCard(slot);
-                }
+            drawCardH.set( (slot) -> {
+                emptyHandlers();
+                drawCardHandler.onDrawCard(slot);
             });
 
-        claimRouteH.set(new ClaimRouteHandler() {
-            @Override
-            public void onClaimRoute(Route route, SortedBag<Card> cardDeck) {
-                emptyHandlers();
-                claimRouteHandler.onClaimRoute(route, cardDeck);
-            }
-        });
+        claimRouteH.set(((route, cardDeck) -> {
+            emptyHandlers();
+            claimRouteHandler.onClaimRoute(route, cardDeck);
+        }));
     }
 
+    /**
+     * Empties handlers
+     */
     private void emptyHandlers() {
         drawTicketH.set(null);
         drawCardH.set(null);
         claimRouteH.set(null);
     }
 
+    /**
+     * Open a windows with the the different tickets choices the player can choose and uses the given
+     * handler to receive said tickets.
+     * @param tickets ticket choices
+     * @param chooseTicketsHandler ticket handler
+     */
     public void chooseTickets(SortedBag<Ticket> tickets, ChooseTicketsHandler chooseTicketsHandler) {
         assert isFxApplicationThread();
         Preconditions.checkArgument(tickets.size() == 3 || tickets.size() == 5);
 
-        ListView listView = new ListView(FXCollections.observableList(tickets.toList()));
-        ObservableList selectedItems = listView.getSelectionModel().getSelectedItems();
+        ListView<Ticket> listView = new ListView<>(FXCollections.observableList(tickets.toList()));
+        ObservableList<Ticket> selectedItems = listView.getSelectionModel().getSelectedItems();
         Button confirmButton = new Button();
         confirmButton.disableProperty().bind(
                 Bindings.size(selectedItems).
@@ -169,10 +170,20 @@ public class GraphicalPlayer {
 
     }
 
+    /**
+     * Lets the player draw one of the face up cards or a card from the deck.
+     * @param drawCardHandler action handler for drawing cards
+     */
     public void drawCard(DrawCardHandler drawCardHandler) {
         assert isFxApplicationThread();
     }
 
+    /**
+     * Open a windows with the the different initial card choices the player can choose to claim a route
+     * and uses the given handler to claim said route.
+     * @param cardOptions possible card combinations to claim
+     * @param chooseCardsHandler action handler for cards
+     */
     public void chooseClaimCards(List<SortedBag<Card>> cardOptions, ChooseCardsHandler chooseCardsHandler) {
         assert isFxApplicationThread();
         if(cardOptions.size() == 1) {
@@ -180,54 +191,59 @@ public class GraphicalPlayer {
             return;
         }
 
-        ListView listView = new ListView();
-        ObservableList selectedItems = listView.getSelectionModel().getSelectedItems();
+        ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(cardOptions));
+        ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
         Button confirmButton = new Button();
         confirmButton.disableProperty().bind(
                 Bindings.size(selectedItems).isNotEqualTo(1));
 
-        Stage selectionWindow = choiceWindow(StringsFr.TICKETS_CHOICE,
+        Stage selectionWindow = choiceWindow(StringsFr.CARDS_CHOICE,
                 listView, confirmButton);
 
         confirmButton.setOnAction((e) -> {
                     selectionWindow.hide();
-                    chooseCardsHandler.onChooseCards(SortedBag.of(selectedItems));
+                    chooseCardsHandler.onChooseCards(selectedItems.get(0));
                 }
         );
 
         selectionWindow.show();
     }
 
+    /**
+     * Open a windows with the the different additional
+     * card choices the player can choose to finalize a claim on a  route
+     * and uses the given handler to claim said route.
+     * @param cardOptions possible additional card combinations to claim
+     * @param chooseCardsHandler action handler for cards
+     */
     public void chooseAdditionalCards(List<SortedBag<Card>> cardOptions, ChooseCardsHandler chooseCardsHandler) {
         assert isFxApplicationThread();
         Preconditions.checkArgument(!cardOptions.isEmpty());
 
-        ListView listView = new ListView();
-        ObservableList selectedItems = listView.getSelectionModel().getSelectedItems();
+        ListView<SortedBag<Card>> listView = new ListView<>(FXCollections.observableList(cardOptions));
+        ObservableList<SortedBag<Card>> selectedItems = listView.getSelectionModel().getSelectedItems();
         Button confirmButton = new Button();
 
 
-        Stage selectionWindow = choiceWindow(StringsFr.TICKETS_CHOICE,
+        Stage selectionWindow = choiceWindow(StringsFr.CHOOSE_ADDITIONAL_CARDS,
                 listView, confirmButton);
 
         confirmButton.setOnAction((e) -> {
                     selectionWindow.hide();
-                    chooseCardsHandler.onChooseCards(SortedBag.of(selectedItems));
+                    chooseCardsHandler.onChooseCards(selectedItems.get(0));
                 }
         );
 
         selectionWindow.show();
     }
 
-
-    private Stage choiceWindow(String string,
-                                   ListView listView,
-                                   Button button) {
+    private <T> Stage choiceWindow(String string,
+                                       ListView<T> listView,
+                                       Button button) {
         Stage choiceWindow = new Stage(StageStyle.UTILITY);
         choiceWindow.initOwner(primaryStage);
         choiceWindow.initModality(Modality.WINDOW_MODAL);
-        choiceWindow.setOnCloseRequest((e) -> e.consume());
-//        Preconditions.checkArgument(list instanceof List<Ticket>);
+        choiceWindow.setOnCloseRequest(Event::consume);
 
 
         VBox choiceBox = new VBox();
@@ -238,7 +254,6 @@ public class GraphicalPlayer {
 
         TextFlow textFlow = new TextFlow(new Text(string));
 
-//        ListView<E> listView = new ListView();
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         choiceBox.getChildren().addAll(textFlow, listView, button);
@@ -247,8 +262,10 @@ public class GraphicalPlayer {
         return choiceWindow;
     }
 
-
-    private class CardBagStringConverter extends StringConverter<SortedBag<Card>> {
+    /**
+     * Redefines the toString method of sorted bags of cards
+     */
+    private static class CardBagStringConverter extends StringConverter<SortedBag<Card>> {
 
         @Override
         public String toString(SortedBag<Card> cards) {
