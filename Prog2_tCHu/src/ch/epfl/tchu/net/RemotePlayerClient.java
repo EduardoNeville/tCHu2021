@@ -7,8 +7,12 @@ import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
 import java.util.regex.Pattern;
 
 import static ch.epfl.tchu.net.Serdes.*;
@@ -20,9 +24,13 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  * Remote player client that connects a player to the proxy on the server to give the players actions.
  */
 public final class RemotePlayerClient {
-    private final Player player;
+    private final ChatUser player;
     private final String address;
     private final int port;
+    private BufferedReader reader;
+    private BufferedWriter writer;
+    private final BlockingQueue<String[]> gameMessage = new ArrayBlockingQueue<>(1);
+//    private final BlockingQueue<String> chatMessage;
 
     /**
      * Constructs a remote player client.
@@ -31,10 +39,11 @@ public final class RemotePlayerClient {
      * @param address address of the proxy server
      * @param port    port of the proxy server
      */
-    public RemotePlayerClient(Player player, String address, int port) {
+    public RemotePlayerClient(ChatUser player, String address, int port) {
         this.player = Objects.requireNonNull(player);
         this.address = address;
         this.port = port;
+//        this.chatMessage = chatMessages;
     }
 
 
@@ -51,11 +60,40 @@ public final class RemotePlayerClient {
                      new BufferedWriter(
                              new OutputStreamWriter(s.getOutputStream(),
                                      US_ASCII))) {
-//            MessageId messageId = MessageId.valueOf(r.readLine());
-            String line;
-            while ( (line = r.readLine()) != null) {
-                String[] messageReceived = line.split(Pattern.quote(" "), -1);
-                String playerResponse = response(messageReceived);
+            reader = r;
+            writer = w;
+            player.receiveChatMessageHandler(m -> {
+                try {
+                    System.out.println("writing"+ m);
+                    writer.write("CHAT" + STRING_SERDE.serialize(m.toString())); //TODO: serialize
+                    writer.write("\n");
+                    writer.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            new Thread(() -> {
+                while(true) {
+                    try {
+                        String line;
+                        if ((line = reader.readLine()) != null) {
+                            String[] messageReceived = line.split(Pattern.quote(" "), -1);
+                            if (line.contains("CHAT")) {
+                                player.receiveChatMessage(new ChatMessage(
+                                        STRING_SERDE.deserialize(messageReceived[1]), PLAYER_2));
+                            } else
+                                gameMessage.put(messageReceived);
+                        }
+                    } catch (IOException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+
+            while(true){
+                String[] message = gameMessage.take();
+                String playerResponse = response(message);
                 if (playerResponse != null) {
                     w.write(playerResponse);
                     w.write("\n");
@@ -63,8 +101,9 @@ public final class RemotePlayerClient {
                 }
             }
 
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+
+        } catch (IOException | InterruptedException e) {
+            throw new UncheckedIOException((IOException) e);
         }
     }
 
@@ -78,6 +117,8 @@ public final class RemotePlayerClient {
         MessageId msgId = MessageId.valueOf(message[0]);
 
         switch (msgId) {
+            case CHAT_MESSAGE:
+                player.receiveChatMessage(new ChatMessage(message[1].toString(), PLAYER_2));
             case INIT_PLAYERS:
                 String[] names = message[2].split(Pattern.quote(","), -1);
                 Map<PlayerId, String> map = Map.of(PLAYER_1, STRING_SERDE.deserialize(names[0]),

@@ -18,6 +18,8 @@ import java.net.Socket;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * A tchu application which connects to a remote tchu game.
@@ -58,6 +60,7 @@ public final class ClientMain extends Application {
 
         GraphicalPlayerAdapter localPlayer = new GraphicalPlayerAdapter();
         RemotePlayerClient client = new RemotePlayerClient(localPlayer, hostname, port);
+
 
         new Thread((client::run)).start();
     }

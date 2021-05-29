@@ -17,7 +17,7 @@ public final class Chat {
         ActionHandler.ChatHandler chatHandler = messagesOutgoing::add;
         players.values().forEach(p -> {
             p.receiveChatMessageHandler(chatHandler);
-        });
+        }); //pass buffered writer????
 
 
         for(;;){ //TODO: add end condition

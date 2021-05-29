@@ -288,7 +288,6 @@ public class GraphicalPlayer {
 //    }
 
     public void receiveMessage(ChatMessage message){
-        //TODO: set the message id or something for color
         chatList.add(message);
     }
 

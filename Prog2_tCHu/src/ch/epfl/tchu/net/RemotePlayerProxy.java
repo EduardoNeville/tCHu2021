@@ -12,6 +12,8 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * RemotePlayerProxy
@@ -21,15 +23,38 @@ import java.util.Map;
 public class RemotePlayerProxy implements Player, ChatUser {
     BufferedReader reader;
     BufferedWriter writer;
+    private final BlockingQueue<String> gameResponses = new ArrayBlockingQueue<>(1);
 
     /**
      * RemotePlayerProxy
      * @param socket Input of the player
      * @throws IOException If the input/ output is wrong
      */
-    public RemotePlayerProxy(Socket socket) throws IOException {
+    public RemotePlayerProxy(Socket socket, BlockingQueue<String> chatQueue) throws IOException {
         this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.US_ASCII));
         this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
+
+
+
+        new Thread( () -> {
+            while(true){
+                String response = receiveMessage();
+                if(response.contains("CHAT")){
+                    try {
+                        chatQueue.put(response);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    try {
+                        gameResponses.put(response);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 
     private void sendMessage(String... argument) {
@@ -45,8 +70,9 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     private String receiveMessage() {
         try {
-            return reader.readLine();
-//            return String.join(" " ,reader.read());
+            String s = reader.readLine();
+            System.out.println(s);
+            return s;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -113,7 +139,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
     @Override
     public SortedBag<Ticket> chooseInitialTickets() {
         sendMessage(CHOOSE_INITIAL_TICKETS.name());
-        return SORTED_BAG_TICKET_SERDE.deserialize(receiveMessage());
+        return SORTED_BAG_TICKET_SERDE.deserialize(blockingQ(gameResponses));
     }
 
     /**
@@ -124,7 +150,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
     public TurnKind nextTurn() {
 
         sendMessage(NEXT_TURN.name());
-        return TURN_KIND_SERDE.deserialize(receiveMessage());
+        return TURN_KIND_SERDE.deserialize(blockingQ(gameResponses));
     }
 
     /**
@@ -137,7 +163,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
     public SortedBag<Ticket> chooseTickets(SortedBag<Ticket> options) {
         sendMessage(CHOOSE_TICKETS.name(), SORTED_BAG_TICKET_SERDE.serialize(options));
 
-        return SORTED_BAG_TICKET_SERDE.deserialize(receiveMessage());
+        return SORTED_BAG_TICKET_SERDE.deserialize(blockingQ(gameResponses));
     }
 
     /**
@@ -148,7 +174,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
     public int drawSlot() {
         sendMessage(DRAW_SLOT.name());
 
-        return INTEGER_SERDE.deserialize(receiveMessage());
+        return INTEGER_SERDE.deserialize(blockingQ(gameResponses));
     }
 
     /**
@@ -158,7 +184,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
     @Override
     public Route claimedRoute() {
         sendMessage(ROUTE.name());
-        return ROUTE_SERDE.deserialize(receiveMessage());
+        return ROUTE_SERDE.deserialize(blockingQ(gameResponses));
     }
 
     /**
@@ -168,7 +194,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
     @Override
     public SortedBag<Card> initialClaimCards() {
         sendMessage(CARDS.name());
-        return SORTED_BAG_CARD_SERDE.deserialize(receiveMessage());
+        return SORTED_BAG_CARD_SERDE.deserialize(blockingQ(gameResponses));
     }
 
     /**
@@ -181,18 +207,26 @@ public class RemotePlayerProxy implements Player, ChatUser {
     public SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options) {
 
         sendMessage(CHOOSE_ADDITIONAL_CARDS.name(), LIST_SORTED_BAG_CARD_SERDE.serialize(options));
-        return SORTED_BAG_CARD_SERDE.deserialize(receiveMessage());
+        return SORTED_BAG_CARD_SERDE.deserialize(blockingQ(gameResponses));
     }
 
 
     @Override
     public void receiveChatMessage(ChatMessage message) {
-
+        sendMessage(CHAT_MESSAGE.name(), STRING_SERDE.serialize(message.toString()));
     }
 
     @Override
     public void receiveChatMessageHandler(ActionHandler.ChatHandler chatHandler) {
 
+    }
+
+    private <T> T blockingQ(BlockingQueue<T> blockingQueue){
+        try {
+            return blockingQueue.take();
+        } catch (InterruptedException e) {
+            throw new IllegalArgumentException();
+        }
     }
 
 }

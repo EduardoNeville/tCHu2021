@@ -21,7 +21,7 @@ public class ClientTest {
         System.out.println("Client done!");
     }
 
-    private final static class TestPlayer implements Player {
+    private final static class TestPlayer implements ChatUser {
         private SortedBag<Ticket> initTickets= SortedBag.of();
 
 
@@ -88,6 +88,16 @@ public class ClientTest {
         @Override
         public SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options) {
             return options.get(0);
+        }
+
+        @Override
+        public void receiveChatMessage(ChatMessage message) {
+
+        }
+
+        @Override
+        public void receiveChatMessageHandler(ActionHandler.ChatHandler chatHandler) {
+
         }
 
 
