@@ -2,13 +2,10 @@ package ch.epfl.tchu.gui;
 
 import ch.epfl.tchu.Preconditions;
 import ch.epfl.tchu.SortedBag;
-import ch.epfl.tchu.game.ChMap;
-import ch.epfl.tchu.game.Game;
-import ch.epfl.tchu.game.Player;
+import ch.epfl.tchu.game.*;
 
 import static ch.epfl.tchu.game.PlayerId.*;
 
-import ch.epfl.tchu.game.PlayerId;
 import ch.epfl.tchu.net.ChatMessage;
 import ch.epfl.tchu.net.RemotePlayerProxy;
 import javafx.application.Application;
@@ -57,11 +54,11 @@ public final class ServerMain extends Application {
         ServerSocket serverSocket = new ServerSocket(5108);
         Socket socket = serverSocket.accept();
 
-        BlockingQueue<String> chatQueue = new ArrayBlockingQueue<>(1);
+        BlockingQueue<ChatMessage> chatQueue = new ArrayBlockingQueue<>(1);
         RemotePlayerProxy proxy = new RemotePlayerProxy(socket, chatQueue);
         ActionHandler.ChatHandler chatHandler = m -> {
             try {
-                chatQueue.put(m.toString());
+                chatQueue.put(m);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -80,11 +77,10 @@ public final class ServerMain extends Application {
 
         new Thread( () -> {
             while (true){
-                String msg = null;
                 try {
-                    msg = chatQueue.take();
-                    localPlayer.receiveChatMessage(new ChatMessage(msg, PLAYER_2));
-                    proxy.receiveChatMessage(new ChatMessage(msg, PLAYER_2));
+                    ChatMessage msg = chatQueue.take();
+                    localPlayer.receiveChatMessage(msg);
+                    proxy.receiveChatMessage(msg);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

@@ -102,6 +102,21 @@ public final class Serdes{
             });
 
     /**
+     * Public card state serde
+     */
+    public static final Serde<ChatMessage> CHAT_MESSAGE_SERDE = Serde.of(
+            message -> String.format("%s;%s",
+                    STRING_SERDE.serialize(message.message()),
+                    PLAYER_ID_SERDE.serialize(message.senderId())),
+
+            message -> {
+                String[] a = message.split(Pattern.quote(";"), -1);
+                return new ChatMessage(STRING_SERDE.deserialize(a[0]),
+                        PLAYER_ID_SERDE.deserialize(a[1]));
+            });
+
+
+    /**
      * public player state serde
      */
     public static final Serde<PublicPlayerState> PUBLIC_PLAYER_STATE_SERDE = Serde.of(
@@ -159,4 +174,7 @@ public final class Serdes{
                         playerStateMap,
                         lastPlayer);
             });
+
+
+
 }

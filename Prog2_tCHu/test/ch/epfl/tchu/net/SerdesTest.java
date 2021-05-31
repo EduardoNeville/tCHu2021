@@ -60,6 +60,12 @@ class SerdesTest {
     }
 
     @Test
+    void chatMsgWorks(){
+        ChatMessage msg = new ChatMessage("testing123", PLAYER_1);
+        assertEquals("testing123", Serdes.CHAT_MESSAGE_SERDE.deserialize(Serdes.CHAT_MESSAGE_SERDE.serialize(msg)).message());
+    }
+
+    @Test
     void RouteSerdeWorks(){
         Route r = ChMap.routes().get(0);
         Serde<Route> s = Serdes.ROUTE_SERDE;

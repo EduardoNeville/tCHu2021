@@ -78,7 +78,7 @@ public class GraphicalPlayer {
                 .createHandView(oGameState);
 
         Node infoView = InfoViewCreator
-                .createInfoView(playerId, names, oGameState, infoList, chatList, chatMessage, chatHandlerH); //TODO : give message property and chat list
+                .createInfoView(playerId, names, oGameState, infoList, chatList, chatMessage, chatHandlerH);
 
 
         BorderPane mainPane =
@@ -280,12 +280,6 @@ public class GraphicalPlayer {
         choiceWindow.setScene(chooserScene);
         return choiceWindow;
     }
-
-//    public void sendMessage(ChatHandler chatHandler){
-//        Preconditions.checkArgument(chatMessage != null);
-//        chatHandler.onSend(chatMessage.get());
-////        chatMessage.set(null);
-//    }
 
     public void receiveMessage(ChatMessage message){
         chatList.add(message);

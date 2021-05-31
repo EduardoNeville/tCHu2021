@@ -15,6 +15,7 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
 import java.util.regex.Pattern;
 
+import static ch.epfl.tchu.net.MessageId.CHAT_MESSAGE;
 import static ch.epfl.tchu.net.Serdes.*;
 import static ch.epfl.tchu.game.PlayerId.*;
 
@@ -60,12 +61,12 @@ public final class RemotePlayerClient {
                      new BufferedWriter(
                              new OutputStreamWriter(s.getOutputStream(),
                                      US_ASCII))) {
+            //problem with threads other wise it seemed
             reader = r;
             writer = w;
             player.receiveChatMessageHandler(m -> {
                 try {
-                    System.out.println("writing"+ m);
-                    writer.write("CHAT" + STRING_SERDE.serialize(m.toString())); //TODO: serialize
+                    writer.write(CHAT_MESSAGE.name() + " " + CHAT_MESSAGE_SERDE.serialize(m));
                     writer.write("\n");
                     writer.flush();
                 } catch (IOException e) {
@@ -79,9 +80,8 @@ public final class RemotePlayerClient {
                         String line;
                         if ((line = reader.readLine()) != null) {
                             String[] messageReceived = line.split(Pattern.quote(" "), -1);
-                            if (line.contains("CHAT")) {
-                                player.receiveChatMessage(new ChatMessage(
-                                        STRING_SERDE.deserialize(messageReceived[1]), PLAYER_2));
+                            if (messageReceived[0].equals(CHAT_MESSAGE.name())) {
+                                player.receiveChatMessage(CHAT_MESSAGE_SERDE.deserialize(messageReceived[1]));
                             } else
                                 gameMessage.put(messageReceived);
                         }
@@ -117,8 +117,6 @@ public final class RemotePlayerClient {
         MessageId msgId = MessageId.valueOf(message[0]);
 
         switch (msgId) {
-            case CHAT_MESSAGE:
-                player.receiveChatMessage(new ChatMessage(message[1].toString(), PLAYER_2));
             case INIT_PLAYERS:
                 String[] names = message[2].split(Pattern.quote(","), -1);
                 Map<PlayerId, String> map = Map.of(PLAYER_1, STRING_SERDE.deserialize(names[0]),

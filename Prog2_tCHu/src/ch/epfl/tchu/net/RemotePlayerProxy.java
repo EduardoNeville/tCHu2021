@@ -27,26 +27,25 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     /**
      * RemotePlayerProxy
+     *
      * @param socket Input of the player
      * @throws IOException If the input/ output is wrong
      */
-    public RemotePlayerProxy(Socket socket, BlockingQueue<String> chatQueue) throws IOException {
+    public RemotePlayerProxy(Socket socket, BlockingQueue<ChatMessage> chatQueue) throws IOException {
         this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.US_ASCII));
         this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
 
 
-
-        new Thread( () -> {
-            while(true){
+        new Thread(() -> {
+            while (true) {
                 String response = receiveMessage();
-                if(response.contains("CHAT")){
+                if (response.contains(CHAT_MESSAGE.name())) {
                     try {
-                        chatQueue.put(response);
+                        chatQueue.put(CHAT_MESSAGE_SERDE.deserialize(response.substring(CHAT_MESSAGE.name().length() + 1)));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }
-                else {
+                } else {
                     try {
                         gameResponses.put(response);
                     } catch (InterruptedException e) {
@@ -70,9 +69,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     private String receiveMessage() {
         try {
-            String s = reader.readLine();
-            System.out.println(s);
-            return s;
+            return reader.readLine();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -80,8 +77,8 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     /**
      * initPlayers
-     * @param ownId
-     *          id of the player
+     *
+     * @param ownId       id of the player
      * @param playerNames names of players
      */
     @Override
@@ -97,6 +94,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     /**
      * setInitialTicketChoice tickets at the beginning
+     *
      * @param tickets tickets of the player at the beginning
      */
     @Override
@@ -108,6 +106,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     /**
      * receiveInfo Serialized version of the information given
+     *
      * @param info information in the form of String
      */
     @Override
@@ -119,8 +118,8 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     /**
      * updateState Updates the state in a serialized way
-     * @param newState
-     *          new public game state
+     *
+     * @param newState new public game state
      * @param ownState PlayerState of the player at hand
      */
     @Override
@@ -134,6 +133,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     /**
      * chooseInitialTickets
+     *
      * @return Deserialised version of the chosen initial tickets
      */
     @Override
@@ -144,6 +144,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     /**
      * nextTurn
+     *
      * @return Deserializes the messages for the next turn
      */
     @Override
@@ -155,8 +156,8 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     /**
      * chooseTickets
-     * @param options
-     *          the tickets the player can choose from
+     *
+     * @param options the tickets the player can choose from
      * @return Deserializes the chosen possible tickets the player can choose from
      */
     @Override
@@ -168,6 +169,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     /**
      * drawSlot
+     *
      * @return Deserialized slot
      */
     @Override
@@ -179,6 +181,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     /**
      * claimedRoute
+     *
      * @return Deserialized claimed routes by player
      */
     @Override
@@ -189,6 +192,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     /**
      * initialClaimCards
+     *
      * @return Deserialized SortedBag of initial player claimed cards
      */
     @Override
@@ -199,8 +203,8 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     /**
      * chooseAdditionalCards
-     * @param options
-     *          list of options the player can choose from to finalise claim
+     *
+     * @param options list of options the player can choose from to finalise claim
      * @return Deserialized SortedBag of chosen additional cards by player
      */
     @Override
@@ -213,7 +217,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     @Override
     public void receiveChatMessage(ChatMessage message) {
-        sendMessage(CHAT_MESSAGE.name(), STRING_SERDE.serialize(message.toString()));
+        sendMessage(CHAT_MESSAGE.name(), CHAT_MESSAGE_SERDE.serialize(message));
     }
 
     @Override
@@ -221,7 +225,7 @@ public class RemotePlayerProxy implements Player, ChatUser {
 
     }
 
-    private <T> T blockingQ(BlockingQueue<T> blockingQueue){
+    private <T> T blockingQ(BlockingQueue<T> blockingQueue) {
         try {
             return blockingQueue.take();
         } catch (InterruptedException e) {

@@ -12,7 +12,7 @@ public class ChatMessage {
     private final PlayerId sender;
 
     public ChatMessage(String message, PlayerId sender) {
-        this.message = message + "\n";
+        this.message = message;
         Calendar c = Calendar.getInstance();
         this.time = String.format("%tl:%tM", c, c);
         this.sender = sender;
@@ -22,7 +22,9 @@ public class ChatMessage {
         return sender;
     }
 
-
+    public String message(){
+        return message;
+    }
     @Override
     public String toString() {
         return time + ": " + message;
