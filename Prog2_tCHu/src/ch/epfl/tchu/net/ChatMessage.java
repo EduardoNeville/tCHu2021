@@ -27,6 +27,6 @@ public class ChatMessage {
     }
     @Override
     public String toString() {
-        return time + ": " + message;
+        return "[" + time + "] " + message;
     }
 }

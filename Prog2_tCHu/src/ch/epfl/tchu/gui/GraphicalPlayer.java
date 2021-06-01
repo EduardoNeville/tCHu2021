@@ -256,6 +256,16 @@ public class GraphicalPlayer {
         selectionWindow.show();
     }
 
+    public void makeTradeDeal(TradeDealHandler tradeDealHandler){
+        assert isFxApplicationThread();
+
+    }
+
+    public boolean acceptTradeDeal(TradeDeal tradeDeal){
+        assert isFxApplicationThread();
+        return false; //TODO: open window and stuff
+    }
+
     private <T> Stage choiceWindow(String string,String string2,
                                    ListView<T> listView,
                                    Button button) {

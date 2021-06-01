@@ -160,6 +160,10 @@ public final class RemotePlayerClient {
                         LIST_SORTED_BAG_CARD_SERDE.deserialize(message[1])
                 );
                 return SORTED_BAG_CARD_SERDE.serialize(additionalCardBag);
+            case TRADE_DEAL_SEND:
+                return TRADE_DEAL_SERDE.serialize(player.makeTradeOffer());
+            case TRADE_DEAL_ACCEPT:
+                return BOOLEAN_SERDE.serialize(player.acceptTradeOffer(TRADE_DEAL_SERDE.deserialize(message[1])));
             default:
                 throw new Error();
         }

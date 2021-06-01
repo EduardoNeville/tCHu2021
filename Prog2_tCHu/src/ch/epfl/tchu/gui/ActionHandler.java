@@ -46,6 +46,10 @@ public interface ActionHandler {
         void onChooseCards(SortedBag<Card> cards);
     }
 
+    interface TradeDealHandler{
+        void onDealOffer(TradeDeal tradeDeal);
+    }
+
 
     interface ChatHandler{
         void onSend(ChatMessage message);

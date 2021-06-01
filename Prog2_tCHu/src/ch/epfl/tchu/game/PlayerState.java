@@ -173,10 +173,31 @@ public class PlayerState extends PublicPlayerState {
      */
     public PlayerState withClaimedRoute(Route route, SortedBag<Card> claimCards) {
         List<Route> totalRoutes = new ArrayList<>(routes());
-        totalRoutes.add(route);
+        if(route != null) totalRoutes.add(route);
         return new PlayerState(tickets, cards.difference(claimCards), totalRoutes);
     }
 
+
+    public PlayerState withTradeDealMade(TradeDeal deal, boolean stateOfProposer){
+        List<Route> newRoutes = new ArrayList<>(routes());
+        if(stateOfProposer){
+            if(deal.routeReceive() != null) newRoutes.add(deal.routeReceive());
+            if(deal.routeGive() != null) newRoutes.remove(deal.routeGive());
+            return new PlayerState(
+                    tickets.difference(SortedBag.of(deal.ticketsGive())).union(SortedBag.of(deal.ticketsReceive())),
+                    cards.union(deal.cardsReceive()).difference(deal.cardsGive()),
+                    newRoutes);
+        } else {
+            if(deal.routeGive() != null) newRoutes.add(deal.routeGive());
+            if(deal.routeReceive() != null) newRoutes.remove(deal.routeReceive());
+            return new PlayerState(
+                    tickets.union(SortedBag.of(deal.ticketsGive())).difference(SortedBag.of(deal.ticketsReceive())),
+                    cards.difference(deal.cardsReceive()).union(deal.cardsGive()),
+                    newRoutes);
+        }
+
+
+    }
     /**
      * Getting the ticket points of all the routes that the player has
      *
@@ -205,6 +226,8 @@ public class PlayerState extends PublicPlayerState {
         }
         return maxTicketPoints;
     }
+
+
 
     /**
      * Final tally of all Player points

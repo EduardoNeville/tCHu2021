@@ -92,26 +92,23 @@ public final class InfoViewCreator {
         scrollPane.setContent(chat);
         chat.setMaxWidth(40d);
         chat.getStyleClass().add("colors.css");
-        chatList.addListener(new ListChangeListener<>() {
-            @Override
-            public void onChanged(Change<? extends ChatMessage> change) {
-                if (change.next()){
-                    Circle circle = new Circle(5);
-                    circle.getStyleClass().addAll("filled");
+        chatList.addListener((ListChangeListener<ChatMessage>) change -> {
+            if (change.next()){
+                Circle circle = new Circle(5);
+                circle.getStyleClass().add("filled");
 
-                    ChatMessage msg = chatList.get(chatList.size()-1); //latest message
+                ChatMessage msg = chatList.get(chatList.size()-1); //latest message
 
-                    //Pane with the message text and colored circle
-                    TextFlow textFlow = new TextFlow(circle, new Text(" " + msg.toString()));
-                    textFlow.setMaxWidth(170);
-                    textFlow.setId("chat-element");
-                    textFlow.getStyleClass().addAll(msg.senderId().name(), "info.css");
+                //Pane with the message text and colored circle
+                TextFlow textFlow = new TextFlow(circle, new Text(" " + msg.toString()));
+                textFlow.setMaxWidth(170);
+                textFlow.setId("chat-element");
+                textFlow.getStyleClass().addAll(msg.senderId().name());
 
-                    chat.getChildren().addAll(textFlow);
+                chat.getChildren().addAll(textFlow);
 
-                    scrollPane.layout(); //to refresh v max
-                    scrollPane.setVvalue(scrollPane.getVmax()); //scroll to bottom
-                }
+                scrollPane.layout(); //to refresh v max
+                scrollPane.setVvalue(scrollPane.getVmax()); //scroll to bottom
             }
         });
 
@@ -126,7 +123,7 @@ public final class InfoViewCreator {
 
 
 
-        topNode.getChildren().addAll(playerStats, new Separator(), messages,new Separator(), scrollPane, textField);
+        topNode.getChildren().addAll(playerStats, new Separator(), messages, new Separator(), scrollPane, textField);
         return topNode;
     }
 

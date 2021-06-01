@@ -1,7 +1,6 @@
 package ch.epfl.tchu.game;
 
 import ch.epfl.tchu.SortedBag;
-import ch.epfl.tchu.gui.ActionHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -17,10 +16,11 @@ public interface Player {
      * A turn kind. The different actions a player can choose to do on his turn.
      */
     enum TurnKind {
-        DRAW_TICKETS, DRAW_CARDS, CLAIM_ROUTE;
+        DRAW_TICKETS, DRAW_CARDS, CLAIM_ROUTE, TRADE;
 
         public final static List<TurnKind> ALL = List.of(values());
     }
+
 
     /**
      * Communicates to the Player his id and the names of all the players (himself included).
@@ -109,6 +109,11 @@ public interface Player {
      * @return SortedBag of the additional cards he uses to claim tunnel or an empty bag if he doesn't claim
      */
     SortedBag<Card> chooseAdditionalCards(List<SortedBag<Card>> options);
+
+
+    TradeDeal makeTradeOffer();
+
+    boolean acceptTradeOffer(TradeDeal offer);
 
 
 }

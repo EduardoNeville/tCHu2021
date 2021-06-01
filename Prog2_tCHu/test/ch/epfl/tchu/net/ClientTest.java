@@ -91,6 +91,16 @@ public class ClientTest {
         }
 
         @Override
+        public TradeDeal makeTradeOffer() {
+            return null;
+        }
+
+        @Override
+        public boolean acceptTradeOffer(TradeDeal offer) {
+            return false;
+        }
+
+        @Override
         public void receiveChatMessage(ChatMessage message) {
 
         }

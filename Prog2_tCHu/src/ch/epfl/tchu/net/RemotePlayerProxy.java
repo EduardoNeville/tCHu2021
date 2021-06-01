@@ -214,6 +214,17 @@ public class RemotePlayerProxy implements Player, ChatUser {
         return SORTED_BAG_CARD_SERDE.deserialize(blockingQ(gameResponses));
     }
 
+    @Override
+    public TradeDeal makeTradeOffer() {
+        return TRADE_DEAL_SERDE.deserialize(blockingQ(gameResponses));
+    }
+
+    @Override
+    public boolean acceptTradeOffer(TradeDeal offer) {
+        sendMessage(TRADE_DEAL_ACCEPT.name(), TRADE_DEAL_SERDE.serialize(offer));
+        return BOOLEAN_SERDE.deserialize(blockingQ(gameResponses));
+    }
+
 
     @Override
     public void receiveChatMessage(ChatMessage message) {

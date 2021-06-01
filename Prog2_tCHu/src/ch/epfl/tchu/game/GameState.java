@@ -259,11 +259,12 @@ public final class GameState extends PublicGameState {
      */
     public GameState withClaimedRoute(Route route, SortedBag<Card> cards) {
         Map<PlayerId, PlayerState> withClaimedRoute = new TreeMap<>(playerState);
-        withClaimedRoute.put(currentPlayerId(), playerState(currentPlayerId()).withClaimedRoute(route, cards));
+        withClaimedRoute.put(currentPlayerId(), currentPlayerState().withClaimedRoute(route, cards));
 
         return new GameState(withClaimedRoute, lastPlayer(), tickets,
                 privateCardState.withMoreDiscardedCards(cards), currentPlayerId());
     }
+
 
     /**
      * Asks were the last turn will begin
@@ -287,4 +288,15 @@ public final class GameState extends PublicGameState {
         return new GameState(playerState, lastPlayer1, tickets,
                 privateCardState, currentPlayerId().next());
     }
+
+    public GameState withTradeDealMade(TradeDeal deal, PlayerId giver, PlayerId recipient) {
+        Map<PlayerId, PlayerState> newMap = new TreeMap<>();
+        newMap.put(currentPlayerId(), currentPlayerState().withTradeDealMade(deal, true));
+        PlayerId dealAcceptor = currentPlayerId().next();
+        newMap.put(dealAcceptor, playerState(dealAcceptor).withTradeDealMade(deal, false));
+
+        return new GameState(newMap, lastPlayer(), tickets, privateCardState, currentPlayerId());
+    }
+
+
 }

@@ -161,6 +161,16 @@ public final class Game {
                         receiveInfo(players, pInfo.get(currentPlayerId).didNotClaimRoute(chosenRoute));
                     }
                     break;
+                case TRADE:
+                    TradeDeal tradeDeal = currentPlayer.makeTradeOffer();
+                    boolean accepted = players.get(currentPlayerId.next()).acceptTradeOffer(tradeDeal);
+
+                    if(accepted){
+                        gameState = gameState.withTradeDealMade(tradeDeal, currentPlayerId, currentPlayerId.next());
+                    }
+                    updateState(players, gameState);
+                    //TODO: receiveInfo()...
+                    //TODO : do not do nextTurn()???
             }
 
             //ending condition

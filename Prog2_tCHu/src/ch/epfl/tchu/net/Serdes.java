@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  *
  * @author Eduardo Neville (314677)
  */
-public final class Serdes{
+public final class Serdes {
 
     /**
      * Integer serde
@@ -21,12 +21,22 @@ public final class Serdes{
             i -> Integer.toString(i),
             Integer::parseInt);
 
+    public static final Serde<Boolean> BOOLEAN_SERDE = Serde.of(
+            bool -> {
+                if(bool) return INTEGER_SERDE.serialize(1);
+                else return INTEGER_SERDE.serialize(0);
+            },
+            msg -> {
+                int res = INTEGER_SERDE.deserialize(msg);
+                return res == 1;
+            });
+
     /**
      * String serde
      */
     public static final Serde<String> STRING_SERDE = Serde.of(
             string -> Base64.getEncoder().encodeToString(string.getBytes(StandardCharsets.UTF_8)),
-            ((base64 -> new String(Base64.getDecoder().decode(base64),StandardCharsets.UTF_8)))
+            ((base64 -> new String(Base64.getDecoder().decode(base64), StandardCharsets.UTF_8)))
     );
 
     /**
@@ -102,6 +112,28 @@ public final class Serdes{
             });
 
     /**
+     * Trade Deal Serde
+     */
+    public static final Serde<TradeDeal> TRADE_DEAL_SERDE = Serde.of(
+            d -> String.format("%s;%s;%s;%s;%s;%s",
+                    ROUTE_SERDE.serialize(d.routeReceive()),
+                    SORTED_BAG_CARD_SERDE.serialize(d.cardsReceive()),
+                    TICKET_SERDE.serialize(d.ticketsReceive()),
+                    ROUTE_SERDE.serialize(d.routeGive()),
+                    SORTED_BAG_CARD_SERDE.serialize(d.cardsGive()),
+                    TICKET_SERDE.serialize(d.ticketsGive())),
+
+            d -> {
+                String[] a = d.split(Pattern.quote(";"), -1);
+                return new TradeDeal(ROUTE_SERDE.deserialize(a[0]),
+                        SORTED_BAG_CARD_SERDE.deserialize(a[2]),
+                        TICKET_SERDE.deserialize(a[1]),
+                        ROUTE_SERDE.deserialize(a[3]),
+                        SORTED_BAG_CARD_SERDE.deserialize(a[5]),
+                        TICKET_SERDE.deserialize(a[4]));
+            });
+
+    /**
      * Public card state serde
      */
     public static final Serde<ChatMessage> CHAT_MESSAGE_SERDE = Serde.of(
@@ -121,8 +153,8 @@ public final class Serdes{
      */
     public static final Serde<PublicPlayerState> PUBLIC_PLAYER_STATE_SERDE = Serde.of(
             object -> String.format("%s;%s;%s",
-                    INTEGER_SERDE.serialize(object.ticketCount()) ,
-                    INTEGER_SERDE.serialize(object.cardCount()) ,
+                    INTEGER_SERDE.serialize(object.ticketCount()),
+                    INTEGER_SERDE.serialize(object.cardCount()),
                     LIST_ROUTE_SERDE.serialize(object.routes())),
 
             object -> {
@@ -142,7 +174,7 @@ public final class Serdes{
                     LIST_ROUTE_SERDE.serialize(object.routes())),
 
             object -> {
-                String[] a = object.split(Pattern.quote(";"),-1);
+                String[] a = object.split(Pattern.quote(";"), -1);
 
                 return new PlayerState(SORTED_BAG_TICKET_SERDE.deserialize(a[0]),
                         SORTED_BAG_CARD_SERDE.deserialize(a[1]),
@@ -154,7 +186,7 @@ public final class Serdes{
      */
     public static final Serde<PublicGameState> PUBLIC_GAME_STATE_SERDE = Serde.of(
             object -> String.format("%s:%s:%s:%s:%s:%s",
-                    INTEGER_SERDE.serialize(object.ticketsCount()) ,
+                    INTEGER_SERDE.serialize(object.ticketsCount()),
                     PUBLIC_CARD_STATE_SERDE.serialize(object.cardState()),
                     PLAYER_ID_SERDE.serialize(object.currentPlayerId()),
                     PUBLIC_PLAYER_STATE_SERDE.serialize(object.playerState(PlayerId.PLAYER_1)),
@@ -162,8 +194,8 @@ public final class Serdes{
                     PLAYER_ID_SERDE.serialize(object.lastPlayer())),
 
             object -> {
-                String[] a = object.split(Pattern.quote(":"),-1);
-                Map<PlayerId,PublicPlayerState> playerStateMap = new EnumMap<>(PlayerId.class);
+                String[] a = object.split(Pattern.quote(":"), -1);
+                Map<PlayerId, PublicPlayerState> playerStateMap = new EnumMap<>(PlayerId.class);
                 playerStateMap.put(PlayerId.PLAYER_1, PUBLIC_PLAYER_STATE_SERDE.deserialize(a[3]));
                 playerStateMap.put(PlayerId.PLAYER_2, PUBLIC_PLAYER_STATE_SERDE.deserialize(a[4]));
                 PlayerId lastPlayer = (a[5].equals("")) ? null : PLAYER_ID_SERDE.deserialize(a[5]);
@@ -174,7 +206,6 @@ public final class Serdes{
                         playerStateMap,
                         lastPlayer);
             });
-
 
 
 }
