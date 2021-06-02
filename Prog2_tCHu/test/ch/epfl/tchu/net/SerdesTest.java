@@ -60,6 +60,20 @@ class SerdesTest {
     }
 
     @Test
+    void tradeTest(){
+         SortedBag<Card> cardsReceive = SortedBag.of(BLACK);
+         SortedBag<Card> cardsGive = SortedBag.of(RED);
+         Ticket ticketsReceive = ChMap.tickets().get(0);
+        Ticket ticketsGive = ChMap.tickets().get(1);
+         Route routeReceive = ChMap.routes().get(0);
+         Route routeGive = ChMap.routes().get(0);
+        TradeDeal d = new TradeDeal(routeReceive, cardsReceive, ticketsReceive, routeGive, cardsGive, ticketsGive);
+        TradeDeal d1 = Serdes.TRADE_DEAL_SERDE.deserialize(Serdes.TRADE_DEAL_SERDE.serialize(d));
+        assertEquals(d1.cardsGive(), d.cardsGive());
+        assertEquals(d1.routeGive(), d.routeGive());
+    }
+
+    @Test
     void chatMsgWorks(){
         ChatMessage msg = new ChatMessage("testing123", PLAYER_1);
         assertEquals("testing123", Serdes.CHAT_MESSAGE_SERDE.deserialize(Serdes.CHAT_MESSAGE_SERDE.serialize(msg)).message());

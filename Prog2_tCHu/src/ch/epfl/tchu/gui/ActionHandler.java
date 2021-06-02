@@ -50,6 +50,10 @@ public interface ActionHandler {
         void onDealOffer(TradeDeal tradeDeal);
     }
 
+    interface TradeDealMakerHandler{
+        void onTrade();
+    }
+
 
     interface ChatHandler{
         void onSend(ChatMessage message);

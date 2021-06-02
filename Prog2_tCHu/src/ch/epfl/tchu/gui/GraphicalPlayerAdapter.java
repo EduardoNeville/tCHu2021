@@ -26,6 +26,7 @@ public class GraphicalPlayerAdapter implements Player, ChatUser{
     private final ArrayBlockingQueue<TradeDeal> tradeDeals = new ArrayBlockingQueue<>(1);
     private final ArrayBlockingQueue<Route> routes = new ArrayBlockingQueue<>(1);
     private final ArrayBlockingQueue<Integer> deckSlot = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<Boolean> tradeAccept = new ArrayBlockingQueue<>(1);
     private ActionHandler.ChatHandler chatHandler;
 
     /**
@@ -93,7 +94,11 @@ public class GraphicalPlayerAdapter implements Player, ChatUser{
                 (route, cardDeck) ->{
                     turnKinds.add(TurnKind.CLAIM_ROUTE);
                     routes.add(route);
-                    sortedBagsCards.add(cardDeck);}));
+                    sortedBagsCards.add(cardDeck);},
+                tradeDeal -> {
+                    turnKinds.add(TurnKind.TRADE);
+                    tradeDeals.add(tradeDeal);
+                }));
         return blockingQ(turnKinds);
     }
 
@@ -155,13 +160,15 @@ public class GraphicalPlayerAdapter implements Player, ChatUser{
 
     @Override
     public TradeDeal makeTradeOffer() {
-        runLater( () -> graphicalPlayer.makeTradeDeal(tradeDeals::add));
+//        runLater( () -> graphicalPlayer.makeTradeDeal(tradeDeals::add));
+        System.out.println("waiting for deal");
         return blockingQ(tradeDeals);
     }
 
     @Override
     public boolean acceptTradeOffer(TradeDeal offer) {
-        return graphicalPlayer.acceptTradeDeal(offer);
+        runLater(() -> graphicalPlayer.acceptTradeDeal(offer, tradeAccept));
+        return blockingQ(tradeAccept);
     }
 
     @Override

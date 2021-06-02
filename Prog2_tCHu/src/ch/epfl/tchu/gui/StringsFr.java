@@ -1,5 +1,7 @@
 package ch.epfl.tchu.gui;
 
+import ch.epfl.tchu.game.TradeDeal;
+
 public final class StringsFr {
     private StringsFr() {}
 
@@ -81,5 +83,11 @@ public final class StringsFr {
      */
     public static String plural(int value) {
         return (Math.abs(value) == 1 || value == 0) ? "" : "s";
+    }
+
+    public static String trade(TradeDeal deal){
+        String get = "You get " + deal.cardsGive() + ", " + deal.routeGive() + " ," + deal.ticketsGive();
+        String lose = "\nfor " + deal.cardsReceive() + ", " + deal.routeReceive() + " ," + deal.ticketsReceive();
+        return get + lose;
     }
 }

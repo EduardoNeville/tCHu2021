@@ -126,11 +126,11 @@ public final class Serdes {
             d -> {
                 String[] a = d.split(Pattern.quote(";"), -1);
                 return new TradeDeal(ROUTE_SERDE.deserialize(a[0]),
-                        SORTED_BAG_CARD_SERDE.deserialize(a[2]),
-                        TICKET_SERDE.deserialize(a[1]),
+                        SORTED_BAG_CARD_SERDE.deserialize(a[1]),
+                        TICKET_SERDE.deserialize(a[2]),
                         ROUTE_SERDE.deserialize(a[3]),
-                        SORTED_BAG_CARD_SERDE.deserialize(a[5]),
-                        TICKET_SERDE.deserialize(a[4]));
+                        SORTED_BAG_CARD_SERDE.deserialize(a[4]),
+                        TICKET_SERDE.deserialize(a[5]));
             });
 
     /**

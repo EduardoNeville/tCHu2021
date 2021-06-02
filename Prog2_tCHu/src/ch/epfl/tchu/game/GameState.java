@@ -289,11 +289,10 @@ public final class GameState extends PublicGameState {
                 privateCardState, currentPlayerId().next());
     }
 
-    public GameState withTradeDealMade(TradeDeal deal, PlayerId giver, PlayerId recipient) {
+    public GameState withTradeDealMade(TradeDeal deal, PlayerId offered, PlayerId acceptor) {
         Map<PlayerId, PlayerState> newMap = new TreeMap<>();
-        newMap.put(currentPlayerId(), currentPlayerState().withTradeDealMade(deal, true));
-        PlayerId dealAcceptor = currentPlayerId().next();
-        newMap.put(dealAcceptor, playerState(dealAcceptor).withTradeDealMade(deal, false));
+        newMap.put(offered, playerState(offered).withTradeDealMade(deal, true));
+        newMap.put(acceptor, playerState(acceptor).withTradeDealMade(deal, false));
 
         return new GameState(newMap, lastPlayer(), tickets, privateCardState, currentPlayerId());
     }

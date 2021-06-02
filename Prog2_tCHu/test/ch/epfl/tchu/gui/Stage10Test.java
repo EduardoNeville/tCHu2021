@@ -76,6 +76,6 @@ public class Stage10Test extends Application {
                     p.receiveInfo(String.format("Je m'empare de %s avec %s", rn, cs));
                 };
 
-        p.startTurn(drawTicketsH, drawCardH, claimRouteH);
+        p.startTurn(drawTicketsH, drawCardH, claimRouteH, null);
     }
 }

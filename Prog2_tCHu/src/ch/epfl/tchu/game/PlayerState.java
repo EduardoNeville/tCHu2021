@@ -183,16 +183,30 @@ public class PlayerState extends PublicPlayerState {
         if(stateOfProposer){
             if(deal.routeReceive() != null) newRoutes.add(deal.routeReceive());
             if(deal.routeGive() != null) newRoutes.remove(deal.routeGive());
+            SortedBag<Ticket> t = deal.ticketsGive() == null ? tickets
+                    :tickets.difference(SortedBag.of(deal.ticketsGive()));
+            SortedBag<Ticket> t1 = deal.ticketsReceive() == null ? t:t.union(SortedBag.of(deal.ticketsReceive()));
+
+            SortedBag<Card> c = deal.cardsGive() == null ? cards
+                    :cards.difference(SortedBag.of(deal.cardsGive()));
+            SortedBag<Card> c1 = deal.cardsReceive() == null ? c:c.union(SortedBag.of(deal.cardsReceive()));
             return new PlayerState(
-                    tickets.difference(SortedBag.of(deal.ticketsGive())).union(SortedBag.of(deal.ticketsReceive())),
-                    cards.union(deal.cardsReceive()).difference(deal.cardsGive()),
+                    t1,
+                    c1,
                     newRoutes);
         } else {
             if(deal.routeGive() != null) newRoutes.add(deal.routeGive());
             if(deal.routeReceive() != null) newRoutes.remove(deal.routeReceive());
+            SortedBag<Ticket> t = deal.ticketsGive() == null ? tickets
+                    :tickets.union(SortedBag.of(deal.ticketsGive()));
+            SortedBag<Ticket> t1 = deal.ticketsReceive() == null ? t:t.difference(SortedBag.of(deal.ticketsReceive()));
+
+            SortedBag<Card> c = deal.cardsGive() == null ? cards
+                    :cards.union(SortedBag.of(deal.cardsGive()));
+            SortedBag<Card> c1 = deal.cardsReceive() == null ? c:c.difference(SortedBag.of(deal.cardsReceive()));
             return new PlayerState(
-                    tickets.union(SortedBag.of(deal.ticketsGive())).difference(SortedBag.of(deal.ticketsReceive())),
-                    cards.difference(deal.cardsReceive()).union(deal.cardsGive()),
+                    t1,
+                    c1,
                     newRoutes);
         }
 

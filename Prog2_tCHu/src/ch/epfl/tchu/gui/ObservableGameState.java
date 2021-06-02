@@ -33,6 +33,7 @@ public final class ObservableGameState {
     private final Map<PlayerId, IntegerProperty> playerConstructionPoints;// = new EnumMap(PlayerId.class);
 
     private final ObservableList<Ticket> playerTickets = FXCollections.observableArrayList();
+
     private final Map<Card, IntegerProperty> playerCardsCount = new EnumMap<>(Card.class);
     private final Map<Route,BooleanProperty> playerClaimableRoutes = new HashMap<>();
 
@@ -102,6 +103,8 @@ public final class ObservableGameState {
         currentPlayerState.tickets().forEach(t -> {
             if (!playerTickets.contains(t)) {
                 playerTickets.add(t);
+            } else if(!currentPlayerState.tickets().contains(t)){
+                playerTickets.remove(t);
             }
         });
         Card.ALL.forEach(c -> playerCardsCount.get(c).set(currentPlayerState.cards().countOf(c)));
@@ -155,6 +158,18 @@ public final class ObservableGameState {
         return routeOwners.get(route);
     }
 
+    public ObservableList<Route> getPlayerRoutes(PlayerId id){
+        ObservableList<Route> list = FXCollections.observableArrayList();
+        routeOwners.keySet().forEach( r -> {
+            if(routeOwners.get(r).getValue() != null &
+                    routeOwners.get(r).getValue() == id){
+                System.out.println(routeOwners.get(r).getValue());
+                list.add(r);
+            }
+        });
+        return FXCollections.unmodifiableObservableList(list);
+    }
+
     /**
      * Returns a read only property of the ticket count of the given player.
      * @param playerId player id of the player
@@ -205,6 +220,7 @@ public final class ObservableGameState {
      * @return a read only property of the card count of the given card of the associated player
      */
     public ReadOnlyIntegerProperty getPlayerCardsCount(Card card) {
+        if(card == null) return new SimpleIntegerProperty(0);
         return playerCardsCount.get(card);
     }
 
