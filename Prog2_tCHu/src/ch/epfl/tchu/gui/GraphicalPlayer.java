@@ -398,7 +398,7 @@ public class GraphicalPlayer {
                     oGameState.getPlayerTickets()) {
                 if(tradeDeal.ticketsReceive().compareTo(t) == 0)  hasTicket = true;
             }
-        }
+        } else hasTicket = true;
 
         System.out.println(hasCards + " " + hasTicket);
 
