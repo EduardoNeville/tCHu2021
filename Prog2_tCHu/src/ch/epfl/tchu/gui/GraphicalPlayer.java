@@ -330,7 +330,7 @@ public class GraphicalPlayer {
 
         TextField card2Amount = new TextField("1");
         card2Amount.textProperty().addListener((o, oV, nV) -> {
-            if (!oV.matches("[1-9]|| "))
+            if (!nV.matches("[1-9]|"))
                 card2Amount.textProperty().setValue(oV);
 
 
