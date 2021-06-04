@@ -4,14 +4,21 @@ import ch.epfl.tchu.SortedBag;
 import ch.epfl.tchu.game.Card;
 import ch.epfl.tchu.game.ChMap;
 import ch.epfl.tchu.game.Route;
+import ch.epfl.tchu.game.Station;
 import javafx.beans.property.ObjectProperty;
 import ch.epfl.tchu.gui.ActionHandler.*;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 
 import java.util.List;
 
@@ -65,6 +72,14 @@ class MapViewCreator {
         return routeGroup;
     }
 
+    private static Button stationGroup(Station station){
+        Button stationGroup = new Button();
+        stationGroup.getStyleClass().add("station");
+        stationGroup.setId("STATION_" + station.id());
+        stationGroup.setOnMouseClicked(e -> System.out.println("hey"));
+        return stationGroup;
+    }
+
     /**
      * Creates the map view part of the interface
      *
@@ -92,6 +107,7 @@ class MapViewCreator {
                     routeGroup.getStyleClass().add(o.getValue().name());
             });
 
+
             routeGroup.disableProperty().bind(
                     claimRouteHandlerObjectProperty.isNull().or(observableGameState.getPlayerClaimableRoute(r).not()));
 
@@ -103,9 +119,28 @@ class MapViewCreator {
                         chosenCards -> claimRouteH.onClaimRoute(r, chosenCards);
                 cardChooser.chooseCards(possibleClaimCards, chooseCardsH);
             });
-
         });
 
+        ChMap.stations().forEach(s -> {
+            Button stationGroup = stationGroup(s);
+            mapView.getChildren().add(stationGroup);
+
+            WebView webView = new WebView();
+            final WebEngine webEngine = webView.getEngine();
+            stationGroup.setOnMouseClicked(e ->{
+                webEngine.load("https://fr.wikipedia.org/wiki/" + s.name().replace(' ', '_'));
+
+                VBox root = new VBox();
+                // Add the WebView to the VBox
+                root.getChildren().add(webView);
+                Stage stage = new Stage();
+                Scene scene = new Scene(root);
+                // Add  the Scene to the Stage
+                stage.setScene(scene);
+                // Display the Stage
+                stage.show();
+            });
+        });
         return mapView;
     }
 
