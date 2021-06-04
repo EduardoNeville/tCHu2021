@@ -9,6 +9,7 @@ import java.util.Objects;
 
 import static ch.epfl.tchu.game.Constants.MAX_ROUTE_LENGTH;
 import static ch.epfl.tchu.game.Constants.MIN_ROUTE_LENGTH;
+import static ch.epfl.tchu.gui.StringsFr.EN_DASH_SEPARATOR;
 
 
 /**
@@ -215,6 +216,14 @@ public final class Route {
      */
     public Color color() {
         return color;
+    }
+
+
+    @Override
+    public String toString() {
+        return station1() +
+                EN_DASH_SEPARATOR +
+                station2();
     }
 
 }

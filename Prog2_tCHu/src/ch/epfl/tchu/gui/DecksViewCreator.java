@@ -88,7 +88,7 @@ class DecksViewCreator {
     public static VBox createCardsView(ObservableGameState observableGameState,
                                        ObjectProperty<ActionHandler.DrawTicketsHandler> drawTicketsHandlerObjectProperty,
                                        ObjectProperty<ActionHandler.DrawCardHandler> drawCardHandlerObjectProperty,
-                                       ActionHandler.TradeDealMakerHandler tradeDealMakerHandler){
+                                       ObjectProperty<ActionHandler.TradeDealMakerHandler> tradeDealMakerHandler){
         VBox faceUpCardVBox = new VBox();
 
         Button ticketsButton = sideButton(StringsFr.TICKETS,observableGameState.ticketAmountProperty());
@@ -121,9 +121,9 @@ class DecksViewCreator {
         drawCardHandlerObjectProperty.get().onDrawCard(Constants.DECK_SLOT));
         faceUpCardVBox.getChildren().add(cardButton);
 
-        Button tradeButton = sideButton(StringsFr.CARDS,observableGameState.cardAmountProperty());
-        tradeButton.getStyleClass().add("gauged");
-        tradeButton.setOnMouseClicked(e -> tradeDealMakerHandler.onTrade());
+        Button tradeButton = new Button("Echange");
+        tradeButton.disableProperty().bind(tradeDealMakerHandler.isNull());
+        tradeButton.setOnMouseClicked(e -> tradeDealMakerHandler.get().onTrade());
         faceUpCardVBox.getChildren().add(tradeButton);
 
         faceUpCardVBox.getStylesheets().addAll("decks.css", "colors.css");

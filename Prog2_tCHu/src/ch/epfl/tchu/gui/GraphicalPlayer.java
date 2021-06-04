@@ -12,6 +12,7 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -32,6 +33,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import static ch.epfl.tchu.gui.StringsFr.AND_SEPARATOR;
+import static ch.epfl.tchu.gui.StringsFr.EN_DASH_SEPARATOR;
 import static javafx.application.Platform.isFxApplicationThread;
 
 /**
@@ -51,6 +53,7 @@ public class GraphicalPlayer {
     private final ObjectProperty<DrawCardHandler> drawCardH = new SimpleObjectProperty<>();
     private final ObjectProperty<ClaimRouteHandler> claimRouteH = new SimpleObjectProperty<>();
     private final ObjectProperty<ChatHandler> chatHandlerH = new SimpleObjectProperty<>();
+    private final ObjectProperty<TradeDealMakerHandler> tradeDealMakerH = new SimpleObjectProperty<>();
     private final ObjectProperty<TradeDealHandler> tradeDealH = new SimpleObjectProperty<>();
 
 
@@ -69,11 +72,11 @@ public class GraphicalPlayer {
         this.primaryStage = new Stage();
         primaryStage.setTitle("tCHu — " + names.get(playerId));
         primaryStage.setScene(new Scene(new BorderPane()));
-
+            //() -> makeTradeDeal(tradeDealH.get())
         Node mapView = MapViewCreator
                 .createMapView(oGameState, claimRouteH, (this::chooseClaimCards));
         Node cardsView = DecksViewCreator
-                .createCardsView(oGameState, drawTicketH, drawCardH, () -> makeTradeDeal(tradeDealH.get()));
+                .createCardsView(oGameState, drawTicketH, drawCardH, tradeDealMakerH);
         Node handView = DecksViewCreator
                 .createHandView(oGameState);
 
@@ -140,6 +143,14 @@ public class GraphicalPlayer {
                 drawCardHandler.onDrawCard(slot);
             });
 
+        tradeDealMakerH.set(() -> {
+            drawTicketH.set(null);
+            drawCardH.set(null);
+            claimRouteH.set(null);
+            tradeDealMakerH.set(null);
+            makeTradeDeal(tradeDealH.get());
+        });
+
         tradeDealH.set(d -> {
             emptyHandlers();
             tradeDealHandler.onDealOffer(d);
@@ -159,6 +170,7 @@ public class GraphicalPlayer {
         drawCardH.set(null);
         claimRouteH.set(null);
         tradeDealH.set(null);
+        tradeDealMakerH.set(null);
     }
 
     /**
@@ -284,6 +296,7 @@ public class GraphicalPlayer {
         cards1G.getItems().add(null);
 
         TextField card1Amount = new TextField("1");
+        card1Amount.setMaxWidth(50);
 
         cards1G.valueProperty().addListener((o, oV, nV) -> {
             if (o.getValue() == null ||
@@ -292,7 +305,7 @@ public class GraphicalPlayer {
             } else canTradeCards.set(false);
         });
 
-        card1Amount.textProperty().addListener((o, oV, nV) -> {
+        card1Amount.textProperty().addListener((o, oV, nV) -> { //TODO listener in variable
             //regex for only 1-9 or nothing for easier writing
             if (!nV.matches("[1-9]|")) {
                 card1Amount.textProperty().setValue(oV);
@@ -301,7 +314,7 @@ public class GraphicalPlayer {
             } else canTradeCards.set(false); //if ""
         });
         card1Amount.disableProperty().bind(Bindings.isNull(cards1G.valueProperty()));
-
+        TextFlow cards1Parent = new TextFlow(card1Amount, new Separator(), cards1G);
 
         ChoiceBox<Ticket> ticketG = new ChoiceBox<>();
         ticketG.getItems().add(null);
@@ -310,7 +323,6 @@ public class GraphicalPlayer {
         ChoiceBox<Route> routesG = new ChoiceBox<>();
         routesG.getItems().add(null);
         routesG.getItems().addAll(oGameState.getPlayerRoutes(id));
-
 
         ChoiceBox<Card> cards1R = new ChoiceBox<>();
         cards1R.getItems().add(null);
@@ -325,6 +337,10 @@ public class GraphicalPlayer {
         });
         card2Amount.disableProperty().bind(Bindings.isNull(cards1R.valueProperty()));
 
+        TextFlow cards2Parent = new TextFlow(card2Amount,new Separator(), cards1R);
+        card2Amount.setMaxWidth(50);
+        cards2Parent.setPadding(new Insets(0, 20, 0, 100));
+        cards1Parent.setPadding(new Insets(0, 20, 0, 100));
 
         ChoiceBox<Ticket> ticketR = new ChoiceBox<>();
         SortedBag<Ticket> otherTickets = SortedBag.of(
@@ -348,7 +364,7 @@ public class GraphicalPlayer {
         .and(Bindings.isNull(ticketG.valueProperty())).and(Bindings.isNull(ticketR.valueProperty()))
         .and(Bindings.isNull(routesG.valueProperty())).and(Bindings.isNull(routesR.valueProperty())));
 
-        Button confirmButton = new Button("SALKDJHASKDHSAK CONFIRMER");
+        Button confirmButton = new Button("Confirmer"); //TODO adds stringsfr
         confirmButton.disableProperty().bind(correctDeal.not().or(allEmpty));
         confirmButton.setOnAction(a -> {
             choiceWindow.hide();
@@ -363,7 +379,7 @@ public class GraphicalPlayer {
             tradeDealH.get().onDealOffer(new TradeDeal( rR, cardsReceive, tR, rG, offered, tG));
         });
 
-        VBox VBox = new VBox(card1Amount, cards1G, ticketG, routesG, new Separator(), card2Amount, cards1R, ticketR, routesR, confirmButton);
+        VBox VBox = new VBox(cards1Parent, ticketG, routesG, new Separator(), cards2Parent, ticketR, routesR, confirmButton);
         Scene chooserScene = new Scene(VBox);
         chooserScene.getStylesheets().add("chooser.css");
 
@@ -495,6 +511,21 @@ public class GraphicalPlayer {
 
         @Override
         public SortedBag<Card> fromString(String s) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    private static class RouteConverter extends StringConverter<Route> {
+
+        @Override
+        public String toString(Route route) {
+            return route.station1() +
+                    EN_DASH_SEPARATOR +
+                    route.station2();
+        }
+
+        @Override
+        public Route fromString(String s) {
             throw new UnsupportedOperationException();
         }
     }
